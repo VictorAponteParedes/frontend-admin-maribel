@@ -382,6 +382,16 @@ export const StockEntryModal: React.FC = () => {
                 placeholder="DD/MM/AAAA"
               />
             </div>
+
+            <div>
+              <AppInput
+                label="N° de Lote / Proveedor"
+                value={batchNumber}
+                onChange={(e) => setBatchNumber(e.target.value)}
+                placeholder="LOT-2026-FRAG-B42"
+                className="font-mono uppercase"
+              />
+            </div>
           </div>
 
           {/* Tarjeta inferior de Proyección en Estantería y Costo Total en Guaraníes */}
