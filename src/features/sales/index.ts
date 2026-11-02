@@ -4,4 +4,6 @@ export * from './components/SaleTable';
 export * from './components/DetailedSalesTable';
 export * from './components/SaleFormModal';
 export * from './components/SaleDetailModal';
+export * from './components/SalesSkeleton';
+export * from './components/SaleDetailSkeleton';
 export * from './types/sale.types';

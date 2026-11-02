@@ -12,7 +12,7 @@ export const PrivateLayout: React.FC<PrivateLayoutProps> = ({ children }) => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-stone-100 text-stone-900 flex select-none">
+    <div className="min-h-screen bg-stone-100 text-stone-900 flex">
       <Sidebar />
       <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden p-8">
         <Suspense fallback={<LoadingSpinner message="Cargando módulo..." />}>
