@@ -45,17 +45,39 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
     }
   };
 
-  // Detención segura del escáner liberando recursos
-  const safeStopScanner = async (scanner: Html5Qrcode | null) => {
-    if (!scanner) return;
+  // Fuerza el apagado inmediato de las pistas de video (apaga la luz verde/cámara del hardware)
+  const killCameraTracks = () => {
     try {
-      if (scanner.isScanning) {
-        await scanner.stop();
-      }
-      scanner.clear();
+      const container = document.getElementById(scannerContainerId);
+      const videos = container ? container.querySelectorAll('video') : document.querySelectorAll('video');
+      videos.forEach((video) => {
+        const stream = video.srcObject as MediaStream | null;
+        if (stream && typeof stream.getTracks === 'function') {
+          stream.getTracks().forEach((track) => {
+            track.enabled = false;
+            track.stop();
+          });
+          video.srcObject = null;
+        }
+      });
     } catch {
-      // Evitar que errores como AbortError de HTML5 Video ensucien la consola
+      // Ignorar
     }
+  };
+
+  const safeStopScanner = async (scanner: Html5Qrcode | null) => {
+    killCameraTracks();
+    if (scanner) {
+      try {
+        if (scanner.isScanning) {
+          await scanner.stop();
+        }
+        scanner.clear();
+      } catch {
+        // Evitar que errores como AbortError de HTML5 Video ensucien la consola
+      }
+    }
+    killCameraTracks();
   };
 
   useEffect(() => {
@@ -76,6 +98,7 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
       try {
         if (scannerRef.current) {
           await safeStopScanner(scannerRef.current);
+          scannerRef.current = null;
         }
 
         if (!isMounted) return;
@@ -118,14 +141,14 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
             playBeep();
             setScannedCode(decodedText);
 
-            // Detener la cámara primero de forma limpia
+            // 1. Apagar hardware de cámara inmediatamente y liberar tracks
             await safeStopScanner(html5QrCode);
+            scannerRef.current = null;
 
+            // 2. Notificar código y cerrar modal
             if (isMounted) {
               onScan(decodedText, result);
-              setTimeout(() => {
-                onClose();
-              }, 300);
+              onClose();
             }
           },
           () => {
@@ -157,6 +180,9 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
       clearTimeout(timer);
       if (scannerRef.current) {
         safeStopScanner(scannerRef.current);
+        scannerRef.current = null;
+      } else {
+        killCameraTracks();
       }
     };
   }, [isOpen, onClose, onScan]);
@@ -164,6 +190,7 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({
   const handleStopAndClose = async () => {
     isStoppingRef.current = true;
     await safeStopScanner(scannerRef.current);
+    scannerRef.current = null;
     onClose();
   };
 
