@@ -2,10 +2,13 @@ import React, { InputHTMLAttributes, forwardRef } from 'react';
 
 export interface AppInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  labelClassName?: string;
+  containerClassName?: string;
   error?: string;
   helperText?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  onRightIconClick?: () => void;
   rightElement?: React.ReactNode;
   prefixText?: string;
 }
@@ -14,10 +17,13 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
   (
     {
       label,
+      labelClassName = '',
+      containerClassName = '',
       error,
       helperText,
       leftIcon,
       rightIcon,
+      onRightIconClick,
       rightElement,
       prefixText,
       className = '',
@@ -29,11 +35,11 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
     const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
     return (
-      <div className="w-full flex flex-col space-y-1">
+      <div className={`w-full flex flex-col space-y-1.5 ${containerClassName}`}>
         {label && (
           <label
             htmlFor={inputId}
-            className="text-xs font-semibold text-stone-700 tracking-wide flex items-center justify-between"
+            className={`text-xs font-semibold text-stone-700 tracking-wide flex items-center justify-between ${labelClassName}`}
           >
             <span>{label}</span>
           </label>
@@ -41,7 +47,7 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
 
         <div className="relative flex items-center">
           {leftIcon && (
-            <div className="absolute left-3 text-stone-400 pointer-events-none flex items-center">
+            <div className="absolute left-3.5 text-stone-400 pointer-events-none flex items-center">
               {leftIcon}
             </div>
           )}
@@ -57,7 +63,7 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
             ref={ref}
             className={`w-full text-xs rounded-xl border bg-white py-2.5 transition-all focus:outline-none focus:ring-2 ${
               leftIcon
-                ? 'pl-9'
+                ? 'pl-10'
                 : prefixText
                 ? 'pl-11'
                 : 'px-3.5'
@@ -65,20 +71,31 @@ export const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
               rightElement
                 ? 'pr-28'
                 : rightIcon
-                ? 'pr-9'
+                ? 'pr-10'
                 : 'pr-3.5'
             } ${
               error
                 ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-200 text-rose-900'
-                : 'border-stone-300 focus:border-maribel-600 focus:ring-maribel-100 text-stone-900'
+                : 'border-stone-200 focus:border-maribel-600 focus:ring-maribel-100 text-stone-900'
             } ${className}`}
             {...rest}
           />
 
           {rightIcon && !rightElement && (
-            <div className="absolute right-3 text-stone-400 pointer-events-none flex items-center">
-              {rightIcon}
-            </div>
+            onRightIconClick ? (
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={onRightIconClick}
+                className="absolute right-3 text-stone-400 hover:text-stone-700 transition-colors flex items-center justify-center p-1 cursor-pointer focus:outline-none"
+              >
+                {rightIcon}
+              </button>
+            ) : (
+              <div className="absolute right-3.5 text-stone-400 pointer-events-none flex items-center">
+                {rightIcon}
+              </div>
+            )
           )}
 
           {rightElement && (

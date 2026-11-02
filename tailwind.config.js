@@ -8,6 +8,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Montserrat', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'Cambria', 'serif'],
       },
       colors: {
         maribel: {
