@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { APP_STORAGE_KEYS } from '@/config/constants';
+import { create } from "zustand";
+import { APP_STORAGE_KEYS } from "@/config/constants";
 
-export type UserRole = 'ADMIN' | 'MANAGER' | 'STAFF';
+export type UserRole = "ADMIN" | "MANAGER" | "STAFF";
 
 export interface AuthUser {
   id: string;
@@ -23,13 +23,14 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: {
-    id: 'admin-01',
-    email: 'admin@maribelregalos.com',
-    fullName: 'Maribel Admin',
-    role: 'ADMIN',
-    permissions: ['*'], // Super Admin wildcard
+    id: "admin-01",
+    email: "admin@maribelregalos.com",
+    fullName: "Maribel Admin",
+    role: "ADMIN",
+    permissions: ["*"], // Super Admin wildcard
   },
-  token: localStorage.getItem(APP_STORAGE_KEYS.AUTH_TOKEN) || 'demo-admin-token',
+  token:
+    localStorage.getItem(APP_STORAGE_KEYS.AUTH_TOKEN) || "demo-admin-token",
   isAuthenticated: true,
   initAuth: () => {
     const token = localStorage.getItem(APP_STORAGE_KEYS.AUTH_TOKEN);
@@ -49,7 +50,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   hasPermission: (permission: string) => {
     const user = get().user;
     if (!user) return false;
-    if (user.role === 'ADMIN' || user.permissions.includes('*')) return true;
+    if (user.role === "ADMIN" || user.permissions.includes("*")) return true;
     return user.permissions.includes(permission);
   },
 }));

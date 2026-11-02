@@ -1,17 +1,21 @@
 import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { LoadingSpinner } from '../components/ui';
-import { ProtectedRoute } from './ProtectedRoute';
-import { AUTH_ROUTES } from '../features/auth/routes';
-import { DASHBOARD_ROUTES } from '../features/dashboard/routes';
-import { PRODUCTS_ROUTES } from '../features/products/routes';
-import { RoutesView } from './routes';
-import type { RouteConfig } from './types';
+import { LoadingSpinner } from '@/components/ui';
+import { ProtectedRoute } from '@/navigation/ProtectedRoute';
+import { AUTH_ROUTES } from '@/features/auth/routes';
+import { DASHBOARD_ROUTES } from '@/features/dashboard/routes';
+import { PRODUCTS_ROUTES } from '@/features/products/routes';
+import { SALES_ROUTES } from '@/features/sales/routes';
+import { CUSTOMERS_ROUTES } from '@/features/customers/routes';
+import { RoutesView } from '@/navigation/routes';
+import type { RouteConfig } from '@/navigation/types';
 
 export const ALL_APP_ROUTES: RouteConfig[] = [
   ...AUTH_ROUTES,
   ...DASHBOARD_ROUTES,
+  ...SALES_ROUTES,
   ...PRODUCTS_ROUTES,
+  ...CUSTOMERS_ROUTES,
 ];
 
 export const AppRoutes: React.FC = () => {

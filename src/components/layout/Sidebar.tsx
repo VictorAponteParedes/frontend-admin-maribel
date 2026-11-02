@@ -2,33 +2,44 @@ import React from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import {
   LayoutDashboard,
+  ShoppingBag,
+  PlusCircle,
   Package,
-  ShoppingCart,
   Users,
   Settings,
   LogOut,
 } from 'lucide-react';
-import { useAuthStore } from '../../store/useAuthStore';
-import { RoutesView } from '../../navigation/routes';
-import { t } from '../../lang';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useSalesStore } from '@/store/useSalesStore';
+import { RoutesView } from '@/navigation/routes';
+import { t } from '@/lang';
 
 export const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-
-  const navItems = [
-    { path: RoutesView.DASHBOARD, label: t('nav.dashboard'), icon: LayoutDashboard },
-    { path: RoutesView.PRODUCTS, label: t('nav.products'), icon: Package },
-    { path: RoutesView.ORDERS, label: t('nav.orders'), icon: ShoppingCart },
-    { path: RoutesView.USERS, label: t('nav.users'), icon: Users },
-    { path: RoutesView.SETTINGS, label: t('nav.settings'), icon: Settings },
-  ];
+  const { openCreateModal } = useSalesStore();
 
   const handleLogout = () => {
     logout();
     navigate(RoutesView.LOGIN);
   };
+
+  const handleQuickSale = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (location.pathname !== RoutesView.SALES) {
+      navigate(RoutesView.SALES);
+    }
+    openCreateModal();
+  };
+
+  const isSalesActive =
+    location.pathname === RoutesView.SALES ||
+    location.pathname.startsWith(`${RoutesView.SALES}/`);
+
+  const isProductsActive =
+    location.pathname === RoutesView.PRODUCTS ||
+    location.pathname.startsWith(`${RoutesView.PRODUCTS}/`);
 
   return (
     <aside className="w-64 bg-stone-900 text-stone-200 flex flex-col h-screen sticky top-0 border-r border-stone-800 select-none shrink-0">
@@ -52,27 +63,91 @@ export const Sidebar: React.FC = () => {
       </Link>
 
       <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+        {/* 1. Dashboard */}
+        <Link
+          to={RoutesView.DASHBOARD}
+          className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+            location.pathname === RoutesView.DASHBOARD
+              ? 'bg-maribel-700 text-white shadow-xs'
+              : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
+          }`}
+        >
+          <LayoutDashboard className="w-4 h-4" />
+          <span>{t('nav.dashboard')}</span>
+        </Link>
 
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
-                isActive
-                  ? 'bg-maribel-700 text-white shadow-xs'
-                  : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
-              }`}
+        {/* 2. Ventas Grupo */}
+        <div className="pt-2">
+          <Link
+            to={RoutesView.SALES}
+            className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+              isSalesActive
+                ? 'bg-maribel-700 text-white shadow-xs'
+                : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
+            }`}
+          >
+            <div className="flex items-center space-x-3">
+              <ShoppingBag className="w-4 h-4" />
+              <span>{t('nav.sales')}</span>
+            </div>
+          </Link>
+
+          {/* Sub-item: Cargar Venta rápida */}
+          <div className="pl-4 pr-1 pt-1">
+            <button
+              type="button"
+              onClick={handleQuickSale}
+              className="w-full flex items-center space-x-2.5 px-3 py-1.5 rounded-lg text-[11px] font-medium text-maribel-300 hover:text-white hover:bg-stone-800/70 transition-colors"
             >
-              <Icon className="w-4 h-4" />
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
+              <PlusCircle className="w-3.5 h-3.5 text-maribel-400" />
+              <span>{t('nav.newSale')}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 3. Inventario / Stock */}
+        <div className="pt-2">
+          <Link
+            to={RoutesView.PRODUCTS}
+            className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+              isProductsActive
+                ? 'bg-maribel-700 text-white shadow-xs'
+                : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
+            }`}
+          >
+            <Package className="w-4 h-4" />
+            <span>{t('nav.inventory')}</span>
+          </Link>
+        </div>
+
+        {/* 4. Clientes */}
+        <Link
+          to={RoutesView.CUSTOMERS}
+          className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+            location.pathname === RoutesView.CUSTOMERS
+              ? 'bg-maribel-700 text-white shadow-xs'
+              : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>{t('nav.customers')}</span>
+        </Link>
+
+        {/* 5. Configuración */}
+        <Link
+          to={RoutesView.SETTINGS}
+          className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+            location.pathname === RoutesView.SETTINGS
+              ? 'bg-maribel-700 text-white shadow-xs'
+              : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
+          }`}
+        >
+          <Settings className="w-4 h-4" />
+          <span>{t('nav.settings')}</span>
+        </Link>
       </nav>
 
+      {/* Perfil del usuario autenticado */}
       <div className="p-4 border-t border-stone-800 bg-stone-950/40">
         <div className="flex items-center justify-between">
           <div className="truncate pr-2">

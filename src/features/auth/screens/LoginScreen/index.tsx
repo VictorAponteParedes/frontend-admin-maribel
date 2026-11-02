@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuthStore } from '@/store/useAuthStore';
 import { Button, ControlledInput } from '@/components/ui';
 import { RoutesView } from '@/navigation/routes';
@@ -36,7 +37,12 @@ export const LoginScreen: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-stone-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl p-8 shadow-md border border-stone-200/80 max-w-md w-full space-y-6">
+      <motion.div
+        initial={{ opacity: 0, x: -30 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="bg-white rounded-3xl p-8 shadow-md border border-stone-200/80 max-w-md w-full space-y-6"
+      >
         <div className="text-center space-y-2">
           <img
             src="/logo-maribel.png"
@@ -88,7 +94,7 @@ export const LoginScreen: React.FC = () => {
             Iniciar Sesión
           </Button>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };

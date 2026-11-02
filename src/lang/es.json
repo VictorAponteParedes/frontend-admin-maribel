@@ -10,13 +10,15 @@
     "status": "Estado",
     "actions": "Acciones",
     "active": "Activo",
-    "inactive": "Inactivo"
+    "inactive": "Inactivo",
+    "filter": "Filtrar"
   },
   "nav": {
     "dashboard": "Dashboard",
-    "products": "Inventario Perfumes",
-    "orders": "Pedidos",
-    "users": "Usuarios & Roles",
+    "sales": "Ventas",
+    "newSale": "Cargar Venta",
+    "inventory": "Inventario / Stock",
+    "customers": "Clientes",
     "settings": "Configuración",
     "logout": "Cerrar sesión"
   },
@@ -24,26 +26,59 @@
     "title": "Panel de Control",
     "subtitle": "Gestión general de Maribel Tienda de Regalos",
     "monthlySales": "Ventas del Mes",
-    "activeOrders": "Pedidos Activos",
-    "totalProducts": "Total Perfumes",
+    "activeOrders": "Ventas del Día",
+    "totalProducts": "Total en Catálogo",
     "lowStock": "Stock Crítico"
   },
-  "products": {
-    "title": "Inventario de Fragancias",
-    "subtitle": "Control de existencias, precios y estados",
-    "newProduct": "Nuevo Perfume",
-    "name": "Nombre",
+  "inventory": {
+    "title": "Inventario & Existencias",
+    "subtitle": "Control unificado de códigos de barras, marcas, medidas y saldos",
+    "barcode": "Código de barras",
     "brand": "Marca",
-    "category": "Categoría",
-    "price": "Precio",
-    "stock": "Stock",
-    "description": "Descripción",
+    "description": "Descripción del producto",
+    "size": "Medida",
+    "totalIn": "Ingreso",
+    "totalSold": "Venta",
+    "stock": "Saldo Inventario",
+    "price": "Precio Venta",
+    "newProduct": "Nuevo Producto",
     "units": "uds"
+  },
+  "sales": {
+    "title": "Ventas Realizadas",
+    "subtitle": "Historial de ventas y consulta detallada de productos",
+    "newSale": "Cargar Venta",
+    "saleNumber": "N° Venta",
+    "date": "Fecha",
+    "customer": "Cliente",
+    "itemsCount": "Artículos",
+    "total": "Total",
+    "viewDetail": "Ver detalle",
+    "saleDetail": "Detalle de Venta",
+    "scanBarcode": "Código de barras (escanear o buscar)",
+    "quantity": "Cantidad a vender",
+    "customerCode": "Código de cliente",
+    "customerName": "Nombre del cliente",
+    "customerDefault": "Consumidor Final",
+    "selectProduct": "Selecciona un producto por código o nombre",
+    "stockAvailable": "Stock actual",
+    "saleSaved": "Venta registrada y stock actualizado con éxito"
+  },
+  "customers": {
+    "title": "Directorio de Clientes",
+    "subtitle": "Base de datos de compradores frecuentes y su historial",
+    "code": "Código",
+    "name": "Nombre completo",
+    "phone": "Teléfono",
+    "email": "Correo",
+    "totalPurchases": "Total Compras",
+    "newCustomer": "Nuevo Cliente"
   },
   "validation": {
     "required": "Este campo es obligatorio",
     "invalidEmail": "Ingresa un correo electrónico válido",
     "minPrice": "El precio debe ser mayor a 0",
-    "minStock": "El stock no puede ser negativo"
+    "minStock": "El stock no puede ser negativo",
+    "insufficientStock": "La cantidad supera el saldo en inventario"
   }
 }

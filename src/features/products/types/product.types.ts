@@ -1,19 +1,21 @@
 export interface Product {
   id: string;
-  name: string;
-  brand: string;
-  category: string;
-  price: number;
-  stock: number;
-  description: string;
+  barcode: string;         // Código de barras
+  brand: string;           // Marca del producto
+  name: string;            // Descripción del producto
+  size: string;            // Medida (ej: 85 ml / 2.9 fl. oz)
+  totalIn: number;         // Ingreso acumulado
+  totalSold: number;       // Venta acumulada
+  stock: number;           // Saldo Inventario
+  price: number;           // Precio venta
   isActive: boolean;
 }
 
 export interface ProductFormData {
-  name: string;
+  barcode: string;
   brand: string;
-  category: string;
+  name: string;
+  size: string;
   price: number;
-  stock: number;
-  description: string;
+  totalIn: number;
 }

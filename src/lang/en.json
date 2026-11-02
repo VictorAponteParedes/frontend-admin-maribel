@@ -10,13 +10,15 @@
     "status": "Status",
     "actions": "Actions",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "filter": "Filter"
   },
   "nav": {
     "dashboard": "Dashboard",
-    "products": "Perfume Inventory",
-    "orders": "Orders",
-    "users": "Users & Roles",
+    "sales": "Sales",
+    "newSale": "New Sale",
+    "inventory": "Inventory / Stock",
+    "customers": "Customers",
     "settings": "Settings",
     "logout": "Log out"
   },
@@ -24,26 +26,59 @@
     "title": "Control Panel",
     "subtitle": "General management of Maribel Gift Shop",
     "monthlySales": "Monthly Sales",
-    "activeOrders": "Active Orders",
-    "totalProducts": "Total Perfumes",
+    "activeOrders": "Today's Sales",
+    "totalProducts": "Catalog Products",
     "lowStock": "Low Stock"
   },
-  "products": {
-    "title": "Fragrance Inventory",
-    "subtitle": "Stock, price, and status monitoring",
-    "newProduct": "New Perfume",
-    "name": "Name",
+  "inventory": {
+    "title": "Inventory & Stock",
+    "subtitle": "Unified tracking for barcodes, brands, sizes, and stock balances",
+    "barcode": "Barcode",
     "brand": "Brand",
-    "category": "Category",
-    "price": "Price",
-    "stock": "Stock",
-    "description": "Description",
+    "description": "Product Description",
+    "size": "Size",
+    "totalIn": "Ingress",
+    "totalSold": "Sold",
+    "stock": "Inventory Balance",
+    "price": "Sale Price",
+    "newProduct": "New Product",
     "units": "units"
+  },
+  "sales": {
+    "title": "Recorded Sales",
+    "subtitle": "Transaction history and detailed breakdown",
+    "newSale": "New Sale",
+    "saleNumber": "Sale #",
+    "date": "Date",
+    "customer": "Customer",
+    "itemsCount": "Items",
+    "total": "Total",
+    "viewDetail": "View detail",
+    "saleDetail": "Sale Details",
+    "scanBarcode": "Barcode (scan or search)",
+    "quantity": "Quantity to sell",
+    "customerCode": "Customer Code",
+    "customerName": "Customer Name",
+    "customerDefault": "Walk-in Customer",
+    "selectProduct": "Select a product by barcode or description",
+    "stockAvailable": "Current stock",
+    "saleSaved": "Sale recorded and stock updated successfully"
+  },
+  "customers": {
+    "title": "Customer Directory",
+    "subtitle": "Customer records and purchase history",
+    "code": "Code",
+    "name": "Full Name",
+    "phone": "Phone",
+    "email": "Email",
+    "totalPurchases": "Total Purchases",
+    "newCustomer": "New Customer"
   },
   "validation": {
     "required": "This field is required",
     "invalidEmail": "Please enter a valid email",
     "minPrice": "Price must be greater than 0",
-    "minStock": "Stock cannot be negative"
+    "minStock": "Stock cannot be negative",
+    "insufficientStock": "Quantity exceeds available inventory balance"
   }
 }
