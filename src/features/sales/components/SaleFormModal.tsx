@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useInventoryStore } from '@/store/useInventoryStore';
 import { useSalesStore } from '@/store/useSalesStore';
+import { useCustomerStore } from '@/store/useCustomerStore';
 import { Sale } from '@/features/sales/types/sale.types';
 import { formatCurrency } from '@/utils/formatters';
 import { t } from '@/lang';
@@ -10,6 +11,7 @@ import { Button } from '@/components/ui';
 export const SaleFormModal: React.FC = () => {
   const { isCreateModalOpen, closeCreateModal, addSale } = useSalesStore();
   const { products, getByBarcode, deductStock } = useInventoryStore();
+  const { customers } = useCustomerStore();
 
   const [barcodeInput, setBarcodeInput] = useState('');
   const [quantity, setQuantity] = useState<number>(1);
@@ -246,13 +248,26 @@ export const SaleFormModal: React.FC = () => {
               <label className="block text-xs font-semibold text-stone-700 mb-1">
                 {t('sales.customerName')}
               </label>
-              <input
-                type="text"
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                placeholder="Consumidor Final"
-                className="w-full px-3 py-2 text-xs bg-stone-50 border border-stone-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-maribel-600"
-              />
+              <div className="flex space-x-1.5">
+                <select
+                  value={customerName}
+                  onChange={(e) => {
+                    const selected = customers.find((c) => c.name === e.target.value);
+                    setCustomerName(e.target.value);
+                    if (selected) {
+                      setCustomerCode(String(selected.code));
+                    }
+                  }}
+                  className="w-full px-3 py-2 text-xs bg-stone-50 border border-stone-200 rounded-xl focus:bg-white focus:outline-none focus:ring-1 focus:ring-maribel-600 truncate"
+                >
+                  <option value="Cliente casual">Cliente casual (Mostrador)</option>
+                  {customers.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      #{c.code} - {c.name} ({c.address})
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 

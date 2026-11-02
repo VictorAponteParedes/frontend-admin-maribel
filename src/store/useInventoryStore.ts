@@ -5,6 +5,7 @@ export interface InventoryState {
   products: Product[];
   addProduct: (productData: ProductFormData) => void;
   deductStock: (barcode: string, quantity: number) => boolean;
+  addIncomingStock: (barcode: string, quantity: number) => boolean;
   getByBarcode: (barcode: string) => Product | undefined;
 }
 
@@ -201,6 +202,30 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
           return {
             ...item,
             totalSold: newSold,
+            stock: newStock,
+          };
+        }
+        return item;
+      }),
+    }));
+    return true;
+  },
+
+  addIncomingStock: (barcode: string, quantity: number): boolean => {
+    const { products } = get();
+    const product = products.find((p) => p.barcode === barcode);
+    if (!product) {
+      return false;
+    }
+
+    set((state) => ({
+      products: state.products.map((item) => {
+        if (item.barcode === barcode) {
+          const newIn = item.totalIn + quantity;
+          const newStock = item.stock + quantity;
+          return {
+            ...item,
+            totalIn: newIn,
             stock: newStock,
           };
         }

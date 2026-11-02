@@ -42,7 +42,16 @@
     "stock": "Inventory Balance",
     "price": "Sale Price",
     "newProduct": "New Product",
-    "units": "units"
+    "units": "units",
+    "tabStock": "Stock Balances",
+    "tabEntries": "Stock Entries History",
+    "newEntry": "Receive Stock",
+    "entryModalTitle": "Incoming Stock Entry",
+    "entryModalSubtitle": "Record incoming shipment and increase inventory stock balance",
+    "unitCost": "Unit cost",
+    "totalCost": "Total cost",
+    "receivedQty": "Received quantity",
+    "entrySaved": "Stock entry recorded and inventory balance updated successfully"
   },
   "sales": {
     "title": "Recorded Sales",

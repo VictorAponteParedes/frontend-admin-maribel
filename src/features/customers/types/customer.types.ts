@@ -1,8 +1,16 @@
 export interface Customer {
   id: string;
-  code: string;
+  code: number;
+  registrationDate: string;
   name: string;
   phone: string;
-  email: string;
-  totalPurchases: number;
+  address: string;
+  gpsUrl?: string;
+}
+
+export interface CustomerFormData {
+  name: string;
+  phone: string;
+  address: string;
+  gpsUrl?: string;
 }
