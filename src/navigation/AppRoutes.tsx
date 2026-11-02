@@ -6,6 +6,7 @@ import { AUTH_ROUTES } from '@/features/auth/routes';
 import { DASHBOARD_ROUTES } from '@/features/dashboard/routes';
 import { PRODUCTS_ROUTES } from '@/features/products/routes';
 import { SALES_ROUTES } from '@/features/sales/routes';
+import { ORDERS_ROUTES } from '@/features/orders/routes';
 import { CUSTOMERS_ROUTES } from '@/features/customers/routes';
 import { RoutesView } from '@/navigation/routes';
 import type { RouteConfig } from '@/navigation/types';
@@ -14,6 +15,7 @@ export const ALL_APP_ROUTES: RouteConfig[] = [
   ...AUTH_ROUTES,
   ...DASHBOARD_ROUTES,
   ...SALES_ROUTES,
+  ...ORDERS_ROUTES,
   ...PRODUCTS_ROUTES,
   ...CUSTOMERS_ROUTES,
 ];

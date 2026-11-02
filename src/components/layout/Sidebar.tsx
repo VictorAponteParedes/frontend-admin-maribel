@@ -3,12 +3,14 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import {
   LayoutDashboard,
   ShoppingBag,
+  Truck,
   Package,
   Users,
   Settings,
   LogOut,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useOrdersStore } from '@/store/useOrdersStore';
 import { RoutesView } from '@/navigation/routes';
 import { t } from '@/lang';
 import { logoAdmin } from '@/assets';
@@ -17,6 +19,9 @@ export const Sidebar: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
+  const { orders } = useOrdersStore();
+
+  const pendingOrdersCount = orders.filter((o) => o.status === 'PENDING').length;
 
   const handleLogout = () => {
     logout();
@@ -37,6 +42,15 @@ export const Sidebar: React.FC = () => {
       isActive:
         location.pathname === RoutesView.SALES ||
         location.pathname.startsWith(`${RoutesView.SALES}/`),
+    },
+    {
+      path: RoutesView.ORDERS,
+      label: t('nav.orders'),
+      icon: Truck,
+      badge: pendingOrdersCount > 0 ? pendingOrdersCount : undefined,
+      isActive:
+        location.pathname === RoutesView.ORDERS ||
+        location.pathname.startsWith(`${RoutesView.ORDERS}/`),
     },
     {
       path: RoutesView.PRODUCTS,
@@ -92,14 +106,21 @@ export const Sidebar: React.FC = () => {
             <Link
               key={item.path}
               to={item.path}
-              className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-colors ${
                 item.isActive
                   ? 'bg-maribel-700 text-white shadow-xs'
                   : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
               }`}
             >
-              <Icon className="w-4 h-4" />
-              <span>{item.label}</span>
+              <div className="flex items-center space-x-3">
+                <Icon className="w-4 h-4" />
+                <span>{item.label}</span>
+              </div>
+              {item.badge !== undefined && item.badge > 0 && (
+                <span className="bg-amber-500 text-stone-900 font-bold text-[10px] px-1.5 py-0.5 rounded-full">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           );
         })}
