@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "../../../frontend-tienda"
+		},
+		{
+			"path": "../../../backend"
+		},
+		{
+			"path": "../.."
+		}
+	],
+	"settings": {}
+}
