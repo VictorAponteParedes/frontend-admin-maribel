@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { TrendingUp } from 'lucide-react';
 import { RevenueEvolutionData, RevenuePoint } from '@/features/dashboard/types/dashboard.types';
+import { useTranslation } from '@/locale';
 
 export interface RevenueEvolutionChartProps {
   data: RevenueEvolutionData;
 }
 
 export const RevenueEvolutionChart: React.FC<RevenueEvolutionChartProps> = ({ data }) => {
-  const { points, peakDay, currencyBadge, currentPeriodLabel, previousPeriodLabel, lastUpdatedText } = data;
+  const { t } = useTranslation('dashboard');
+  const { points, peakDay, currencyBadge } = data;
+
+  const currentPeriodLabel = data.currentPeriodLabel || t('revenueEvolution.currentPeriod');
+  const previousPeriodLabel = data.previousPeriodLabel || t('revenueEvolution.previousPeriod');
+  const lastUpdatedText = data.lastUpdatedText || t('revenueEvolution.lastUpdated', { time: '3 min' });
 
   // Find index of the peak or default to 4 (pico)
   const defaultHoverIndex = points.findIndex((p) => p.isPeak);
@@ -65,6 +71,31 @@ export const RevenueEvolutionChart: React.FC<RevenueEvolutionChartProps> = ({ da
   const activePoint: RevenuePoint = points[hoveredIndex] || points[defaultHoverIndex];
   const activeCoord = currentPts[hoveredIndex] || currentPts[defaultHoverIndex];
 
+  const getPointFullDate = (p: RevenuePoint) => {
+    if (p.dayKey && p.dayNumber && p.monthKey) {
+      const dayName = t(`revenueEvolution.days.${p.dayKey}`);
+      const monthName = t(`revenueEvolution.months.${p.monthKey}`);
+      return `${dayName}, ${p.dayNumber} ${monthName}`;
+    }
+    return p.fullDate;
+  };
+
+  const getPointChange = (p: RevenuePoint) => {
+    if (p.changePercent) {
+      return t('revenueEvolution.vsWeeklyAvg', { percent: p.changePercent });
+    }
+    return p.changeVsAvg;
+  };
+
+  const getPointDayLabel = (p: RevenuePoint) => {
+    if (p.dayNumber && p.monthKey) {
+      const monthName = t(`revenueEvolution.months.${p.monthKey}`);
+      const peakTag = p.isPeak ? ` (${t('revenueEvolution.peakTag')})` : '';
+      return `${p.dayNumber} ${monthName}${peakTag}`;
+    }
+    return p.dayLabel;
+  };
+
   return (
     <div className="bg-white rounded-3xl p-6 sm:p-7 border border-neutral-100 shadow-sm flex flex-col justify-between transition-all duration-200">
       {/* Top Header */}
@@ -72,14 +103,14 @@ export const RevenueEvolutionChart: React.FC<RevenueEvolutionChartProps> = ({ da
         <div>
           <div className="flex items-center gap-2.5">
             <h2 className="text-xl font-bold text-neutral-900 tracking-tight font-sans">
-              Evolución de Ingresos & Ventas
+              {t('revenueEvolution.title')}
             </h2>
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#fff1f2] text-[#880E2B] border border-[#fecdd3]">
               {currencyBadge}
             </span>
           </div>
           <p className="text-xs text-neutral-400 mt-1">
-            Comparativa del período actual vs. período anterior
+            {t('revenueEvolution.subtitle')}
           </p>
         </div>
 
@@ -109,7 +140,7 @@ export const RevenueEvolutionChart: React.FC<RevenueEvolutionChartProps> = ({ da
           >
             <div className="bg-[#18181b] text-white px-3.5 py-2.5 rounded-2xl shadow-2xl border border-neutral-800 text-left min-w-[170px]">
               <p className="text-[11px] font-medium text-neutral-300">
-                {activePoint.fullDate}
+                {getPointFullDate(activePoint)}
               </p>
               <div className="flex items-center gap-2 mt-1">
                 <span className="w-2 h-2 rounded-full bg-[#e11d48]" />
@@ -117,10 +148,10 @@ export const RevenueEvolutionChart: React.FC<RevenueEvolutionChartProps> = ({ da
                   {formatCurrency(activePoint.current)}
                 </span>
               </div>
-              {activePoint.changeVsAvg && (
+              {getPointChange(activePoint) && (
                 <div className="mt-1">
                   <span className="inline-block text-[10px] font-semibold text-emerald-400 bg-emerald-950/70 border border-emerald-800/40 px-2 py-0.5 rounded-full">
-                    {activePoint.changeVsAvg}
+                    {getPointChange(activePoint)}
                   </span>
                 </div>
               )}
@@ -267,7 +298,7 @@ export const RevenueEvolutionChart: React.FC<RevenueEvolutionChartProps> = ({ da
                     : 'text-neutral-400 font-medium'
                 }`}
               >
-                {pt.dayLabel}
+                {getPointDayLabel(pt)}
               </button>
             );
           })}
@@ -279,11 +310,11 @@ export const RevenueEvolutionChart: React.FC<RevenueEvolutionChartProps> = ({ da
         <div className="flex items-center gap-2 text-neutral-600">
           <TrendingUp className="w-4 h-4 text-[#880E2B] shrink-0" />
           <span>
-            Mejor día del ciclo:{' '}
+            {t('revenueEvolution.bestDayLabel')}{' '}
             <strong className="text-neutral-900 font-semibold">
-              {peakDay.dayName} ({formatCurrency(peakDay.amount)})
+              {peakDay.dayKey ? t(`revenueEvolution.days.${peakDay.dayKey}`) : peakDay.dayName} ({formatCurrency(peakDay.amount)})
             </strong>{' '}
-            impulsado por fragancias {peakDay.topBrand}.
+            {t('revenueEvolution.drivenBy', { brand: peakDay.topBrand })}
           </span>
         </div>
         <span className="text-neutral-400 text-xs">

@@ -1,0 +1,11 @@
+{
+  "title": "Online Orders",
+  "subtitle": "Real-time control of purchases placed from the online store",
+  "totalOrders": "Total Orders",
+  "pending": "Pending",
+  "preparing": "Preparing",
+  "ready": "Ready for delivery",
+  "delivered": "Delivered",
+  "cancelled": "Cancelled",
+  "searchPlaceholder": "Search by customer, WhatsApp or order #..."
+}

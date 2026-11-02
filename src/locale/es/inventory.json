@@ -1,0 +1,23 @@
+{
+  "title": "Inventario & Existencias",
+  "subtitle": "Control unificado de códigos de barras, marcas, medidas y saldos",
+  "barcode": "Código de barras",
+  "brand": "Marca",
+  "description": "Descripción del producto",
+  "size": "Medida",
+  "totalIn": "Ingreso",
+  "totalSold": "Venta",
+  "stock": "Saldo Inventario",
+  "price": "Precio Venta",
+  "newProduct": "Nuevo Producto",
+  "units": "uds",
+  "tabStock": "Saldos de Stock",
+  "tabEntries": "Historial de Ingresos",
+  "newEntry": "Registrar Ingreso",
+  "entryModalTitle": "Ingreso de Mercadería",
+  "entryModalSubtitle": "Registra la recepción de un lote y suma unidades al saldo del inventario",
+  "unitCost": "Costo unitario",
+  "totalCost": "Costo total",
+  "receivedQty": "Cantidad recibida",
+  "entrySaved": "Ingreso registrado y stock actualizado exitosamente"
+}

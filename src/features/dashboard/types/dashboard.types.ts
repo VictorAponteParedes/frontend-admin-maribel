@@ -14,6 +14,10 @@ export interface RevenuePoint {
   previous: number;
   isPeak?: boolean;
   changeVsAvg?: string;
+  dayNumber?: string;
+  monthKey?: string;
+  dayKey?: string;
+  changePercent?: string;
 }
 
 export interface BrandSaleShare {
@@ -26,13 +30,14 @@ export interface BrandSaleShare {
 
 export interface RevenueEvolutionData {
   currencyBadge: string;
-  currentPeriodLabel: string;
-  previousPeriodLabel: string;
+  currentPeriodLabel?: string;
+  previousPeriodLabel?: string;
   points: RevenuePoint[];
   peakDay: {
     dayName: string;
+    dayKey?: string;
     amount: number;
     topBrand: string;
   };
-  lastUpdatedText: string;
+  lastUpdatedText?: string;
 }

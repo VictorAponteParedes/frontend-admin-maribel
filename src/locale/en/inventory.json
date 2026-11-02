@@ -1,0 +1,23 @@
+{
+  "title": "Inventory & Stock",
+  "subtitle": "Unified control of barcodes, brands, sizes and balances",
+  "barcode": "Barcode",
+  "brand": "Brand",
+  "description": "Product description",
+  "size": "Size",
+  "totalIn": "Total In",
+  "totalSold": "Total Sold",
+  "stock": "Stock Balance",
+  "price": "Sale Price",
+  "newProduct": "New Product",
+  "units": "units",
+  "tabStock": "Stock Balances",
+  "tabEntries": "Entry History",
+  "newEntry": "Record Stock Entry",
+  "entryModalTitle": "Merchandise Entry",
+  "entryModalSubtitle": "Record batch reception and add units to inventory balance",
+  "unitCost": "Unit cost",
+  "totalCost": "Total cost",
+  "receivedQty": "Received quantity",
+  "entrySaved": "Stock entry saved and inventory updated successfully"
+}

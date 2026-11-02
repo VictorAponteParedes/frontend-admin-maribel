@@ -5,33 +5,33 @@ import { RevenueEvolutionChart } from '@/features/dashboard/components/RevenueEv
 import { BrandSalesChart } from '@/features/dashboard/components/BrandSalesChart';
 import { useDashboardAnalytics } from '@/features/dashboard/hooks/useDashboardAnalytics';
 import { DashboardMetric } from '@/features/dashboard/types/dashboard.types';
-import { t } from '@/lang';
+import { useTranslation } from '@/locale';
 
 const DASHBOARD_METRICS: DashboardMetric[] = [
   {
     id: 'monthly-sales',
-    titleKey: 'dashboard.monthlySales',
+    titleKey: 'monthlySales',
     value: '$ 3.450.000',
     change: '+14.2%',
     isPositive: true,
   },
   {
     id: 'active-orders',
-    titleKey: 'dashboard.activeOrders',
+    titleKey: 'activeOrders',
     value: '28',
     change: '+5.1%',
     isPositive: true,
   },
   {
     id: 'total-products',
-    titleKey: 'dashboard.totalProducts',
+    titleKey: 'totalProducts',
     value: '142',
     change: '+3',
     isPositive: true,
   },
   {
     id: 'low-stock',
-    titleKey: 'dashboard.lowStock',
+    titleKey: 'lowStock',
     value: '4',
     change: '-2',
     isPositive: false,
@@ -39,13 +39,14 @@ const DASHBOARD_METRICS: DashboardMetric[] = [
 ];
 
 export const DashboardScreen: React.FC = () => {
+  const { t } = useTranslation('dashboard');
   const { revenueEvolution, brandSales } = useDashboardAnalytics();
 
   return (
     <div className="space-y-6">
       <Header
-        title={t('dashboard.title')}
-        subtitle={t('dashboard.subtitle')}
+        title={t('title')}
+        subtitle={t('subtitle')}
       />
 
       {/* Top Metric Cards */}

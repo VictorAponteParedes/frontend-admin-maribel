@@ -1,0 +1,14 @@
+{
+  "dashboard": "Dashboard",
+  "sales": "Sales",
+  "orders": "Orders",
+  "newSale": "New Sale",
+  "inventory": "Inventory / Stock",
+  "customers": "Customers",
+  "settings": "Settings",
+  "logout": "Log out",
+  "collapseSidebar": "Collapse menu",
+  "expandSidebar": "Expand menu",
+  "openMenu": "Open menu",
+  "closeMenu": "Close menu"
+}

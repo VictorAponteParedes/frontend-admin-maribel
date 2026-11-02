@@ -1,0 +1,10 @@
+{
+  "title": "Directorio de Clientes",
+  "subtitle": "Base de datos de compradores frecuentes y su historial",
+  "code": "Código",
+  "name": "Nombre completo",
+  "phone": "Teléfono",
+  "email": "Correo",
+  "totalPurchases": "Total Compras",
+  "newCustomer": "Nuevo Cliente"
+}

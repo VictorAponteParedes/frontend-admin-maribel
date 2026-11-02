@@ -1,0 +1,20 @@
+{
+  "title": "Sales History",
+  "subtitle": "Sales records and detailed product lookups",
+  "newSale": "New Sale",
+  "saleNumber": "Sale #",
+  "date": "Date",
+  "customer": "Customer",
+  "itemsCount": "Items",
+  "total": "Total",
+  "viewDetail": "View detail",
+  "saleDetail": "Sale Detail",
+  "scanBarcode": "Barcode (scan or search)",
+  "quantity": "Quantity to sell",
+  "customerCode": "Customer code",
+  "customerName": "Customer name",
+  "customerDefault": "End Consumer",
+  "selectProduct": "Select product by barcode or name",
+  "stockAvailable": "Current stock",
+  "saleSaved": "Sale recorded and stock updated successfully"
+}

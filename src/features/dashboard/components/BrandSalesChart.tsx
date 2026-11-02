@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import { BrandSaleShare } from '@/features/dashboard/types/dashboard.types';
+import { useTranslation } from '@/locale';
 
 export interface BrandSalesChartProps {
   data: BrandSaleShare[];
 }
 
 export const BrandSalesChart: React.FC<BrandSalesChartProps> = ({ data }) => {
+  const { t } = useTranslation('dashboard');
+
   const topBrand = data[0] || {
     id: 'cool-girl',
     brand: 'Cool Girl Fragrance',
@@ -37,6 +40,13 @@ export const BrandSalesChart: React.FC<BrandSalesChartProps> = ({ data }) => {
     return `$ ${amount.toLocaleString('es-CO')}`;
   };
 
+  const getBrandDisplayName = (brandItem: BrandSaleShare): string => {
+    if (brandItem.id === 'other-brands') {
+      return t('brandSales.otherBrands');
+    }
+    return brandItem.brand;
+  };
+
   // Compute stroke offsets
   let accumulatedPercent = 0;
   const segments = data.map((item) => {
@@ -57,15 +67,15 @@ export const BrandSalesChart: React.FC<BrandSalesChartProps> = ({ data }) => {
       <div className="flex items-start justify-between mb-4">
         <div>
           <h2 className="text-xl font-bold text-neutral-900 tracking-tight font-sans">
-            Ventas por Marca
+            {t('brandSales.title')}
           </h2>
           <p className="text-xs text-neutral-400 mt-1">
-            Participación en facturación mensual
+            {t('brandSales.subtitle')}
           </p>
         </div>
         <button
           type="button"
-          aria-label="Opciones"
+          aria-label={t('brandSales.options')}
           className="text-neutral-400 hover:text-neutral-600 p-1 rounded-lg hover:bg-neutral-50 transition-colors"
         >
           <MoreHorizontal className="w-5 h-5" />
@@ -110,13 +120,13 @@ export const BrandSalesChart: React.FC<BrandSalesChartProps> = ({ data }) => {
         {/* Center Display */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
           <span className="text-[10px] font-bold text-neutral-400 tracking-wider uppercase mb-0.5">
-            {activeBrandId ? 'PARTICIPACIÓN' : 'TOP VENTAS'}
+            {activeBrandId ? t('brandSales.shareLabel') : t('brandSales.topSalesLabel')}
           </span>
           <span className="text-3xl font-extrabold text-neutral-900 tracking-tight leading-none">
             {selectedItem.percentage}%
           </span>
           <span className="text-xs font-semibold text-[#880E2B] mt-1 line-clamp-1 max-w-[100px]">
-            {selectedItem.brand.replace(' Fragrance', '').replace(' Fragrances', '')}
+            {getBrandDisplayName(selectedItem).replace(' Fragrance', '').replace(' Fragrances', '')}
           </span>
         </div>
       </div>
@@ -140,7 +150,7 @@ export const BrandSalesChart: React.FC<BrandSalesChartProps> = ({ data }) => {
                   style={{ backgroundColor: item.color }}
                 />
                 <span className="text-xs font-medium text-neutral-700 truncate">
-                  {item.brand}
+                  {getBrandDisplayName(item)}
                 </span>
               </div>
 

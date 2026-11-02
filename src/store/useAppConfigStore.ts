@@ -13,7 +13,10 @@ interface AppConfigState {
 
 export const useAppConfigStore = create<AppConfigState>((set) => ({
   theme: 'light',
-  language: 'es',
+  language:
+    typeof window !== 'undefined'
+      ? ((localStorage.getItem(APP_STORAGE_KEYS.LANGUAGE) as Language) || 'es')
+      : 'es',
   setTheme: (theme: ThemeMode) => {
     localStorage.setItem(APP_STORAGE_KEYS.THEME, theme);
     set({ theme });

@@ -1,0 +1,45 @@
+{
+  "title": "Control Panel",
+  "subtitle": "General management of Maribel Gift Shop",
+  "monthlySales": "Monthly Sales",
+  "activeOrders": "Today's Sales",
+  "totalProducts": "Total in Catalog",
+  "lowStock": "Low Stock",
+  "metrics": {
+    "monthlySales": "Monthly Sales",
+    "activeOrders": "Today's Sales",
+    "totalProducts": "Total in Catalog",
+    "lowStock": "Low Stock"
+  },
+  "revenueEvolution": {
+    "title": "Revenue & Sales Evolution",
+    "subtitle": "Comparison of current period vs. previous period",
+    "currentPeriod": "Current November",
+    "previousPeriod": "Previous Month",
+    "peakTag": "Peak",
+    "bestDayLabel": "Best day of the cycle:",
+    "drivenBy": "driven by {{brand}} fragrances.",
+    "lastUpdated": "Updated {{time}} ago",
+    "vsWeeklyAvg": "{{percent}} vs weekly average",
+    "days": {
+      "friday": "Friday",
+      "wednesday": "Wednesday",
+      "monday": "Monday",
+      "saturday": "Saturday",
+      "thursday": "Thursday",
+      "sunday": "Sunday",
+      "tuesday": "Tuesday"
+    },
+    "months": {
+      "nov": "Nov"
+    }
+  },
+  "brandSales": {
+    "title": "Sales by Brand",
+    "subtitle": "Share of monthly revenue",
+    "options": "Options",
+    "shareLabel": "SHARE",
+    "topSalesLabel": "TOP SALES",
+    "otherBrands": "Other Brands / Acc."
+  }
+}

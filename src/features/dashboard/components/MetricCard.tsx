@@ -1,13 +1,15 @@
 import React from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { DashboardMetric } from '@/features/dashboard/types/dashboard.types';
-import { t } from '@/lang';
+import { useTranslation } from '@/locale';
 
 export interface MetricCardProps {
   metric: DashboardMetric;
 }
 
 export const MetricCard: React.FC<MetricCardProps> = ({ metric }) => {
+  const { t } = useTranslation(['dashboard', 'translation']);
+
   return (
     <div className="bg-white p-5 rounded-2xl border border-stone-200/80 shadow-xs">
       <div className="flex items-center justify-between">

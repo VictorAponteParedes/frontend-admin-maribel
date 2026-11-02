@@ -21,7 +21,11 @@
     "inventory": "Inventario / Stock",
     "customers": "Clientes",
     "settings": "Configuración",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "collapseSidebar": "Colapsar menú",
+    "expandSidebar": "Expandir menú",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú"
   },
   "dashboard": {
     "title": "Panel de Control",

@@ -1,0 +1,10 @@
+{
+  "title": "Customer Directory",
+  "subtitle": "Database of frequent shoppers and their history",
+  "code": "Code",
+  "name": "Full Name",
+  "phone": "Phone",
+  "email": "Email",
+  "totalPurchases": "Total Purchases",
+  "newCustomer": "New Customer"
+}

@@ -1,0 +1,16 @@
+{
+  "appName": "Maribel",
+  "backoffice": "Backoffice",
+  "search": "Buscar...",
+  "save": "Guardar",
+  "cancel": "Cancelar",
+  "delete": "Eliminar",
+  "edit": "Editar",
+  "status": "Estado",
+  "actions": "Acciones",
+  "active": "Activo",
+  "inactive": "Inactivo",
+  "filter": "Filtrar",
+  "loading": "Cargando módulo...",
+  "currency": "COP ($)"
+}

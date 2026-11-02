@@ -1,0 +1,11 @@
+{
+  "title": "Pedidos Web",
+  "subtitle": "Control en tiempo real de compras realizadas desde la tienda online",
+  "totalOrders": "Total Pedidos",
+  "pending": "Pendientes",
+  "preparing": "En preparación",
+  "ready": "Listo para entrega",
+  "delivered": "Entregados",
+  "cancelled": "Cancelados",
+  "searchPlaceholder": "Buscar por cliente, WhatsApp o N° pedido..."
+}

@@ -1,0 +1,45 @@
+{
+  "title": "Panel de Control",
+  "subtitle": "Gestión general de Maribel Tienda de Regalos",
+  "monthlySales": "Ventas del Mes",
+  "activeOrders": "Ventas del Día",
+  "totalProducts": "Total en Catálogo",
+  "lowStock": "Stock Crítico",
+  "metrics": {
+    "monthlySales": "Ventas del Mes",
+    "activeOrders": "Ventas del Día",
+    "totalProducts": "Total en Catálogo",
+    "lowStock": "Stock Crítico"
+  },
+  "revenueEvolution": {
+    "title": "Evolución de Ingresos & Ventas",
+    "subtitle": "Comparativa del período actual vs. período anterior",
+    "currentPeriod": "Noviembre actual",
+    "previousPeriod": "Mes anterior",
+    "peakTag": "Pico",
+    "bestDayLabel": "Mejor día del ciclo:",
+    "drivenBy": "impulsado por fragancias {{brand}}.",
+    "lastUpdated": "Actualizado hace {{time}}",
+    "vsWeeklyAvg": "{{percent}} vs promedio semanal",
+    "days": {
+      "friday": "Viernes",
+      "wednesday": "Miércoles",
+      "monday": "Lunes",
+      "saturday": "Sábado",
+      "thursday": "Jueves",
+      "sunday": "Domingo",
+      "tuesday": "Martes"
+    },
+    "months": {
+      "nov": "Nov"
+    }
+  },
+  "brandSales": {
+    "title": "Ventas por Marca",
+    "subtitle": "Participación en facturación mensual",
+    "options": "Opciones",
+    "shareLabel": "PARTICIPACIÓN",
+    "topSalesLabel": "TOP VENTAS",
+    "otherBrands": "Otras Marcas / Acc."
+  }
+}

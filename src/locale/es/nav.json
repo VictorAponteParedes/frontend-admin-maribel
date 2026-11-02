@@ -1,0 +1,14 @@
+{
+  "dashboard": "Dashboard",
+  "sales": "Ventas",
+  "orders": "Pedidos",
+  "newSale": "Cargar Venta",
+  "inventory": "Inventario / Stock",
+  "customers": "Clientes",
+  "settings": "Configuración",
+  "logout": "Cerrar sesión",
+  "collapseSidebar": "Colapsar menú",
+  "expandSidebar": "Expandir menú",
+  "openMenu": "Abrir menú",
+  "closeMenu": "Cerrar menú"
+}
