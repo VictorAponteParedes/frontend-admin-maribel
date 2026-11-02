@@ -1,0 +1,49 @@
+{
+  "common": {
+    "appName": "Maribel",
+    "backoffice": "Backoffice",
+    "search": "Search...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "status": "Status",
+    "actions": "Actions",
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "products": "Perfume Inventory",
+    "orders": "Orders",
+    "users": "Users & Roles",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "dashboard": {
+    "title": "Control Panel",
+    "subtitle": "General management of Maribel Gift Shop",
+    "monthlySales": "Monthly Sales",
+    "activeOrders": "Active Orders",
+    "totalProducts": "Total Perfumes",
+    "lowStock": "Low Stock"
+  },
+  "products": {
+    "title": "Fragrance Inventory",
+    "subtitle": "Stock, price, and status monitoring",
+    "newProduct": "New Perfume",
+    "name": "Name",
+    "brand": "Brand",
+    "category": "Category",
+    "price": "Price",
+    "stock": "Stock",
+    "description": "Description",
+    "units": "units"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Please enter a valid email",
+    "minPrice": "Price must be greater than 0",
+    "minStock": "Stock cannot be negative"
+  }
+}

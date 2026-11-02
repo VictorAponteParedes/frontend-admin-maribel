@@ -1,0 +1,49 @@
+{
+  "common": {
+    "appName": "Maribel",
+    "backoffice": "Backoffice",
+    "search": "Buscar...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "status": "Estado",
+    "actions": "Acciones",
+    "active": "Activo",
+    "inactive": "Inactivo"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "products": "Inventario Perfumes",
+    "orders": "Pedidos",
+    "users": "Usuarios & Roles",
+    "settings": "Configuración",
+    "logout": "Cerrar sesión"
+  },
+  "dashboard": {
+    "title": "Panel de Control",
+    "subtitle": "Gestión general de Maribel Tienda de Regalos",
+    "monthlySales": "Ventas del Mes",
+    "activeOrders": "Pedidos Activos",
+    "totalProducts": "Total Perfumes",
+    "lowStock": "Stock Crítico"
+  },
+  "products": {
+    "title": "Inventario de Fragancias",
+    "subtitle": "Control de existencias, precios y estados",
+    "newProduct": "Nuevo Perfume",
+    "name": "Nombre",
+    "brand": "Marca",
+    "category": "Categoría",
+    "price": "Precio",
+    "stock": "Stock",
+    "description": "Descripción",
+    "units": "uds"
+  },
+  "validation": {
+    "required": "Este campo es obligatorio",
+    "invalidEmail": "Ingresa un correo electrónico válido",
+    "minPrice": "El precio debe ser mayor a 0",
+    "minStock": "El stock no puede ser negativo"
+  }
+}
