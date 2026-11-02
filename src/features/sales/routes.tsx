@@ -9,12 +9,27 @@ const SalesScreen = lazyLoad(() =>
   }))
 );
 
+const SaleDetailScreen = lazyLoad(() =>
+  import('./screens/SaleDetailScreen').then((module) => ({
+    default: module.SaleDetailScreen,
+  }))
+);
+
 export const SALES_ROUTES: RouteConfig[] = [
   {
     path: RoutesView.SALES,
     element: (
       <PrivateLayout>
         <SalesScreen />
+      </PrivateLayout>
+    ),
+    isProtected: true,
+  },
+  {
+    path: RoutesView.SALE_DETAIL,
+    element: (
+      <PrivateLayout>
+        <SaleDetailScreen />
       </PrivateLayout>
     ),
     isProtected: true,

@@ -73,13 +73,24 @@ export const SaleFormModal: React.FC = () => {
     const formattedDate = `${String(today.getDate()).padStart(2, '0')}/${String(
       today.getMonth() + 1
     ).padStart(2, '0')}/${today.getFullYear()}`;
+    const formattedTime = `${String(today.getHours()).padStart(2, '0')}:${String(
+      today.getMinutes()
+    ).padStart(2, '0')} hs`;
+
+    const matchedCustomer = customers.find(
+      (c) => c.name === customerName || String(c.code) === customerCode
+    );
 
     const newSale: Sale = {
       id: `sale-${Date.now()}`,
       saleNumber: `V-${Date.now().toString().slice(-4)}`,
       date: formattedDate,
+      time: formattedTime,
       customerCode: customerCode.trim() || undefined,
-      customerName: customerName.trim() || 'Consumidor Final',
+      customerName: customerName.trim() || 'Cliente casual',
+      customerPhone: matchedCustomer?.phone,
+      customerAddress: matchedCustomer?.address,
+      status: 'CONFIRMED',
       totalQuantity: quantity,
       total: subtotal,
       items: [

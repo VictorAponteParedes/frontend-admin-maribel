@@ -2,22 +2,37 @@ import React, { useState } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui';
 import { SaleTable } from '@/features/sales/components/SaleTable';
+import { DetailedSalesTable } from '@/features/sales/components/DetailedSalesTable';
 import { SaleFormModal } from '@/features/sales/components/SaleFormModal';
-import { SaleDetailModal } from '@/features/sales/components/SaleDetailModal';
 import { useSalesStore } from '@/store/useSalesStore';
 import { formatCurrency } from '@/utils/formatters';
 import { t } from '@/lang';
-import { Plus, Search, ShoppingBag, DollarSign, TrendingUp } from 'lucide-react';
+import {
+  Plus,
+  Search,
+  ShoppingBag,
+  DollarSign,
+  TrendingUp,
+  Receipt,
+  ListOrdered,
+} from 'lucide-react';
 
 export const SalesScreen: React.FC = () => {
-  const { sales, openCreateModal, openDetailModal } = useSalesStore();
+  const { sales, openCreateModal } = useSalesStore();
+  const [activeTab, setActiveTab] = useState<'summary' | 'detailed'>('summary');
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredSales = sales.filter(
     (sale) =>
       sale.saleNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
       sale.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      sale.date.includes(searchQuery)
+      sale.date.includes(searchQuery) ||
+      sale.items.some(
+        (i) =>
+          i.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          i.barcode.includes(searchQuery)
+      )
   );
 
   const totalRevenue = sales.reduce((acc, s) => acc + s.total, 0);
@@ -80,6 +95,44 @@ export const SalesScreen: React.FC = () => {
       </div>
 
       <section className="bg-white rounded-2xl border border-stone-200/80 shadow-xs overflow-hidden">
+        {/* Pestañas: Resumen vs Ventas Detalladas */}
+        <div className="px-5 pt-4 pb-0 border-b border-stone-200 flex items-center justify-between flex-wrap gap-3 bg-stone-50/50">
+          <div className="flex space-x-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab('summary')}
+              className={`flex items-center space-x-2 py-2.5 px-4 text-xs font-semibold rounded-t-xl border-b-2 transition-all ${
+                activeTab === 'summary'
+                  ? 'border-maribel-700 text-maribel-800 bg-white shadow-xs'
+                  : 'border-transparent text-stone-500 hover:text-stone-800'
+              }`}
+            >
+              <Receipt className="w-4 h-4" />
+              <span>Resumen por Comprobante ({sales.length})</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('detailed')}
+              className={`flex items-center space-x-2 py-2.5 px-4 text-xs font-semibold rounded-t-xl border-b-2 transition-all ${
+                activeTab === 'detailed'
+                  ? 'border-maribel-700 text-maribel-800 bg-white shadow-xs'
+                  : 'border-transparent text-stone-500 hover:text-stone-800'
+              }`}
+            >
+              <ListOrdered className="w-4 h-4" />
+              <span>Venta Detallada (Renglones)</span>
+            </button>
+          </div>
+
+          <span className="text-[11px] text-stone-400 pb-2">
+            {activeTab === 'summary'
+              ? 'Haz clic en "Ver detalle" para ir a la vista completa de la venta'
+              : 'Vista renglón por renglón con cliente y fecha/hora'}
+          </span>
+        </div>
+
+        {/* Buscador */}
         <div className="p-4 border-b border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -87,18 +140,21 @@ export const SalesScreen: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar por N° de venta, cliente o fecha..."
+              placeholder="Buscar por N° venta, cliente, fragancia o código..."
               className="w-full pl-9 pr-3 py-2 text-xs bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-maribel-600"
             />
           </div>
         </div>
 
-        <SaleTable sales={filteredSales} onSelectSale={openDetailModal} />
+        {activeTab === 'summary' ? (
+          <SaleTable sales={filteredSales} />
+        ) : (
+          <DetailedSalesTable sales={filteredSales} />
+        )}
       </section>
 
-      {/* Modales de Ventas */}
+      {/* Modal para crear venta */}
       <SaleFormModal />
-      <SaleDetailModal />
     </div>
   );
 };
