@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useInventoryStore } from '@/store/useInventoryStore';
 import { useStockEntryStore } from '@/store/useStockEntryStore';
-import { formatCurrency } from '@/utils/formatters';
+import { formatCurrency, formatGuarani, parseGuarani } from '@/utils/formatters';
+import { AppInput, DatePickerInput } from '@/components/ui';
 import {
   X,
   Barcode,
@@ -10,7 +11,6 @@ import {
   Plus,
   Minus,
   Check,
-  Calendar,
   AlertCircle,
   Package,
   Sparkles,
@@ -22,9 +22,9 @@ export const StockEntryModal: React.FC = () => {
 
   const [barcodeInput, setBarcodeInput] = useState('6972011068673');
   const [quantity, setQuantity] = useState<number>(12);
-  const [unitCost, setUnitCost] = useState<number>(120000);
+  const [unitCost, setUnitCost] = useState<number>(120250);
   const [dateInput, setDateInput] = useState('');
-  const [batchNumber, setBatchNumber] = useState('LOT-2026-FRAG-B12');
+  const [batchNumber, setBatchNumber] = useState('LOT-2026-FRAG-B42');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -62,6 +62,12 @@ export const StockEntryModal: React.FC = () => {
 
   const handleQuickAddQty = (qtyToAdd: number) => {
     setQuantity(qtyToAdd);
+  };
+
+  const handleUnitCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const raw = e.target.value;
+    const parsed = parseGuarani(raw);
+    setUnitCost(parsed);
   };
 
   const handleSaveEntry = (e: React.FormEvent) => {
@@ -128,6 +134,9 @@ export const StockEntryModal: React.FC = () => {
                 <span className="px-2 py-0.5 bg-rose-50 border border-rose-100 text-maribel-700 text-[11px] font-semibold rounded-full">
                   Perfumería
                 </span>
+                <span className="px-2 py-0.5 bg-stone-100 border border-stone-200 text-stone-600 text-[11px] font-mono rounded-full">
+                  {batchNumber}
+                </span>
               </div>
               <p className="text-xs text-stone-500 mt-0.5">
                 Registra la recepción de lotes, códigos de barra y actualiza saldos al instante
@@ -158,7 +167,7 @@ export const StockEntryModal: React.FC = () => {
             </div>
           )}
 
-          {/* Fila: Código de barras / SKU + Badge de Lector */}
+          {/* Fila: Código de barras / SKU con AppInput + Badge de Lector */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-semibold text-stone-800 flex items-center space-x-1">
@@ -172,28 +181,25 @@ export const StockEntryModal: React.FC = () => {
               </span>
             </div>
 
-            <div className="relative flex items-center">
-              <div className="absolute left-3.5 text-stone-400 pointer-events-none">
-                <Barcode className="w-5 h-5" />
-              </div>
-              <input
-                type="text"
-                value={barcodeInput}
-                onChange={(e) => setBarcodeInput(e.target.value)}
-                placeholder="6972011068673"
-                className="w-full pl-11 pr-28 py-2.5 text-xs font-mono font-medium bg-stone-50 border border-stone-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-maribel-600/20 focus:border-maribel-600 transition-all"
-                autoFocus
-              />
-              <button
-                type="button"
-                onClick={() => {}}
-                className="absolute right-2 px-2.5 py-1 text-[11px] font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 flex items-center space-x-1.5 transition-colors shadow-2xs"
-                title="Escanear con cámara"
-              >
-                <Camera className="w-3.5 h-3.5 text-maribel-700" />
-                <span>Cámara</span>
-              </button>
-            </div>
+            <AppInput
+              value={barcodeInput}
+              onChange={(e) => setBarcodeInput(e.target.value)}
+              placeholder="6972011068673"
+              leftIcon={<Barcode className="w-5 h-5" />}
+              rightElement={
+                <button
+                  type="button"
+                  onClick={() => {}}
+                  className="px-2.5 py-1 text-[11px] font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 flex items-center space-x-1.5 transition-colors shadow-2xs"
+                  title="Escanear con cámara"
+                >
+                  <Camera className="w-3.5 h-3.5 text-maribel-700" />
+                  <span>Cámara</span>
+                </button>
+              }
+              className="font-mono font-medium"
+              autoFocus
+            />
 
             {/* Coincidencias rápidas del catálogo */}
             <div className="mt-2.5">
@@ -260,7 +266,7 @@ export const StockEntryModal: React.FC = () => {
             </div>
           )}
 
-          {/* Fila: Cantidad recibida + Costo unitario */}
+          {/* Fila: Cantidad recibida + Costo unitario (Gs.) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Cantidad recibida */}
             <div>
@@ -333,11 +339,11 @@ export const StockEntryModal: React.FC = () => {
               </div>
             </div>
 
-            {/* Costo unitario */}
+            {/* Costo unitario en Guaraníes (Gs.) usando AppInput */}
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="text-xs font-semibold text-stone-800">
-                  Costo unitario ($)
+                  Costo unitario (Gs.)
                 </label>
                 {estimatedMargin > 0 && (
                   <span className="text-[11px] font-semibold text-maribel-700">
@@ -346,18 +352,14 @@ export const StockEntryModal: React.FC = () => {
                 )}
               </div>
 
-              <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-stone-400">
-                  $
-                </span>
-                <input
-                  type="number"
-                  min={0}
-                  value={unitCost}
-                  onChange={(e) => setUnitCost(Math.max(0, Number(e.target.value)))}
-                  className="w-full pl-8 pr-3 py-2.5 text-xs font-semibold bg-stone-50 border border-stone-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-maribel-600/20 focus:border-maribel-600 transition-all"
-                />
-              </div>
+              <AppInput
+                type="text"
+                prefixText="Gs."
+                value={unitCost > 0 ? formatGuarani(unitCost) : ''}
+                onChange={handleUnitCostChange}
+                placeholder="0"
+                className="font-semibold"
+              />
 
               {selectedProduct && (
                 <p className="text-[11px] text-stone-400 mt-1.5">
@@ -370,39 +372,19 @@ export const StockEntryModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Fila: Fecha de recepción + N° de Lote / Proveedor */}
+          {/* Fila: Fecha de recepción con DatePickerInput + N° de Lote con AppInput */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-stone-800 mb-1">
-                Fecha de recepción
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={dateInput}
-                  onChange={(e) => setDateInput(e.target.value)}
-                  placeholder="02/11/2026"
-                  className="w-full px-3 py-2 text-xs font-mono bg-stone-50 border border-stone-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-maribel-600/20 focus:border-maribel-600 transition-all"
-                />
-                <Calendar className="w-4 h-4 text-stone-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-stone-800 mb-1">
-                N° de Lote / Proveedor
-              </label>
-              <input
-                type="text"
-                value={batchNumber}
-                onChange={(e) => setBatchNumber(e.target.value)}
-                placeholder="LOT-2026-FRAG-B12"
-                className="w-full px-3 py-2 text-xs font-mono uppercase bg-stone-50 border border-stone-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-maribel-600/20 focus:border-maribel-600 transition-all"
+              <DatePickerInput
+                label="Fecha de recepción"
+                value={dateInput}
+                onChange={(newDate) => setDateInput(newDate)}
+                placeholder="DD/MM/AAAA"
               />
             </div>
           </div>
 
-          {/* Tarjeta inferior de Proyección en Estantería y Costo Total */}
+          {/* Tarjeta inferior de Proyección en Estantería y Costo Total en Guaraníes */}
           <div className="p-4 bg-emerald-50/50 border border-emerald-100 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-sm shrink-0">
