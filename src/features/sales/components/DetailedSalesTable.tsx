@@ -3,29 +3,51 @@ import { Sale } from '@/features/sales/types/sale.types';
 import { formatCurrency } from '@/utils/formatters';
 import { Barcode, Clock } from 'lucide-react';
 
-export interface DetailedSalesTableProps {
-  sales: Sale[];
+export interface DetailedSaleRow {
+  rowKey: string;
+  saleNumber: string;
+  date: string;
+  time: string;
+  customerCode: string;
+  customerName: string;
+  barcode: string;
+  brand: string;
+  name: string;
+  size: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
 }
 
-export const DetailedSalesTable: React.FC<DetailedSalesTableProps> = ({ sales }) => {
-  // Desglosar cada venta en sus renglones individuales
-  const flattenedRows = sales.flatMap((sale) =>
-    sale.items.map((item, idx) => ({
-      rowKey: `${sale.id}-${item.barcode}-${idx}`,
-      saleNumber: sale.saleNumber,
-      date: sale.date,
-      time: sale.time,
-      customerCode: sale.customerCode || '-',
-      customerName: sale.customerName,
-      barcode: item.barcode,
-      brand: item.brand,
-      name: item.name,
-      size: item.size,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice,
-      subtotal: item.subtotal,
-    }))
-  );
+export interface DetailedSalesTableProps {
+  sales?: Sale[];
+  rows?: DetailedSaleRow[];
+}
+
+export const DetailedSalesTable: React.FC<DetailedSalesTableProps> = ({
+  sales = [],
+  rows,
+}) => {
+  // Si se proveen filas ya procesadas (p. ej. paginadas), se usan directamente; sino se desglosan de sales
+  const displayRows: DetailedSaleRow[] =
+    rows ??
+    sales.flatMap((sale) =>
+      sale.items.map((item, idx) => ({
+        rowKey: `${sale.id}-${item.barcode}-${idx}`,
+        saleNumber: sale.saleNumber,
+        date: sale.date,
+        time: sale.time,
+        customerCode: sale.customerCode || '-',
+        customerName: sale.customerName,
+        barcode: item.barcode,
+        brand: item.brand,
+        name: item.name,
+        size: item.size,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        subtotal: item.subtotal,
+      }))
+    );
 
   return (
     <div className="overflow-x-auto">
@@ -44,7 +66,7 @@ export const DetailedSalesTable: React.FC<DetailedSalesTableProps> = ({ sales })
           </tr>
         </thead>
         <tbody className="divide-y divide-stone-100">
-          {flattenedRows.map((row) => (
+          {displayRows.map((row) => (
             <tr key={row.rowKey} className="hover:bg-stone-50/70 transition-colors">
               <td className="px-5 py-3.5 font-mono text-[11px] text-stone-600 whitespace-nowrap">
                 <div className="flex items-center space-x-1.5">
@@ -69,12 +91,13 @@ export const DetailedSalesTable: React.FC<DetailedSalesTableProps> = ({ sales })
               <td className="px-5 py-3.5 font-semibold text-stone-900 whitespace-nowrap">
                 {row.brand}
               </td>
-              <td className="px-5 py-3.5 text-stone-800 font-medium max-w-xs truncate" title={row.name}>
+              <td
+                className="px-5 py-3.5 text-stone-800 font-medium max-w-xs truncate"
+                title={row.name}
+              >
                 {row.name}
               </td>
-              <td className="px-4 py-3.5 text-stone-500 whitespace-nowrap">
-                {row.size}
-              </td>
+              <td className="px-4 py-3.5 text-stone-500 whitespace-nowrap">{row.size}</td>
               <td className="px-5 py-3.5 font-bold text-stone-900 text-right whitespace-nowrap">
                 {formatCurrency(row.unitPrice)}
               </td>
@@ -86,7 +109,7 @@ export const DetailedSalesTable: React.FC<DetailedSalesTableProps> = ({ sales })
               </td>
             </tr>
           ))}
-          {flattenedRows.length === 0 && (
+          {displayRows.length === 0 && (
             <tr>
               <td colSpan={9} className="px-5 py-8 text-center text-stone-400">
                 No hay ventas detalladas para mostrar.

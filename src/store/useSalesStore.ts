@@ -4,8 +4,11 @@ import { Sale } from '@/features/sales/types/sale.types';
 export interface SalesState {
   sales: Sale[];
   isCreateModalOpen: boolean;
+  selectedSaleForDetail: Sale | null;
   openCreateModal: () => void;
   closeCreateModal: () => void;
+  openDetailModal: (sale: Sale) => void;
+  closeDetailModal: () => void;
   addSale: (sale: Sale) => void;
   getSaleById: (id: string) => Sale | undefined;
 }
@@ -136,9 +139,13 @@ const INITIAL_SALES: Sale[] = [
 export const useSalesStore = create<SalesState>((set, get) => ({
   sales: INITIAL_SALES,
   isCreateModalOpen: false,
+  selectedSaleForDetail: null,
 
   openCreateModal: () => set({ isCreateModalOpen: true }),
   closeCreateModal: () => set({ isCreateModalOpen: false }),
+
+  openDetailModal: (sale: Sale) => set({ selectedSaleForDetail: sale }),
+  closeDetailModal: () => set({ selectedSaleForDetail: null }),
 
   addSale: (sale: Sale) =>
     set((state) => ({ sales: [sale, ...state.sales] })),

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui';
+import { Pagination } from '@/componentes';
 import { SaleTable } from '@/features/sales/components/SaleTable';
-import { DetailedSalesTable } from '@/features/sales/components/DetailedSalesTable';
+import { DetailedSalesTable, DetailedSaleRow } from '@/features/sales/components/DetailedSalesTable';
 import { SaleFormModal } from '@/features/sales/components/SaleFormModal';
 import { useSalesStore } from '@/store/useSalesStore';
 import { formatCurrency } from '@/utils/formatters';
@@ -22,6 +23,20 @@ export const SalesScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'summary' | 'detailed'>('summary');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Estados de paginación para pestaña Resumen
+  const [salesPage, setSalesPage] = useState<number>(1);
+  const [salesPageSize, setSalesPageSize] = useState<number>(10);
+
+  // Estados de paginación para pestaña Venta Detallada
+  const [detailedPage, setDetailedPage] = useState<number>(1);
+  const [detailedPageSize, setDetailedPageSize] = useState<number>(10);
+
+  // Reiniciar a la primera página si cambia la búsqueda
+  useEffect(() => {
+    setSalesPage(1);
+    setDetailedPage(1);
+  }, [searchQuery]);
+
   const filteredSales = sales.filter(
     (sale) =>
       sale.saleNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -35,9 +50,52 @@ export const SalesScreen: React.FC = () => {
       )
   );
 
+  // Paginación para ventas por comprobante
+  const paginatedSales = filteredSales.slice(
+    (salesPage - 1) * salesPageSize,
+    salesPage * salesPageSize
+  );
+
+  // Todos los renglones detallados de las ventas filtradas
+  const allDetailedRows = useMemo<DetailedSaleRow[]>(() => {
+    return filteredSales.flatMap((sale) =>
+      sale.items.map((item, idx) => ({
+        rowKey: `${sale.id}-${item.barcode}-${idx}`,
+        saleNumber: sale.saleNumber,
+        date: sale.date,
+        time: sale.time,
+        customerCode: sale.customerCode || '-',
+        customerName: sale.customerName,
+        barcode: item.barcode,
+        brand: item.brand,
+        name: item.name,
+        size: item.size,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        subtotal: item.subtotal,
+      }))
+    );
+  }, [filteredSales]);
+
+  // Renglones paginados
+  const paginatedDetailedRows = allDetailedRows.slice(
+    (detailedPage - 1) * detailedPageSize,
+    detailedPage * detailedPageSize
+  );
+
   const totalRevenue = sales.reduce((acc, s) => acc + s.total, 0);
   const totalItemsSold = sales.reduce((acc, s) => acc + s.totalQuantity, 0);
   const averageTicket = sales.length > 0 ? Math.round(totalRevenue / sales.length) : 0;
+
+  const handleSalesPageSizeChange = (newSize: number) => {
+    setSalesPageSize(newSize);
+    setSalesPage(1);
+  };
+
+  const handleDetailedPageSizeChange = (newSize: number) => {
+    setDetailedPageSize(newSize);
+    setDetailedPage(1);
+  };
 
   return (
     <div>
@@ -100,7 +158,10 @@ export const SalesScreen: React.FC = () => {
           <div className="flex space-x-2">
             <button
               type="button"
-              onClick={() => setActiveTab('summary')}
+              onClick={() => {
+                setActiveTab('summary');
+                setSalesPage(1);
+              }}
               className={`flex items-center space-x-2 py-2.5 px-4 text-xs font-semibold rounded-t-xl border-b-2 transition-all ${
                 activeTab === 'summary'
                   ? 'border-maribel-700 text-maribel-800 bg-white shadow-xs'
@@ -113,7 +174,10 @@ export const SalesScreen: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => setActiveTab('detailed')}
+              onClick={() => {
+                setActiveTab('detailed');
+                setDetailedPage(1);
+              }}
               className={`flex items-center space-x-2 py-2.5 px-4 text-xs font-semibold rounded-t-xl border-b-2 transition-all ${
                 activeTab === 'detailed'
                   ? 'border-maribel-700 text-maribel-800 bg-white shadow-xs'
@@ -121,7 +185,7 @@ export const SalesScreen: React.FC = () => {
               }`}
             >
               <ListOrdered className="w-4 h-4" />
-              <span>Venta Detallada (Renglones)</span>
+              <span>Venta Detallada ({allDetailedRows.length} renglones)</span>
             </button>
           </div>
 
@@ -147,9 +211,30 @@ export const SalesScreen: React.FC = () => {
         </div>
 
         {activeTab === 'summary' ? (
-          <SaleTable sales={filteredSales} />
+          <SaleTable sales={paginatedSales} />
         ) : (
-          <DetailedSalesTable sales={filteredSales} />
+          <DetailedSalesTable rows={paginatedDetailedRows} />
+        )}
+
+        {/* Paginación según pestaña activa */}
+        {activeTab === 'summary' ? (
+          <Pagination
+            currentPage={salesPage}
+            totalItems={filteredSales.length}
+            pageSize={salesPageSize}
+            pageSizeOptions={[10, 25, 50, 100]}
+            onPageChange={setSalesPage}
+            onPageSizeChange={handleSalesPageSizeChange}
+          />
+        ) : (
+          <Pagination
+            currentPage={detailedPage}
+            totalItems={allDetailedRows.length}
+            pageSize={detailedPageSize}
+            pageSizeOptions={[10, 25, 50, 100]}
+            onPageChange={setDetailedPage}
+            onPageSizeChange={handleDetailedPageSizeChange}
+          />
         )}
       </section>
 

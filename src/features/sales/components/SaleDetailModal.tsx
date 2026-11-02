@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSalesStore } from '@/store/useSalesStore';
+import { SaleItem } from '@/features/sales/types/sale.types';
 import { formatCurrency } from '@/utils/formatters';
 import { t } from '@/lang';
 import { X, Receipt, Barcode } from 'lucide-react';
@@ -50,7 +51,7 @@ export const SaleDetailModal: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {selectedSaleForDetail.items.map((item, idx) => (
+                {selectedSaleForDetail.items.map((item: SaleItem, idx: number) => (
                   <tr key={`${item.barcode}-${idx}`} className="hover:bg-stone-50/60">
                     <td className="px-4 py-3 font-mono text-[11px] text-stone-500 whitespace-nowrap">
                       <div className="flex items-center space-x-1">

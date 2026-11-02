@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui';
+import { Pagination } from '@/componentes';
 import { CustomerFormModal } from '@/features/customers/components/CustomerFormModal';
 import { CustomerFormData } from '@/features/customers/types/customer.types';
 import { useCustomerStore } from '@/store/useCustomerStore';
@@ -11,6 +12,15 @@ export const CustomersScreen: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Estados de paginación
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+
+  // Reiniciar a la primera página si cambia la búsqueda
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   const filteredCustomers = customers.filter(
     (c) =>
       c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -19,8 +29,18 @@ export const CustomersScreen: React.FC = () => {
       c.address.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const paginatedCustomers = filteredCustomers.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
   const handleCreateCustomer = (data: CustomerFormData) => {
     addCustomer(data);
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    setPageSize(newSize);
+    setCurrentPage(1);
   };
 
   const getCleanPhone = (phone: string) => {
@@ -73,7 +93,7 @@ export const CustomersScreen: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {filteredCustomers.map((customer) => {
+              {paginatedCustomers.map((customer) => {
                 const cleanPhone = getCleanPhone(customer.phone);
                 const isPhoneValid = cleanPhone.length >= 7;
 
@@ -137,7 +157,7 @@ export const CustomersScreen: React.FC = () => {
                 );
               })}
 
-              {filteredCustomers.length === 0 && (
+              {paginatedCustomers.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-5 py-8 text-center text-stone-400">
                     No se encontraron clientes coincidentes.
@@ -147,6 +167,16 @@ export const CustomersScreen: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Paginación genérica */}
+        <Pagination
+          currentPage={currentPage}
+          totalItems={filteredCustomers.length}
+          pageSize={pageSize}
+          pageSizeOptions={[10, 25, 50, 100]}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={handlePageSizeChange}
+        />
       </section>
 
       <CustomerFormModal

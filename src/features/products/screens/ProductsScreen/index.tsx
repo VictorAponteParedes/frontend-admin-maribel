@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui';
+import { Pagination } from '@/componentes';
 import { ProductTable } from '@/features/products/components/ProductTable';
 import { ProductFormModal } from '@/features/products/components/ProductFormModal';
 import { ProductDetailModal } from '@/features/products/components/ProductDetailModal';
@@ -30,6 +31,20 @@ export const ProductsScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterLowStock, setFilterLowStock] = useState(false);
 
+  // Estados de paginación para pestaña Stock
+  const [productsPage, setProductsPage] = useState<number>(1);
+  const [productsPageSize, setProductsPageSize] = useState<number>(10);
+
+  // Estados de paginación para pestaña Ingresos
+  const [entriesPage, setEntriesPage] = useState<number>(1);
+  const [entriesPageSize, setEntriesPageSize] = useState<number>(10);
+
+  // Reiniciar páginas al buscar o cambiar filtro
+  useEffect(() => {
+    setProductsPage(1);
+    setEntriesPage(1);
+  }, [searchQuery, filterLowStock]);
+
   const handleCreateProduct = (data: ProductFormData) => {
     addProduct(data);
   };
@@ -54,9 +69,30 @@ export const ProductsScreen: React.FC = () => {
       entry.date.includes(searchQuery)
   );
 
+  // Registros paginados según la pestaña activa
+  const paginatedProducts = filteredProducts.slice(
+    (productsPage - 1) * productsPageSize,
+    productsPage * productsPageSize
+  );
+
+  const paginatedEntries = filteredEntries.slice(
+    (entriesPage - 1) * entriesPageSize,
+    entriesPage * entriesPageSize
+  );
+
   const lowStockCount = products.filter((p) => p.stock <= 5).length;
   const totalStockUnits = products.reduce((acc, p) => acc + p.stock, 0);
   const totalEntriesUnits = entries.reduce((acc, e) => acc + e.quantity, 0);
+
+  const handleProductsPageSizeChange = (newSize: number) => {
+    setProductsPageSize(newSize);
+    setProductsPage(1);
+  };
+
+  const handleEntriesPageSizeChange = (newSize: number) => {
+    setEntriesPageSize(newSize);
+    setEntriesPage(1);
+  };
 
   return (
     <div>
@@ -122,7 +158,10 @@ export const ProductsScreen: React.FC = () => {
           <div className="flex space-x-2">
             <button
               type="button"
-              onClick={() => setActiveTab('stock')}
+              onClick={() => {
+                setActiveTab('stock');
+                setProductsPage(1);
+              }}
               className={`flex items-center space-x-2 py-2.5 px-4 text-xs font-semibold rounded-t-xl border-b-2 transition-all ${
                 activeTab === 'stock'
                   ? 'border-maribel-700 text-maribel-800 bg-white shadow-xs'
@@ -135,7 +174,10 @@ export const ProductsScreen: React.FC = () => {
 
             <button
               type="button"
-              onClick={() => setActiveTab('entries')}
+              onClick={() => {
+                setActiveTab('entries');
+                setEntriesPage(1);
+              }}
               className={`flex items-center space-x-2 py-2.5 px-4 text-xs font-semibold rounded-t-xl border-b-2 transition-all ${
                 activeTab === 'entries'
                   ? 'border-maribel-700 text-maribel-800 bg-white shadow-xs'
@@ -192,11 +234,32 @@ export const ProductsScreen: React.FC = () => {
         {/* Tabla activa */}
         {activeTab === 'stock' ? (
           <ProductTable
-            products={filteredProducts}
+            products={paginatedProducts}
             onSelectProduct={openProductDetail}
           />
         ) : (
-          <StockEntryTable entries={filteredEntries} />
+          <StockEntryTable entries={paginatedEntries} />
+        )}
+
+        {/* Componente de Paginación */}
+        {activeTab === 'stock' ? (
+          <Pagination
+            currentPage={productsPage}
+            totalItems={filteredProducts.length}
+            pageSize={productsPageSize}
+            pageSizeOptions={[10, 25, 50, 100]}
+            onPageChange={setProductsPage}
+            onPageSizeChange={handleProductsPageSizeChange}
+          />
+        ) : (
+          <Pagination
+            currentPage={entriesPage}
+            totalItems={filteredEntries.length}
+            pageSize={entriesPageSize}
+            pageSizeOptions={[10, 25, 50, 100]}
+            onPageChange={setEntriesPage}
+            onPageSizeChange={handleEntriesPageSizeChange}
+          />
         )}
       </section>
 
