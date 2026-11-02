@@ -3,6 +3,8 @@ import { useInventoryStore } from '@/store/useInventoryStore';
 import { useStockEntryStore } from '@/store/useStockEntryStore';
 import { formatCurrency, formatGuarani, parseGuarani } from '@/utils/formatters';
 import { AppInput, DatePickerInput } from '@/components/ui';
+import { BarcodeScannerModal } from '@/componentes';
+import type { Html5QrcodeResult } from 'html5-qrcode';
 import {
   X,
   Barcode,
@@ -27,6 +29,13 @@ export const StockEntryModal: React.FC = () => {
   const [batchNumber, setBatchNumber] = useState('LOT-2026-FRAG-B42');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+  const handleBarcodeScanned = (decodedText: string, decodedResult: Html5QrcodeResult) => {
+    console.log('[StockEntryModal] Código escaneado:', decodedText);
+    console.log('[StockEntryModal] Resultado detallado:', decodedResult);
+    setBarcodeInput(decodedText);
+  };
 
   const selectedProduct = getByBarcode(barcodeInput) || products[0];
 
@@ -189,8 +198,8 @@ export const StockEntryModal: React.FC = () => {
               rightElement={
                 <button
                   type="button"
-                  onClick={() => {}}
-                  className="px-2.5 py-1 text-[11px] font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 flex items-center space-x-1.5 transition-colors shadow-2xs"
+                  onClick={() => setIsScannerOpen(true)}
+                  className="px-2.5 py-1 text-[11px] font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 flex items-center space-x-1.5 transition-colors shadow-2xs active:scale-95"
                   title="Escanear con cámara"
                 >
                   <Camera className="w-3.5 h-3.5 text-maribel-700" />
@@ -432,6 +441,13 @@ export const StockEntryModal: React.FC = () => {
           </div>
         </form>
       </div>
+
+      {/* Modal de escáner por cámara */}
+      <BarcodeScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScan={handleBarcodeScanned}
+      />
     </div>
   );
 };

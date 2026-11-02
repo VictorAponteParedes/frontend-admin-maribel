@@ -5,6 +5,8 @@ import { useStockEntryStore } from '@/store/useStockEntryStore';
 import { toast } from '@/store/useToastStore';
 import { formatCurrency, formatGuarani, parseGuarani } from '@/utils/formatters';
 import { AppInput, DatePickerInput } from '@/components/ui';
+import { BarcodeScannerModal } from '@/componentes';
+import type { Html5QrcodeResult } from 'html5-qrcode';
 import { RoutesView } from '@/navigation/routes';
 import {
   ArrowLeft,
@@ -40,6 +42,15 @@ export const StockEntryScreen: React.FC = () => {
   const [batchNumber, setBatchNumber] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+
+  // Manejar el resultado del escáner por cámara
+  const handleBarcodeScanned = (decodedText: string, decodedResult: Html5QrcodeResult) => {
+    console.log('[StockEntryScreen] Código de barra recibido:', decodedText);
+    console.log('[StockEntryScreen] Resultado completo:', decodedResult);
+    handleBarcodeChange(decodedText);
+    toast.success('Código detectado', `Lectura: ${decodedText}`);
+  };
 
   // Inicializar solo fecha y lote (sin preseleccionar ningún producto)
   useEffect(() => {
@@ -123,9 +134,15 @@ export const StockEntryScreen: React.FC = () => {
       return;
     }
 
-    if (costPrice < 0) {
-      setErrorMessage('El precio de compra no puede ser negativo.');
-      toast.error('Precio inválido', 'El precio de compra no puede ser negativo.');
+    if (costPrice <= 0) {
+      setErrorMessage('Debes ingresar un precio de compra válido mayor a 0 Gs.');
+      toast.error('Precio requerido', 'Debes ingresar el precio de compra.');
+      return;
+    }
+
+    if (sellingPrice <= 0) {
+      setErrorMessage('Debes ingresar un precio de venta válido mayor a 0 Gs.');
+      toast.error('Precio requerido', 'Debes ingresar el precio de venta sugerido.');
       return;
     }
 
@@ -186,7 +203,10 @@ export const StockEntryScreen: React.FC = () => {
     barcodeInput.trim().length > 0 &&
     brandInput.trim().length > 0 &&
     nameInput.trim().length > 0 &&
-    quantity > 0;
+    sizeInput.trim().length > 0 &&
+    quantity > 0 &&
+    costPrice > 0 &&
+    sellingPrice > 0;
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-12">
@@ -271,12 +291,19 @@ export const StockEntryScreen: React.FC = () => {
               <AppInput
                 value={barcodeInput}
                 onChange={(e) => handleBarcodeChange(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault(); // Evita envío accidental del formulario con el Enter de la pistola USB
+                  }
+                }}
+                autoFocus
                 placeholder="Escanea o ingresa el código de barras..."
                 leftIcon={<Barcode className="w-5 h-5" />}
                 rightElement={
                   <button
                     type="button"
-                    className="px-2.5 py-1 text-[11px] font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 flex items-center space-x-1.5 shadow-2xs"
+                    onClick={() => setIsScannerOpen(true)}
+                    className="px-2.5 py-1 text-[11px] font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 flex items-center space-x-1.5 shadow-2xs active:scale-95 transition-all"
                   >
                     <Camera className="w-3.5 h-3.5 text-maribel-700" />
                     <span>Cámara</span>
@@ -416,7 +443,10 @@ export const StockEntryScreen: React.FC = () => {
               {/* Precio Compra */}
               <div>
                 <label className="text-xs font-semibold text-stone-800 mb-1.5 flex items-center justify-between">
-                  <span>Precio de compra (Gs.)</span>
+                  <span className="flex items-center space-x-1">
+                    <span>Precio de compra (Gs.)</span>
+                    <span className="text-rose-500">*</span>
+                  </span>
                   <DollarSign className="w-3.5 h-3.5 text-stone-400" />
                 </label>
                 <AppInput
@@ -432,7 +462,10 @@ export const StockEntryScreen: React.FC = () => {
               {/* Precio Venta */}
               <div>
                 <label className="text-xs font-semibold text-stone-800 mb-1.5 flex items-center justify-between">
-                  <span>Precio de venta (Gs.)</span>
+                  <span className="flex items-center space-x-1">
+                    <span>Precio de venta (Gs.)</span>
+                    <span className="text-rose-500">*</span>
+                  </span>
                   <ShoppingCart className="w-3.5 h-3.5 text-maribel-700" />
                 </label>
                 <AppInput
@@ -556,11 +589,17 @@ export const StockEntryScreen: React.FC = () => {
               <button
                 type="submit"
                 disabled={!isFormValid}
-                className="w-full inline-flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-xs font-bold text-white bg-maribel-800 hover:bg-maribel-900 transition-all shadow-xs disabled:opacity-50 active:scale-98"
+                className="w-full inline-flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-xs font-bold text-white bg-maribel-800 hover:bg-maribel-900 transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed active:scale-98"
               >
                 <Check className="w-4 h-4 stroke-[2.5]" />
                 <span>Confirmar Ingreso (+{quantity} uds)</span>
               </button>
+
+              {!isFormValid && (
+                <p className="text-[11px] text-center text-stone-400 font-medium">
+                  Completa los campos con (*) incluyendo compra y venta para guardar.
+                </p>
+              )}
 
               <button
                 type="button"
@@ -573,6 +612,13 @@ export const StockEntryScreen: React.FC = () => {
           </div>
         </div>
       </form>
+
+      {/* Modal de escaneo de código de barras por cámara */}
+      <BarcodeScannerModal
+        isOpen={isScannerOpen}
+        onClose={() => setIsScannerOpen(false)}
+        onScan={handleBarcodeScanned}
+      />
     </div>
   );
 };
