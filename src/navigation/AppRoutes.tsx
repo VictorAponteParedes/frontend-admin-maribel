@@ -8,6 +8,7 @@ import { PRODUCTS_ROUTES } from '@/features/products/routes';
 import { SALES_ROUTES } from '@/features/sales/routes';
 import { ORDERS_ROUTES } from '@/features/orders/routes';
 import { CUSTOMERS_ROUTES } from '@/features/customers/routes';
+import { SETTINGS_ROUTES } from '@/features/settings/routes';
 import { RoutesView } from '@/navigation/routes';
 import type { RouteConfig } from '@/navigation/types';
 
@@ -18,6 +19,7 @@ export const ALL_APP_ROUTES: RouteConfig[] = [
   ...ORDERS_ROUTES,
   ...PRODUCTS_ROUTES,
   ...CUSTOMERS_ROUTES,
+  ...SETTINGS_ROUTES,
 ];
 
 export const AppRoutes: React.FC = () => {
