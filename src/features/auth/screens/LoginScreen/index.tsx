@@ -88,9 +88,13 @@ export const LoginScreen: React.FC = () => {
       />
 
       <motion.div
-        initial={{ opacity: 0, y: 18, scale: 0.99 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        initial={{ opacity: 0, x: -28 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 28 }}
+        transition={{
+          duration: 0.32,
+          ease: [0.16, 1, 0.3, 1],
+        }}
         className="relative z-10 w-full max-w-[960px] bg-white rounded-[32px] shadow-2xl shadow-stone-900/10 border border-stone-200/80 overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[580px]"
       >
         {/* PANEL IZQUIERDO: Branding Luxury Maribel */}

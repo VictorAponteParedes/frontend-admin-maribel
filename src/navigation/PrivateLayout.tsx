@@ -58,7 +58,7 @@ export const PrivateLayout: React.FC<PrivateLayoutProps> = ({ children }) => {
       {/* Área de contenido */}
       <main className="flex-1 flex flex-col min-w-0 overflow-x-hidden p-4 sm:p-6 lg:p-8">
         <Suspense fallback={<LoadingSpinner message="Cargando módulo..." />}>
-          <AnimatePresence mode="wait" initial={false}>
+          <AnimatePresence mode="wait" initial={true}>
             <PageTransition key={location.pathname}>
               {children || <Outlet />}
             </PageTransition>
