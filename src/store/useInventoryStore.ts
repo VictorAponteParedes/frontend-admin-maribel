@@ -12,7 +12,10 @@ export interface InventoryState {
     quantity: number,
     costPrice: number,
     sellingPrice?: number,
-    receptionDate?: string
+    receptionDate?: string,
+    brand?: string,
+    name?: string,
+    size?: string
   ) => boolean;
   getByBarcode: (barcode: string) => Product | undefined;
   getById: (id: string) => Product | undefined;
@@ -299,7 +302,10 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     quantity: number,
     costPrice: number,
     sellingPrice?: number,
-    receptionDate?: string
+    receptionDate?: string,
+    brand?: string,
+    name?: string,
+    size?: string
   ): boolean => {
     const { products } = get();
     const product = products.find((p) => p.barcode === barcode);
@@ -312,6 +318,9 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
           const finalCost = costPrice && costPrice > 0 ? costPrice : item.costPrice;
           return {
             ...item,
+            brand: brand?.trim() || item.brand,
+            name: name?.trim() || item.name,
+            size: size?.trim() || item.size,
             totalIn: item.totalIn + quantity,
             stock: item.stock + quantity,
             costPrice: finalCost,

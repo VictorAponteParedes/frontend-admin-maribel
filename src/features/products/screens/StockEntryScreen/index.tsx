@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useInventoryStore } from '@/store/useInventoryStore';
 import { useStockEntryStore } from '@/store/useStockEntryStore';
+import { toast } from '@/store/useToastStore';
 import { formatCurrency, formatGuarani, parseGuarani } from '@/utils/formatters';
 import { AppInput, DatePickerInput } from '@/components/ui';
 import { RoutesView } from '@/navigation/routes';
@@ -9,42 +10,39 @@ import {
   ArrowLeft,
   Barcode,
   Camera,
-  Search,
   Plus,
   Minus,
   Check,
   AlertCircle,
   Package,
-  Sparkles,
   TrendingUp,
   DollarSign,
   ShoppingCart,
+  Tag,
+  Droplets,
 } from 'lucide-react';
 
 export const StockEntryScreen: React.FC = () => {
   const navigate = useNavigate();
-  const { products, getByBarcode, recordIncomingStock } = useInventoryStore();
+  const { getByBarcode, recordIncomingStock, addProduct } = useInventoryStore();
   const { recordStockEntry } = useStockEntryStore();
 
-  const [barcodeInput, setBarcodeInput] = useState('6972011068673');
+  // Estados de los campos (sin preselección automática)
+  const [barcodeInput, setBarcodeInput] = useState('');
+  const [brandInput, setBrandInput] = useState('');
+  const [nameInput, setNameInput] = useState('');
+  const [sizeInput, setSizeInput] = useState('');
+
   const [quantity, setQuantity] = useState<number>(12);
-  const [costPrice, setCostPrice] = useState<number>(20000); // Precio unitario de compra
-  const [sellingPrice, setSellingPrice] = useState<number>(30000); // Precio unitario de venta
+  const [costPrice, setCostPrice] = useState<number>(0);
+  const [sellingPrice, setSellingPrice] = useState<number>(0);
   const [dateInput, setDateInput] = useState('');
-  const [batchNumber, setBatchNumber] = useState('LOT-2026-FRAG-B42');
+  const [batchNumber, setBatchNumber] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const selectedProduct = getByBarcode(barcodeInput) || products[0];
-
+  // Inicializar solo fecha y lote (sin preseleccionar ningún producto)
   useEffect(() => {
-    if (products.length > 0) {
-      const initialProd = products[0];
-      setBarcodeInput(initialProd.barcode);
-      setCostPrice(initialProd.costPrice || 20000);
-      setSellingPrice(initialProd.price || 30000);
-    }
-    setQuantity(12);
     setBatchNumber(`LOT-${new Date().getFullYear()}-FRAG-B${Math.floor(Math.random() * 90 + 10)}`);
     const today = new Date();
     setDateInput(
@@ -52,16 +50,26 @@ export const StockEntryScreen: React.FC = () => {
         today.getMonth() + 1
       ).padStart(2, '0')}/${today.getFullYear()}`
     );
-  }, [products]);
+  }, []);
 
-  const handleSelectQuickProduct = (barcode: string) => {
-    setBarcodeInput(barcode);
-    const prod = getByBarcode(barcode);
-    if (prod) {
-      setCostPrice(prod.costPrice || Math.round(prod.price * 0.65));
-      setSellingPrice(prod.price);
-    }
+  // Verificar si el código ingresado coincide con algún producto existente en el catálogo
+  const existingProduct = barcodeInput.trim() ? getByBarcode(barcodeInput.trim()) : undefined;
+
+  // Manejar cambio en el código de barras y autocompletar si existe
+  const handleBarcodeChange = (val: string) => {
+    setBarcodeInput(val);
     setErrorMessage('');
+    const clean = val.trim();
+    if (!clean) return;
+
+    const matched = getByBarcode(clean);
+    if (matched) {
+      setBrandInput(matched.brand);
+      setNameInput(matched.name);
+      setSizeInput(matched.size);
+      setCostPrice(matched.costPrice || 0);
+      setSellingPrice(matched.price || 0);
+    }
   };
 
   const handleQuickAddQty = (qtyToAdd: number) => {
@@ -78,55 +86,107 @@ export const StockEntryScreen: React.FC = () => {
   const totalSales = quantity * sellingPrice;
   const totalProfit = quantity * unitProfit;
 
-  const existingStock = selectedProduct ? selectedProduct.stock : 0;
+  const existingStock = existingProduct ? existingProduct.stock : 0;
   const projectedStock = existingStock + quantity;
 
   const handleSaveEntry = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
 
-    if (!selectedProduct) {
-      setErrorMessage('Debes seleccionar un producto válido por su código de barras.');
+    if (!barcodeInput.trim()) {
+      setErrorMessage('Debes ingresar el código de barras o SKU del producto.');
+      toast.error('Código requerido', 'Debes ingresar el código de barras o SKU.');
+      return;
+    }
+
+    if (!brandInput.trim()) {
+      setErrorMessage('Debes ingresar la marca del producto.');
+      toast.error('Marca requerida', 'Debes ingresar la marca del producto.');
+      return;
+    }
+
+    if (!nameInput.trim()) {
+      setErrorMessage('Debes ingresar la descripción del producto.');
+      toast.error('Descripción requerida', 'Debes ingresar la descripción del producto.');
+      return;
+    }
+
+    if (!sizeInput.trim()) {
+      setErrorMessage('Debes ingresar las medidas del producto (ej: 85 ml / 2.9 fl. oz).');
+      toast.error('Medidas requeridas', 'Debes ingresar las medidas del producto.');
       return;
     }
 
     if (quantity <= 0) {
       setErrorMessage('La cantidad ingresada debe ser mayor a 0 unidades.');
+      toast.error('Cantidad inválida', 'La cantidad debe ser mayor a 0.');
       return;
     }
 
     if (costPrice < 0) {
       setErrorMessage('El precio de compra no puede ser negativo.');
+      toast.error('Precio inválido', 'El precio de compra no puede ser negativo.');
       return;
     }
 
     if (sellingPrice < costPrice) {
       setErrorMessage('Advertencia: El precio de venta no debería ser menor al costo de compra.');
-      // Permite continuar si el usuario lo confirma, pero avisa
+      toast.warning('Margen negativo', 'El precio de venta es menor al costo de compra.');
     }
 
-    // 1. Registrar entrada en el store de historial
+    const cleanBarcode = barcodeInput.trim();
+    const cleanBrand = brandInput.trim();
+    const cleanName = nameInput.trim();
+    const cleanSize = sizeInput.trim();
+
+    // 1. Registrar movimiento en el store de historial
     recordStockEntry({
-      barcode: selectedProduct.barcode,
+      barcode: cleanBarcode,
       quantity,
       unitCost: costPrice,
       date: dateInput,
     });
 
-    // 2. Actualizar el inventario general con los nuevos precios y saldos
-    recordIncomingStock(
-      selectedProduct.barcode,
-      quantity,
-      costPrice,
-      sellingPrice,
-      dateInput
-    );
+    // 2. Si el producto ya existe, actualizamos stock y datos
+    if (existingProduct) {
+      recordIncomingStock(
+        cleanBarcode,
+        quantity,
+        costPrice,
+        sellingPrice,
+        dateInput,
+        cleanBrand,
+        cleanName,
+        cleanSize
+      );
+    } else {
+      // Si es un producto nuevo, lo agregamos al inventario
+      addProduct({
+        barcode: cleanBarcode,
+        brand: cleanBrand,
+        name: cleanName,
+        size: cleanSize,
+        costPrice,
+        price: sellingPrice,
+        totalIn: quantity,
+        receptionDate: dateInput,
+      });
+    }
 
-    setSuccessMessage('¡Ingreso registrado y existencias actualizadas con éxito!');
+    const successMsg = `¡Ingreso registrado con éxito! (+${quantity} uds de ${cleanBrand})`;
+    setSuccessMessage(successMsg);
+    toast.success('Ingreso registrado', successMsg);
+
     setTimeout(() => {
       navigate(RoutesView.PRODUCTS);
     }, 700);
   };
+
+  const isFormValid =
+    barcodeInput.trim().length > 0 &&
+    brandInput.trim().length > 0 &&
+    nameInput.trim().length > 0 &&
+    quantity > 0;
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto pb-12">
@@ -157,7 +217,7 @@ export const StockEntryScreen: React.FC = () => {
               Registrar Ingreso de Mercadería
             </h1>
             <p className="text-xs text-stone-500 mt-1">
-              Actualiza saldos, precios unitarios de compra y venta, y visualiza la ganancia estimada en tiempo real.
+              Ingresa los datos del producto, actualiza saldos, precios y visualiza la rentabilidad en tiempo real.
             </p>
           </div>
         </div>
@@ -180,13 +240,12 @@ export const StockEntryScreen: React.FC = () => {
       <form onSubmit={handleSaveEntry} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Columna Principal (2 de 3) */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Tarjeta: Búsqueda y Selección del Producto */}
-          <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-semibold text-stone-800 flex items-center space-x-1">
-                <span>Código de barras / SKU</span>
-                <span className="text-rose-500">*</span>
-              </label>
+          {/* Tarjeta: Datos del Producto (Inputs Separados) */}
+          <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-xs space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100">
+              <h3 className="font-serif font-bold text-stone-900 text-sm">
+                Datos del Producto
+              </h3>
 
               <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 bg-emerald-50 border border-emerald-200/60 rounded-full text-[11px] font-medium text-emerald-700">
                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
@@ -194,83 +253,83 @@ export const StockEntryScreen: React.FC = () => {
               </span>
             </div>
 
-            <AppInput
-              value={barcodeInput}
-              onChange={(e) => setBarcodeInput(e.target.value)}
-              placeholder="6972011068673"
-              leftIcon={<Barcode className="w-5 h-5" />}
-              rightElement={
-                <button
-                  type="button"
-                  className="px-2.5 py-1 text-[11px] font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 flex items-center space-x-1.5 shadow-2xs"
-                >
-                  <Camera className="w-3.5 h-3.5 text-maribel-700" />
-                  <span>Cámara</span>
-                </button>
-              }
-              className="font-mono font-medium"
-            />
-
-            {/* Coincidencias rápidas del catálogo */}
-            <div className="pt-2">
-              <div className="flex items-center justify-between text-[11px] mb-2 text-stone-500">
-                <span className="flex items-center space-x-1">
-                  <Search className="w-3.5 h-3.5 text-stone-400" />
-                  <span>Seleccionar producto frecuente del catálogo:</span>
-                </span>
+            {/* Código de barras / SKU */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-semibold text-stone-800 flex items-center space-x-1">
+                  <span>Código de barras / SKU</span>
+                  <span className="text-rose-500">*</span>
+                </label>
+                {existingProduct && (
+                  <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/60 flex items-center space-x-1">
+                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                    <span>En catálogo • Stock: {existingProduct.stock} uds</span>
+                  </span>
+                )}
               </div>
 
-              <div className="flex flex-wrap gap-2">
-                {products.slice(0, 4).map((prod) => {
-                  const isSelected = selectedProduct?.barcode === prod.barcode;
-                  return (
-                    <button
-                      key={prod.id}
-                      type="button"
-                      onClick={() => handleSelectQuickProduct(prod.barcode)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all text-left ${
-                        isSelected
-                          ? 'bg-rose-50 border border-maribel-400 text-maribel-900 font-semibold shadow-2xs'
-                          : 'bg-stone-100 hover:bg-stone-200/80 text-stone-700 border border-transparent'
-                      }`}
-                    >
-                      <span className="font-bold">{prod.brand}</span> •{' '}
-                      <span className="opacity-90">{prod.name.slice(0, 20)}...</span>
-                    </button>
-                  );
-                })}
+              <AppInput
+                value={barcodeInput}
+                onChange={(e) => handleBarcodeChange(e.target.value)}
+                placeholder="Escanea o ingresa el código de barras..."
+                leftIcon={<Barcode className="w-5 h-5" />}
+                rightElement={
+                  <button
+                    type="button"
+                    className="px-2.5 py-1 text-[11px] font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 flex items-center space-x-1.5 shadow-2xs"
+                  >
+                    <Camera className="w-3.5 h-3.5 text-maribel-700" />
+                    <span>Cámara</span>
+                  </button>
+                }
+                className="font-mono font-medium"
+              />
+            </div>
+
+            {/* Fila: Marca de producto y Medidas del producto */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Input 1: Marca de producto */}
+              <div>
+                <label className="text-xs font-semibold text-stone-800 flex items-center space-x-1 mb-1.5">
+                  <span>Marca de producto</span>
+                  <span className="text-rose-500">*</span>
+                </label>
+                <AppInput
+                  value={brandInput}
+                  onChange={(e) => setBrandInput(e.target.value)}
+                  placeholder="ej: COOL GIRL"
+                  leftIcon={<Tag className="w-4 h-4" />}
+                />
+              </div>
+
+              {/* Input 2: Medidas del producto */}
+              <div>
+                <label className="text-xs font-semibold text-stone-800 flex items-center space-x-1 mb-1.5">
+                  <span>Medidas del producto</span>
+                  <span className="text-rose-500">*</span>
+                </label>
+                <AppInput
+                  value={sizeInput}
+                  onChange={(e) => setSizeInput(e.target.value)}
+                  placeholder="ej: 85 ml / 2.9 fl. oz"
+                  leftIcon={<Droplets className="w-4 h-4" />}
+                />
               </div>
             </div>
 
-            {/* Card del Producto Seleccionado */}
-            {selectedProduct && (
-              <div className="p-4 bg-stone-50/80 border border-stone-200/80 rounded-2xl flex items-center justify-between gap-4 mt-2">
-                <div className="flex items-center space-x-3 min-w-0">
-                  <div className="w-11 h-11 bg-white rounded-xl border border-stone-200 flex items-center justify-center text-maribel-700 shrink-0 shadow-2xs">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs text-stone-500 font-medium truncate">
-                      <strong className="text-stone-800 font-bold">{selectedProduct.brand}</strong> •{' '}
-                      {selectedProduct.size}
-                    </p>
-                    <h4 className="font-serif font-bold text-stone-900 text-sm truncate mt-0.5">
-                      {selectedProduct.name}
-                    </h4>
-                  </div>
-                </div>
-
-                <div className="text-right shrink-0">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
-                    STOCK ACTUAL
-                  </span>
-                  <span className="inline-flex items-center space-x-1 px-3 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 mt-0.5">
-                    <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                    <span>{selectedProduct.stock} uds</span>
-                  </span>
-                </div>
-              </div>
-            )}
+            {/* Input 3: Descripción del producto */}
+            <div>
+              <label className="text-xs font-semibold text-stone-800 flex items-center space-x-1 mb-1.5">
+                <span>Descripción del producto</span>
+                <span className="text-rose-500">*</span>
+              </label>
+              <AppInput
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                placeholder="ej: IT'S SO GOOD TO BE BAD - EAU DE PARFUM"
+                leftIcon={<Package className="w-4 h-4" />}
+              />
+            </div>
           </div>
 
           {/* Tarjeta: Cantidades y Precios de Compra / Venta / Ganancia */}
@@ -418,16 +477,6 @@ export const StockEntryScreen: React.FC = () => {
                   onChange={(d) => setDateInput(d)}
                 />
               </div>
-
-              <div>
-                <AppInput
-                  label="N° de Lote / Proveedor"
-                  value={batchNumber}
-                  onChange={(e) => setBatchNumber(e.target.value)}
-                  placeholder="LOT-2026-FRAG-B42"
-                  className="font-mono uppercase"
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -496,7 +545,7 @@ export const StockEntryScreen: React.FC = () => {
             <div className="space-y-2 pt-2">
               <button
                 type="submit"
-                disabled={!selectedProduct || quantity <= 0}
+                disabled={!isFormValid}
                 className="w-full inline-flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-xs font-bold text-white bg-maribel-800 hover:bg-maribel-900 transition-all shadow-xs disabled:opacity-50 active:scale-98"
               >
                 <Check className="w-4 h-4 stroke-[2.5]" />
