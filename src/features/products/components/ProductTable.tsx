@@ -2,13 +2,14 @@ import React from 'react';
 import { Product } from '@/features/products/types/product.types';
 import { formatCurrency } from '@/utils/formatters';
 import { t } from '@/lang';
-import { Barcode } from 'lucide-react';
+import { Barcode, Eye } from 'lucide-react';
 
 export interface ProductTableProps {
   products: Product[];
+  onSelectProduct?: (product: Product) => void;
 }
 
-export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
+export const ProductTable: React.FC<ProductTableProps> = ({ products, onSelectProduct }) => {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left text-xs">
@@ -22,6 +23,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
             <th className="px-4 py-3.5 text-center">{t('inventory.totalIn')}</th>
             <th className="px-4 py-3.5 text-center">{t('inventory.totalSold')}</th>
             <th className="px-5 py-3.5 text-center">{t('inventory.stock')}</th>
+            <th className="px-4 py-3.5 text-center">{t('common.actions')}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-stone-100">
@@ -62,11 +64,22 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                   {product.stock} {t('inventory.units')}
                 </span>
               </td>
+              <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                <button
+                  type="button"
+                  onClick={() => onSelectProduct?.(product)}
+                  className="inline-flex items-center space-x-1 px-2.5 py-1 bg-stone-100 hover:bg-maribel-50 hover:text-maribel-800 text-stone-700 rounded-lg text-xs font-semibold transition-colors"
+                  title="Ver detalle del producto"
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Detalle</span>
+                </button>
+              </td>
             </tr>
           ))}
           {products.length === 0 && (
             <tr>
-              <td colSpan={8} className="px-5 py-8 text-center text-stone-400">
+              <td colSpan={9} className="px-5 py-8 text-center text-stone-400">
                 No se encontraron productos en el inventario.
               </td>
             </tr>

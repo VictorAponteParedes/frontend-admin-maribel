@@ -11,6 +11,7 @@ import {
 import { useAuthStore } from '@/store/useAuthStore';
 import { RoutesView } from '@/navigation/routes';
 import { t } from '@/lang';
+import { logoAdmin } from '@/assets';
 
 export const Sidebar: React.FC = () => {
   const location = useLocation();
@@ -70,7 +71,7 @@ export const Sidebar: React.FC = () => {
         className="p-5 border-b border-stone-800 flex items-center space-x-3 hover:bg-stone-800/40 transition-colors"
       >
         <img
-          src="/logo-maribel.png"
+          src={logoAdmin}
           alt="Maribel Tienda de Regalos"
           className="h-10 w-10 rounded-full object-cover ring-2 ring-maribel-600"
         />

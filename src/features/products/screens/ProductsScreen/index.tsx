@@ -3,6 +3,7 @@ import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui';
 import { ProductTable } from '@/features/products/components/ProductTable';
 import { ProductFormModal } from '@/features/products/components/ProductFormModal';
+import { ProductDetailModal } from '@/features/products/components/ProductDetailModal';
 import { StockEntryTable } from '@/features/products/components/StockEntryTable';
 import { StockEntryModal } from '@/features/products/components/StockEntryModal';
 import { ProductFormData } from '@/features/products/types/product.types';
@@ -21,7 +22,7 @@ import {
 } from 'lucide-react';
 
 export const ProductsScreen: React.FC = () => {
-  const { products, addProduct } = useInventoryStore();
+  const { products, addProduct, openProductDetail } = useInventoryStore();
   const { entries, openEntryModal } = useStockEntryStore();
 
   const [activeTab, setActiveTab] = useState<'stock' | 'entries'>('stock');
@@ -190,7 +191,10 @@ export const ProductsScreen: React.FC = () => {
 
         {/* Tabla activa */}
         {activeTab === 'stock' ? (
-          <ProductTable products={filteredProducts} />
+          <ProductTable
+            products={filteredProducts}
+            onSelectProduct={openProductDetail}
+          />
         ) : (
           <StockEntryTable entries={filteredEntries} />
         )}
@@ -204,6 +208,7 @@ export const ProductsScreen: React.FC = () => {
       />
 
       <StockEntryModal />
+      <ProductDetailModal />
     </div>
   );
 };

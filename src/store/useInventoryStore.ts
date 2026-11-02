@@ -3,10 +3,13 @@ import { Product, ProductFormData } from '@/features/products/types/product.type
 
 export interface InventoryState {
   products: Product[];
+  selectedProductForDetail: Product | null;
   addProduct: (productData: ProductFormData) => void;
   deductStock: (barcode: string, quantity: number) => boolean;
   addIncomingStock: (barcode: string, quantity: number) => boolean;
   getByBarcode: (barcode: string) => Product | undefined;
+  openProductDetail: (product: Product) => void;
+  closeProductDetail: () => void;
 }
 
 const INITIAL_PRODUCTS: Product[] = [
@@ -170,6 +173,10 @@ const INITIAL_PRODUCTS: Product[] = [
 
 export const useInventoryStore = create<InventoryState>((set, get) => ({
   products: INITIAL_PRODUCTS,
+  selectedProductForDetail: null,
+
+  openProductDetail: (product: Product) => set({ selectedProductForDetail: product }),
+  closeProductDetail: () => set({ selectedProductForDetail: null }),
 
   addProduct: (productData: ProductFormData) => {
     const newProduct: Product = {
