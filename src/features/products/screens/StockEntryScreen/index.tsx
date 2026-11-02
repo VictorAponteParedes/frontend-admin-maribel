@@ -477,6 +477,16 @@ export const StockEntryScreen: React.FC = () => {
                   onChange={(d) => setDateInput(d)}
                 />
               </div>
+
+              <div>
+                <AppInput
+                  label="N° de Lote / Proveedor"
+                  value={batchNumber}
+                  onChange={(e) => setBatchNumber(e.target.value)}
+                  placeholder="LOT-2026-FRAG-B42"
+                  className="font-mono uppercase"
+                />
+              </div>
             </div>
           </div>
         </div>
