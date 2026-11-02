@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { ControlledInput, Button } from '@/components/ui';
 import { CustomerFormData } from '@/features/customers/types/customer.types';
-import { t } from '@/lang';
+import { useTranslation } from '@/locale';
 import { X, UserPlus, MapPin, Phone } from 'lucide-react';
 
 export interface CustomerFormModalProps {
@@ -16,6 +16,7 @@ export const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
   onClose,
   onSubmitCustomer,
 }) => {
+  const { t } = useTranslation(['customers', 'translation']);
   const { control, handleSubmit, reset } = useForm<CustomerFormData>({
     defaultValues: {
       name: '',
@@ -44,10 +45,10 @@ export const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
             </div>
             <div>
               <h3 className="font-serif font-bold text-stone-900 text-base">
-                Registrar Nuevo Cliente
+                {t('modal.title')}
               </h3>
               <p className="text-xs text-stone-500">
-                Se le asignará un código correlativo automáticamente
+                {t('modal.subtitle')}
               </p>
             </div>
           </div>
@@ -64,33 +65,33 @@ export const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
           <ControlledInput
             control={control}
             name="name"
-            label="Nombre Completo"
-            placeholder="ej. Pablo Ariel Melgarejo Servian"
-            rules={{ required: t('validation.required') }}
+            label={t('modal.nameLabel')}
+            placeholder={t('modal.namePlaceholder')}
+            rules={{ required: t('modal.requiredField') }}
           />
 
           <ControlledInput
             control={control}
             name="phone"
-            label="Número de teléfono (WhatsApp)"
-            placeholder="ej. 0986 314 630"
+            label={t('modal.phoneLabel')}
+            placeholder={t('modal.phonePlaceholder')}
             leftIcon={<Phone className="w-4 h-4 text-stone-400" />}
           />
 
           <ControlledInput
             control={control}
             name="address"
-            label="Dirección o referencia / Ciudad"
-            placeholder="ej. Pedro Juan Caballero / Ypané"
+            label={t('modal.addressLabel')}
+            placeholder={t('modal.addressPlaceholder')}
             leftIcon={<MapPin className="w-4 h-4 text-stone-400" />}
-            rules={{ required: t('validation.required') }}
+            rules={{ required: t('modal.requiredField') }}
           />
 
           <ControlledInput
             control={control}
             name="gpsUrl"
-            label="Enlace GPS Google Maps (Opcional)"
-            placeholder="https://maps.google.com/?q=..."
+            label={t('modal.gpsLabel')}
+            placeholder={t('modal.gpsPlaceholder')}
           />
 
           <div className="pt-4 border-t border-stone-100 flex justify-end space-x-2">
@@ -98,7 +99,7 @@ export const CustomerFormModal: React.FC<CustomerFormModalProps> = ({
               {t('common.cancel')}
             </Button>
             <Button type="submit" variant="primary">
-              Guardar Cliente
+              {t('modal.saveButton')}
             </Button>
           </div>
         </form>

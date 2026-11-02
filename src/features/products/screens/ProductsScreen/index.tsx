@@ -12,7 +12,6 @@ import { useStockEntryStore } from '@/store/useStockEntryStore';
 import { RoutesView } from '@/navigation/routes';
 import { useTranslation } from '@/locale';
 import {
-  Plus,
   Search,
   Filter,
   AlertTriangle,
@@ -20,6 +19,7 @@ import {
   PackagePlus,
   Boxes,
   History,
+  Plus,
 } from 'lucide-react';
 
 export const ProductsScreen: React.FC = () => {

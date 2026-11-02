@@ -1,10 +1,33 @@
 {
-  "title": "Customer Directory",
-  "subtitle": "Database of frequent shoppers and their history",
-  "code": "Code",
-  "name": "Full Name",
-  "phone": "Phone",
-  "email": "Email",
-  "totalPurchases": "Total Purchases",
-  "newCustomer": "New Customer"
+  "title": "Customers Directory",
+  "subtitle": "Manage customers, contact information, addresses and GPS location",
+  "newCustomer": "New Customer",
+  "searchPlaceholder": "Search by code, name, phone or city...",
+  "registeredCount": "{{count}} registered customers",
+  "sendWhatsAppTooltip": "Send WhatsApp",
+  "viewMap": "View Map",
+  "noPhone": "No phone",
+  "table": {
+    "code": "Code",
+    "registrationDate": "Registration Date",
+    "name": "Name",
+    "phone": "Phone Number",
+    "address": "Address or Reference",
+    "gpsLocation": "GPS Location",
+    "noResults": "No matching customers found."
+  },
+  "modal": {
+    "title": "Register New Customer",
+    "subtitle": "A sequential code will be assigned automatically",
+    "nameLabel": "Full Name",
+    "namePlaceholder": "e.g. Pablo Ariel Melgarejo Servian",
+    "phoneLabel": "Phone Number (WhatsApp)",
+    "phonePlaceholder": "e.g. 0986 314 630",
+    "addressLabel": "Address or reference / City",
+    "addressPlaceholder": "e.g. Pedro Juan Caballero / Ypané",
+    "gpsLabel": "Google Maps GPS Link (Optional)",
+    "gpsPlaceholder": "https://maps.google.com/?q=...",
+    "saveButton": "Save Customer",
+    "requiredField": "This field is required"
+  }
 }

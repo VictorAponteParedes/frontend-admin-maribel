@@ -1,10 +1,33 @@
 {
   "title": "Directorio de Clientes",
-  "subtitle": "Base de datos de compradores frecuentes y su historial",
-  "code": "Código",
-  "name": "Nombre completo",
-  "phone": "Teléfono",
-  "email": "Correo",
-  "totalPurchases": "Total Compras",
-  "newCustomer": "Nuevo Cliente"
+  "subtitle": "Control de clientes, datos de contacto, direcciones y ubicación GPS",
+  "newCustomer": "Nuevo Cliente",
+  "searchPlaceholder": "Buscar por código, nombre, teléfono o ciudad...",
+  "registeredCount": "{{count}} clientes registrados",
+  "sendWhatsAppTooltip": "Enviar WhatsApp",
+  "viewMap": "Ver Mapa",
+  "noPhone": "Sin teléfono",
+  "table": {
+    "code": "Código",
+    "registrationDate": "Fecha Registro",
+    "name": "Nombre",
+    "phone": "Número de Teléfono",
+    "address": "Dirección o Referencia",
+    "gpsLocation": "Ubicación GPS",
+    "noResults": "No se encontraron clientes coincidentes."
+  },
+  "modal": {
+    "title": "Registrar Nuevo Cliente",
+    "subtitle": "Se le asignará un código correlativo automáticamente",
+    "nameLabel": "Nombre Completo",
+    "namePlaceholder": "ej. Pablo Ariel Melgarejo Servian",
+    "phoneLabel": "Número de teléfono (WhatsApp)",
+    "phonePlaceholder": "ej. 0986 314 630",
+    "addressLabel": "Dirección o referencia / Ciudad",
+    "addressPlaceholder": "ej. Pedro Juan Caballero / Ypané",
+    "gpsLabel": "Enlace GPS Google Maps (Opcional)",
+    "gpsPlaceholder": "https://maps.google.com/?q=...",
+    "saveButton": "Guardar Cliente",
+    "requiredField": "Este campo es obligatorio"
+  }
 }
