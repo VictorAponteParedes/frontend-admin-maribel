@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { ControlledInput, Button } from '@/components/ui';
 import { ProductFormData } from '@/features/products/types/product.types';
-import { t } from '@/lang';
+import { useTranslation } from '@/locale';
 import { X, Barcode } from 'lucide-react';
 
 export interface ProductFormModalProps {
@@ -16,6 +16,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   onClose,
   onSubmitProduct,
 }) => {
+  const { t } = useTranslation(['inventory', 'translation']);
   const { control, handleSubmit, reset } = useForm<ProductFormData>({
     defaultValues: {
       barcode: '',
@@ -47,7 +48,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
           <div className="flex items-center space-x-2">
             <Barcode className="w-5 h-5 text-maribel-700" />
             <h3 className="font-serif font-bold text-stone-900 text-base">
-              {t('inventory.newProduct')}
+              {t('newProduct')}
             </h3>
           </div>
           <button
@@ -63,34 +64,34 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
           <ControlledInput
             control={control}
             name="barcode"
-            label={t('inventory.barcode')}
+            label={t('barcode')}
             placeholder="e.g. 6972011068673"
-            rules={{ required: t('validation.required') }}
+            rules={{ required: t('entry.errors.barcodeRequired') }}
           />
 
           <div className="grid grid-cols-2 gap-4">
             <ControlledInput
               control={control}
               name="brand"
-              label={t('inventory.brand')}
+              label={t('brand')}
               placeholder="e.g. COOL GIRL / MYSTICAL"
-              rules={{ required: t('validation.required') }}
+              rules={{ required: t('entry.errors.brandRequired') }}
             />
             <ControlledInput
               control={control}
               name="size"
-              label={t('inventory.size')}
+              label={t('size')}
               placeholder="e.g. 85 ml / 2.9 fl. oz"
-              rules={{ required: t('validation.required') }}
+              rules={{ required: t('entry.errors.sizeRequired') }}
             />
           </div>
 
           <ControlledInput
             control={control}
             name="name"
-            label={t('inventory.description')}
+            label={t('description')}
             placeholder="e.g. IT'S SO GOOD TO BE BAD - EAU DE PARFUM"
-            rules={{ required: t('validation.required') }}
+            rules={{ required: t('entry.errors.descRequired') }}
           />
 
           <div className="grid grid-cols-2 gap-4">
@@ -98,22 +99,22 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               control={control}
               name="price"
               type="number"
-              label={t('inventory.price')}
+              label={t('price')}
               placeholder="0"
               rules={{
-                required: t('validation.required'),
-                min: { value: 1, message: t('validation.minPrice') },
+                required: t('entry.errors.salePositive'),
+                min: { value: 1, message: t('entry.errors.salePositive') },
               }}
             />
             <ControlledInput
               control={control}
               name="totalIn"
               type="number"
-              label={t('inventory.totalIn')}
+              label={t('totalIn')}
               placeholder="10"
               rules={{
-                required: t('validation.required'),
-                min: { value: 1, message: t('validation.minStock') },
+                required: t('entry.errors.quantityPositive'),
+                min: { value: 1, message: t('entry.errors.quantityPositive') },
               }}
             />
           </div>

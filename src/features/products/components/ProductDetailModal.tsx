@@ -3,7 +3,7 @@ import { useInventoryStore } from '@/store/useInventoryStore';
 import { useStockEntryStore } from '@/store/useStockEntryStore';
 import { useSalesStore } from '@/store/useSalesStore';
 import { formatCurrency } from '@/utils/formatters';
-import { t } from '@/lang';
+import { useTranslation } from '@/locale';
 import {
   X,
   Barcode,
@@ -17,6 +17,7 @@ import {
 import { Button } from '@/components/ui';
 
 export const ProductDetailModal: React.FC = () => {
+  const { t } = useTranslation(['inventory', 'translation']);
   const { selectedProductForDetail, closeProductDetail } = useInventoryStore();
   const { entries } = useStockEntryStore();
   const { sales } = useSalesStore();
@@ -79,12 +80,13 @@ export const ProductDetailModal: React.FC = () => {
                 <span className="font-semibold text-stone-800">{product.barcode}</span>
               </div>
               <p className="text-xs text-stone-500">
-                Presentación / Medida: <strong className="text-stone-700">{product.size}</strong>
+                {t('modal.presentationSize')}{' '}
+                <strong className="text-stone-700">{product.size}</strong>
               </p>
             </div>
 
             <div className="sm:text-right">
-              <span className="text-xs text-stone-500 block">Precio de Venta al Público</span>
+              <span className="text-xs text-stone-500 block">{t('modal.salePricePublic')}</span>
               <p className="text-2xl font-bold font-serif text-maribel-800">
                 {formatCurrency(product.price)}
               </p>
@@ -95,25 +97,29 @@ export const ProductDetailModal: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="p-4 rounded-xl border border-stone-200 bg-white">
               <div className="flex items-center justify-between text-stone-500 text-xs font-medium mb-1">
-                <span>Total Ingresos</span>
+                <span>{t('modal.totalIn')}</span>
                 <Layers className="w-4 h-4 text-stone-400" />
               </div>
-              <p className="text-xl font-bold font-serif text-stone-900">{product.totalIn} uds</p>
-              <span className="text-[11px] text-stone-400">mercadería recibida</span>
+              <p className="text-xl font-bold font-serif text-stone-900">
+                {product.totalIn} {t('units')}
+              </p>
+              <span className="text-[11px] text-stone-400">{t('modal.receivedGoods')}</span>
             </div>
 
             <div className="p-4 rounded-xl border border-stone-200 bg-white">
               <div className="flex items-center justify-between text-stone-500 text-xs font-medium mb-1">
-                <span>Total Vendidas</span>
+                <span>{t('modal.totalSold')}</span>
                 <ShoppingBag className="w-4 h-4 text-maribel-700" />
               </div>
-              <p className="text-xl font-bold font-serif text-maribel-800">{product.totalSold} uds</p>
-              <span className="text-[11px] text-stone-400">salidas por mostrador</span>
+              <p className="text-xl font-bold font-serif text-maribel-800">
+                {product.totalSold} {t('units')}
+              </p>
+              <span className="text-[11px] text-stone-400">{t('modal.counterSales')}</span>
             </div>
 
             <div className="p-4 rounded-xl border border-stone-200 bg-white">
               <div className="flex items-center justify-between text-stone-500 text-xs font-medium mb-1">
-                <span>Saldo en Stock</span>
+                <span>{t('modal.stockBalance')}</span>
                 <Boxes className="w-4 h-4 text-emerald-600" />
               </div>
               <p
@@ -125,9 +131,9 @@ export const ProductDetailModal: React.FC = () => {
                     : 'text-emerald-700'
                 }`}
               >
-                {product.stock} uds
+                {product.stock} {t('units')}
               </p>
-              <span className="text-[11px] text-stone-400">disponibles hoy</span>
+              <span className="text-[11px] text-stone-400">{t('modal.availableToday')}</span>
             </div>
           </div>
 
@@ -135,16 +141,18 @@ export const ProductDetailModal: React.FC = () => {
           <div>
             <h4 className="text-xs font-bold text-stone-800 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
               <ArrowDownRight className="w-4 h-4 text-emerald-600" />
-              <span>Entradas de Mercadería ({productEntries.length})</span>
+              <span>
+                {t('modal.stockEntriesCount', { count: productEntries.length })}
+              </span>
             </h4>
             <div className="border border-stone-200 rounded-xl overflow-hidden">
               <table className="w-full text-left text-xs">
                 <thead className="bg-stone-50 text-stone-500 text-[11px] border-b border-stone-200 uppercase tracking-wider">
                   <tr>
-                    <th className="px-4 py-2.5">Fecha</th>
-                    <th className="px-4 py-2.5 text-center">Cantidad</th>
-                    <th className="px-4 py-2.5 text-right">Costo Unit.</th>
-                    <th className="px-4 py-2.5 text-right">Costo Total</th>
+                    <th className="px-4 py-2.5">{t('detail.date')}</th>
+                    <th className="px-4 py-2.5 text-center">{t('detail.qtyReceived')}</th>
+                    <th className="px-4 py-2.5 text-right">{t('modal.unitCostShort')}</th>
+                    <th className="px-4 py-2.5 text-right">{t('modal.totalCost')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
@@ -154,7 +162,7 @@ export const ProductDetailModal: React.FC = () => {
                         {entry.date}
                       </td>
                       <td className="px-4 py-2 text-center font-bold text-emerald-800">
-                        +{entry.quantity} uds
+                        +{entry.quantity} {t('units')}
                       </td>
                       <td className="px-4 py-2 text-right text-stone-600">
                         {formatCurrency(entry.unitCost)}
@@ -167,7 +175,7 @@ export const ProductDetailModal: React.FC = () => {
                   {productEntries.length === 0 && (
                     <tr>
                       <td colSpan={4} className="px-4 py-3 text-center text-stone-400 text-xs">
-                        No hay ingresos individuales registrados para este producto.
+                        {t('modal.noIndividualEntries')}
                       </td>
                     </tr>
                   )}
@@ -180,17 +188,19 @@ export const ProductDetailModal: React.FC = () => {
           <div>
             <h4 className="text-xs font-bold text-stone-800 uppercase tracking-wider mb-2 flex items-center space-x-1.5">
               <Receipt className="w-4 h-4 text-maribel-700" />
-              <span>Ventas Registradas ({productSales.length})</span>
+              <span>
+                {t('modal.recordedSalesCount', { count: productSales.length })}
+              </span>
             </h4>
             <div className="border border-stone-200 rounded-xl overflow-hidden">
               <table className="w-full text-left text-xs">
                 <thead className="bg-stone-50 text-stone-500 text-[11px] border-b border-stone-200 uppercase tracking-wider">
                   <tr>
-                    <th className="px-4 py-2.5">N° Venta</th>
-                    <th className="px-4 py-2.5">Fecha</th>
-                    <th className="px-4 py-2.5">Cliente</th>
-                    <th className="px-4 py-2.5 text-center">Cant.</th>
-                    <th className="px-4 py-2.5 text-right">Subtotal</th>
+                    <th className="px-4 py-2.5">{t('modal.saleNumber')}</th>
+                    <th className="px-4 py-2.5">{t('detail.date')}</th>
+                    <th className="px-4 py-2.5">{t('modal.client')}</th>
+                    <th className="px-4 py-2.5 text-center">{t('modal.qtyShort')}</th>
+                    <th className="px-4 py-2.5 text-right">{t('modal.subtotal')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
@@ -204,7 +214,7 @@ export const ProductDetailModal: React.FC = () => {
                       </td>
                       <td className="px-4 py-2 text-stone-700">{sale.customerName}</td>
                       <td className="px-4 py-2 text-center font-bold text-maribel-800">
-                        {sale.quantity} uds
+                        {sale.quantity} {t('units')}
                       </td>
                       <td className="px-4 py-2 text-right font-bold text-stone-900">
                         {formatCurrency(sale.subtotal)}
@@ -214,7 +224,7 @@ export const ProductDetailModal: React.FC = () => {
                   {productSales.length === 0 && (
                     <tr>
                       <td colSpan={5} className="px-4 py-3 text-center text-stone-400 text-xs">
-                        No hay ventas registradas de este producto todavía.
+                        {t('modal.noSalesRecorded')}
                       </td>
                     </tr>
                   )}

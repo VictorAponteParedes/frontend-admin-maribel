@@ -8,6 +8,7 @@ import { AppInput, DatePickerInput } from '@/components/ui';
 import { BarcodeScannerModal } from '@/componentes';
 import type { Html5QrcodeResult } from 'html5-qrcode';
 import { RoutesView } from '@/navigation/routes';
+import { useTranslation } from '@/locale';
 import {
   ArrowLeft,
   Barcode,
@@ -25,6 +26,7 @@ import {
 } from 'lucide-react';
 
 export const StockEntryScreen: React.FC = () => {
+  const { t } = useTranslation(['inventory', 'translation']);
   const navigate = useNavigate();
   const { getByBarcode, recordIncomingStock, addProduct } = useInventoryStore();
   const { recordStockEntry } = useStockEntryStore();
@@ -105,50 +107,50 @@ export const StockEntryScreen: React.FC = () => {
     setErrorMessage('');
 
     if (!barcodeInput.trim()) {
-      setErrorMessage('Debes ingresar el código de barras o SKU del producto.');
-      toast.error('Código requerido', 'Debes ingresar el código de barras o SKU.');
+      setErrorMessage(t('entry.errors.barcodeRequired'));
+      toast.error('Código requerido', t('entry.errors.barcodeRequired'));
       return;
     }
 
     if (!brandInput.trim()) {
-      setErrorMessage('Debes ingresar la marca del producto.');
-      toast.error('Marca requerida', 'Debes ingresar la marca del producto.');
+      setErrorMessage(t('entry.errors.brandRequired'));
+      toast.error('Marca requerida', t('entry.errors.brandRequired'));
       return;
     }
 
     if (!nameInput.trim()) {
-      setErrorMessage('Debes ingresar la descripción del producto.');
-      toast.error('Descripción requerida', 'Debes ingresar la descripción del producto.');
+      setErrorMessage(t('entry.errors.descRequired'));
+      toast.error('Descripción requerida', t('entry.errors.descRequired'));
       return;
     }
 
     if (!sizeInput.trim()) {
-      setErrorMessage('Debes ingresar las medidas del producto (ej: 85 ml / 2.9 fl. oz).');
-      toast.error('Medidas requeridas', 'Debes ingresar las medidas del producto.');
+      setErrorMessage(t('entry.errors.sizeRequired'));
+      toast.error('Medidas requeridas', t('entry.errors.sizeRequired'));
       return;
     }
 
     if (quantity <= 0) {
-      setErrorMessage('La cantidad ingresada debe ser mayor a 0 unidades.');
-      toast.error('Cantidad inválida', 'La cantidad debe ser mayor a 0.');
+      setErrorMessage(t('entry.errors.quantityPositive'));
+      toast.error('Cantidad inválida', t('entry.errors.quantityPositive'));
       return;
     }
 
     if (costPrice <= 0) {
-      setErrorMessage('Debes ingresar un precio de compra válido mayor a 0 Gs.');
-      toast.error('Precio requerido', 'Debes ingresar el precio de compra.');
+      setErrorMessage(t('entry.errors.costPositive'));
+      toast.error('Precio requerido', t('entry.errors.costPositive'));
       return;
     }
 
     if (sellingPrice <= 0) {
-      setErrorMessage('Debes ingresar un precio de venta válido mayor a 0 Gs.');
-      toast.error('Precio requerido', 'Debes ingresar el precio de venta sugerido.');
+      setErrorMessage(t('entry.errors.salePositive'));
+      toast.error('Precio requerido', t('entry.errors.salePositive'));
       return;
     }
 
     if (sellingPrice < costPrice) {
-      setErrorMessage('Advertencia: El precio de venta no debería ser menor al costo de compra.');
-      toast.warning('Margen negativo', 'El precio de venta es menor al costo de compra.');
+      setErrorMessage(t('entry.errors.negativeMarginWarning'));
+      toast.warning('Margen negativo', t('entry.errors.negativeMarginWarning'));
     }
 
     const cleanBarcode = barcodeInput.trim();
@@ -190,7 +192,7 @@ export const StockEntryScreen: React.FC = () => {
       });
     }
 
-    const successMsg = `¡Ingreso registrado con éxito! (+${quantity} uds de ${cleanBrand})`;
+    const successMsg = t('entry.entrySuccess', { count: quantity, brand: cleanBrand });
     setSuccessMessage(successMsg);
     toast.success('Ingreso registrado', successMsg);
 
@@ -218,11 +220,11 @@ export const StockEntryScreen: React.FC = () => {
           className="inline-flex items-center space-x-2 text-xs font-semibold text-stone-600 hover:text-maribel-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Volver al Inventario</span>
+          <span>{t('detail.backButton')}</span>
         </button>
 
         <span className="px-3 py-1 bg-rose-50 border border-rose-100 text-maribel-700 text-xs font-semibold rounded-full">
-          Recepción de Mercadería & Actualización de Precios
+          {t('entry.navBadge')}
         </span>
       </div>
 
@@ -234,10 +236,10 @@ export const StockEntryScreen: React.FC = () => {
           </div>
           <div>
             <h1 className="text-2xl font-serif font-bold text-stone-900 tracking-tight">
-              Registrar Ingreso de Mercadería
+              {t('entry.title')}
             </h1>
             <p className="text-xs text-stone-500 mt-1">
-              Ingresa los datos del producto, actualiza saldos, precios y visualiza la rentabilidad en tiempo real.
+              {t('entry.subtitle')}
             </p>
           </div>
         </div>
@@ -264,12 +266,12 @@ export const StockEntryScreen: React.FC = () => {
           <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-xs space-y-5">
             <div className="flex items-center justify-between pb-3 border-b border-stone-100">
               <h3 className="font-serif font-bold text-stone-900 text-sm">
-                Datos del Producto
+                {t('entry.productData')}
               </h3>
 
               <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 bg-emerald-50 border border-emerald-200/60 rounded-full text-[11px] font-medium text-emerald-700">
                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                <span>Lector USB Activo</span>
+                <span>{t('entry.usbScannerActive')}</span>
               </span>
             </div>
 
@@ -277,13 +279,13 @@ export const StockEntryScreen: React.FC = () => {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-semibold text-stone-800 flex items-center space-x-1">
-                  <span>Código de barras / SKU</span>
+                  <span>{t('entry.barcodeLabel')}</span>
                   <span className="text-rose-500">*</span>
                 </label>
                 {existingProduct && (
                   <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200/60 flex items-center space-x-1">
                     <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                    <span>En catálogo • Stock: {existingProduct.stock} uds</span>
+                    <span>{t('entry.inCatalogTag', { count: existingProduct.stock })}</span>
                   </span>
                 )}
               </div>
@@ -293,11 +295,11 @@ export const StockEntryScreen: React.FC = () => {
                 onChange={(e) => handleBarcodeChange(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    e.preventDefault(); // Evita envío accidental del formulario con el Enter de la pistola USB
+                    e.preventDefault();
                   }
                 }}
                 autoFocus
-                placeholder="Escanea o ingresa el código de barras..."
+                placeholder={t('entry.barcodePlaceholder')}
                 leftIcon={<Barcode className="w-5 h-5" />}
                 rightElement={
                   <button
@@ -306,7 +308,7 @@ export const StockEntryScreen: React.FC = () => {
                     className="px-2.5 py-1 text-[11px] font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 flex items-center space-x-1.5 shadow-2xs active:scale-95 transition-all"
                   >
                     <Camera className="w-3.5 h-3.5 text-maribel-700" />
-                    <span>Cámara</span>
+                    <span>{t('entry.cameraButton')}</span>
                   </button>
                 }
                 className="font-mono font-medium"
@@ -315,10 +317,9 @@ export const StockEntryScreen: React.FC = () => {
 
             {/* Fila: Marca de producto y Medidas del producto */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Input 1: Marca de producto */}
               <div>
                 <label className="text-xs font-semibold text-stone-800 flex items-center space-x-1 mb-1.5">
-                  <span>Marca de producto</span>
+                  <span>{t('entry.brandLabel')}</span>
                   <span className="text-rose-500">*</span>
                 </label>
                 <AppInput
@@ -329,10 +330,9 @@ export const StockEntryScreen: React.FC = () => {
                 />
               </div>
 
-              {/* Input 2: Medidas del producto */}
               <div>
                 <label className="text-xs font-semibold text-stone-800 flex items-center space-x-1 mb-1.5">
-                  <span>Medidas del producto</span>
+                  <span>{t('entry.sizeLabel')}</span>
                   <span className="text-rose-500">*</span>
                 </label>
                 <AppInput
@@ -347,7 +347,7 @@ export const StockEntryScreen: React.FC = () => {
             {/* Input 3: Descripción del producto */}
             <div>
               <label className="text-xs font-semibold text-stone-800 flex items-center space-x-1 mb-1.5">
-                <span>Descripción del producto</span>
+                <span>{t('entry.descriptionLabel')}</span>
                 <span className="text-rose-500">*</span>
               </label>
               <AppInput
@@ -362,16 +362,16 @@ export const StockEntryScreen: React.FC = () => {
           {/* Tarjeta: Cantidades y Precios de Compra / Venta / Ganancia */}
           <div className="bg-white rounded-3xl p-6 border border-stone-200/80 shadow-xs space-y-5">
             <h3 className="font-serif font-bold text-stone-900 text-sm pb-2 border-b border-stone-100">
-              Cantidades, Precios y Rentabilidad
+              {t('entry.quantitiesPricesTitle')}
             </h3>
 
             {/* Cantidad recibida */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-semibold text-stone-800">
-                  Cantidad recibida a ingresar (uds)
+                  {t('entry.qtyToEnter')}
                 </label>
-                <span className="text-[11px] text-stone-400">Pack estándar: 12 unidades</span>
+                <span className="text-[11px] text-stone-400">{t('entry.standardPack')}</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
@@ -421,7 +421,7 @@ export const StockEntryScreen: React.FC = () => {
                         : 'bg-stone-100 hover:bg-stone-200/80 border-transparent text-stone-700'
                     }`}
                   >
-                    +12 (Caja)
+                    {t('entry.boxTag')}
                   </button>
                   <button
                     type="button"
@@ -432,7 +432,7 @@ export const StockEntryScreen: React.FC = () => {
                         : 'bg-stone-100 hover:bg-stone-200/80 border-transparent text-stone-700'
                     }`}
                   >
-                    +24 (Master)
+                    {t('entry.masterTag')}
                   </button>
                 </div>
               </div>
@@ -444,7 +444,7 @@ export const StockEntryScreen: React.FC = () => {
               <div>
                 <label className="text-xs font-semibold text-stone-800 mb-1.5 flex items-center justify-between">
                   <span className="flex items-center space-x-1">
-                    <span>Precio de compra (Gs.)</span>
+                    <span>{t('entry.purchasePriceLabel')}</span>
                     <span className="text-rose-500">*</span>
                   </span>
                   <DollarSign className="w-3.5 h-3.5 text-stone-400" />
@@ -456,14 +456,14 @@ export const StockEntryScreen: React.FC = () => {
                   placeholder="0"
                   className="font-semibold text-sm"
                 />
-                <p className="text-[11px] text-stone-400 mt-1">Costo pagado al proveedor</p>
+                <p className="text-[11px] text-stone-400 mt-1">{t('entry.purchasePriceDesc')}</p>
               </div>
 
               {/* Precio Venta */}
               <div>
                 <label className="text-xs font-semibold text-stone-800 mb-1.5 flex items-center justify-between">
                   <span className="flex items-center space-x-1">
-                    <span>Precio de venta (Gs.)</span>
+                    <span>{t('entry.sellingPriceLabel')}</span>
                     <span className="text-rose-500">*</span>
                   </span>
                   <ShoppingCart className="w-3.5 h-3.5 text-maribel-700" />
@@ -475,7 +475,7 @@ export const StockEntryScreen: React.FC = () => {
                   placeholder="0"
                   className="font-bold text-sm"
                 />
-                <p className="text-[11px] text-stone-400 mt-1">PVP sugerido al cliente</p>
+                <p className="text-[11px] text-stone-400 mt-1">{t('entry.sellingPriceDesc')}</p>
               </div>
 
               {/* Ganancia Unitaria Calculada en tiempo real */}
@@ -483,7 +483,7 @@ export const StockEntryScreen: React.FC = () => {
                 <div>
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-900">
-                      Ganancia / Unidad
+                      {t('entry.profitPerUnit')}
                     </span>
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
                       ~{marginPercent}%
@@ -495,8 +495,8 @@ export const StockEntryScreen: React.FC = () => {
                 </div>
                 <p className="text-[10px] text-emerald-700/80 font-medium">
                   {costPrice > 0 && sellingPrice > 0
-                    ? `Ganas ${formatCurrency(unitProfit)} por cada frasco`
-                    : 'Ingresa compra y venta'}
+                    ? t('entry.gainPerBottle', { profit: formatCurrency(unitProfit) })
+                    : t('entry.enterPurchaseSale')}
                 </p>
               </div>
             </div>
@@ -505,7 +505,7 @@ export const StockEntryScreen: React.FC = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               <div>
                 <DatePickerInput
-                  label="Fecha de recepción"
+                  label={t('entry.receptionDate')}
                   value={dateInput}
                   onChange={(d) => setDateInput(d)}
                 />
@@ -513,7 +513,7 @@ export const StockEntryScreen: React.FC = () => {
 
               <div>
                 <AppInput
-                  label="N° de Lote / Proveedor"
+                  label={t('entry.batchNumber')}
                   value={batchNumber}
                   onChange={(e) => setBatchNumber(e.target.value)}
                   placeholder="LOT-2026-FRAG-B42"
@@ -530,27 +530,27 @@ export const StockEntryScreen: React.FC = () => {
             <div className="flex items-center space-x-2 pb-3 border-b border-stone-100">
               <TrendingUp className="w-5 h-5 text-emerald-700" />
               <h3 className="font-serif font-bold text-stone-900 text-base">
-                Resumen del Lote
+                {t('entry.batchSummary')}
               </h3>
             </div>
 
             {/* Proyección de existencias */}
             <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200/60 space-y-2">
               <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
-                PROYECCIÓN EN ESTANTERÍA
+                {t('entry.shelfProjection')}
               </span>
               <div className="flex items-center justify-between text-xs text-stone-600">
-                <span>Stock actual:</span>
-                <span className="font-medium">{existingStock} uds</span>
+                <span>{t('entry.currentStock')}</span>
+                <span className="font-medium">{t('table.unitsTag', { count: existingStock })}</span>
               </div>
               <div className="flex items-center justify-between text-xs text-emerald-700 font-semibold">
-                <span>Ingreso nuevo:</span>
-                <span>+{quantity} uds</span>
+                <span>{t('entry.newIncoming')}</span>
+                <span>{t('table.plusUnitsTag', { count: quantity })}</span>
               </div>
               <div className="pt-2 border-t border-stone-200/60 flex items-center justify-between text-xs">
-                <span className="font-bold text-stone-800">Total Disponible:</span>
+                <span className="font-bold text-stone-800">{t('entry.totalAvailable')}</span>
                 <span className="font-bold text-base text-stone-900 font-serif">
-                  {projectedStock} uds
+                  {t('table.unitsTag', { count: projectedStock })}
                 </span>
               </div>
             </div>
@@ -558,14 +558,14 @@ export const StockEntryScreen: React.FC = () => {
             {/* Resumen Monetario del Lote */}
             <div className="space-y-3 text-xs">
               <div className="flex items-center justify-between p-3 rounded-xl bg-stone-50">
-                <span className="text-stone-500 font-medium">Inversión Total del Lote:</span>
+                <span className="text-stone-500 font-medium">{t('entry.totalBatchInvestment')}</span>
                 <strong className="text-stone-900 text-sm font-mono">
                   {formatCurrency(totalCost)}
                 </strong>
               </div>
 
               <div className="flex items-center justify-between p-3 rounded-xl bg-stone-50">
-                <span className="text-stone-500 font-medium">Venta Bruta Proyectada:</span>
+                <span className="text-stone-500 font-medium">{t('entry.projectedGrossSales')}</span>
                 <strong className="text-stone-900 text-sm font-mono">
                   {formatCurrency(totalSales)}
                 </strong>
@@ -573,13 +573,13 @@ export const StockEntryScreen: React.FC = () => {
 
               <div className="p-4 rounded-2xl bg-emerald-50/90 border border-emerald-200 space-y-1">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 block">
-                  GANANCIA TOTAL ESTIMADA
+                  {t('entry.estimatedTotalProfit')}
                 </span>
                 <p className="text-2xl font-bold font-serif text-emerald-800">
                   +{formatCurrency(totalProfit)}
                 </p>
                 <p className="text-[11px] text-emerald-700">
-                  Al vender las {quantity} unidades de este ingreso
+                  {t('entry.whenSellingAll', { count: quantity })}
                 </p>
               </div>
             </div>
@@ -592,12 +592,12 @@ export const StockEntryScreen: React.FC = () => {
                 className="w-full inline-flex items-center justify-center space-x-2 py-3 px-4 rounded-xl text-xs font-bold text-white bg-maribel-800 hover:bg-maribel-900 transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed active:scale-98"
               >
                 <Check className="w-4 h-4 stroke-[2.5]" />
-                <span>Confirmar Ingreso (+{quantity} uds)</span>
+                <span>{t('entry.confirmEntry', { count: quantity })}</span>
               </button>
 
               {!isFormValid && (
                 <p className="text-[11px] text-center text-stone-400 font-medium">
-                  Completa los campos con (*) incluyendo compra y venta para guardar.
+                  {t('entry.formRequirementNote')}
                 </p>
               )}
 
@@ -606,7 +606,7 @@ export const StockEntryScreen: React.FC = () => {
                 onClick={() => navigate(RoutesView.PRODUCTS)}
                 className="w-full py-2.5 text-xs font-semibold text-stone-500 hover:text-stone-800 hover:bg-stone-50 rounded-xl transition-colors text-center"
               >
-                Cancelar y regresar
+                {t('entry.cancelAndReturn')}
               </button>
             </div>
           </div>

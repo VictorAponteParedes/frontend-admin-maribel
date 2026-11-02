@@ -10,7 +10,7 @@ import { ProductFormData } from '@/features/products/types/product.types';
 import { useInventoryStore } from '@/store/useInventoryStore';
 import { useStockEntryStore } from '@/store/useStockEntryStore';
 import { RoutesView } from '@/navigation/routes';
-import { t } from '@/lang';
+import { useTranslation } from '@/locale';
 import {
   Plus,
   Search,
@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 
 export const ProductsScreen: React.FC = () => {
+  const { t } = useTranslation(['inventory', 'translation']);
   const navigate = useNavigate();
   const { products, addProduct } = useInventoryStore();
   const { entries } = useStockEntryStore();
@@ -98,8 +99,8 @@ export const ProductsScreen: React.FC = () => {
   return (
     <div>
       <Header
-        title={t('inventory.title')}
-        subtitle={t('inventory.subtitle')}
+        title={t('title')}
+        subtitle={t('subtitle')}
         action={
           <div className="flex items-center space-x-2">
             <Button
@@ -107,14 +108,14 @@ export const ProductsScreen: React.FC = () => {
               leftIcon={<Plus className="w-4 h-4" />}
               onClick={() => setIsProductModalOpen(true)}
             >
-              {t('inventory.newProduct')}
+              {t('newProduct')}
             </Button>
             <Button
               variant="primary"
               leftIcon={<PackagePlus className="w-4 h-4" />}
               onClick={() => navigate(RoutesView.STOCK_ENTRY)}
             >
-              {t('inventory.newEntry')}
+              {t('newEntry')}
             </Button>
           </div>
         }
@@ -127,8 +128,12 @@ export const ProductsScreen: React.FC = () => {
             <Layers className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase text-stone-500">Catálogo Activo</p>
-            <p className="text-xl font-bold font-serif text-stone-900">{products.length} productos</p>
+            <p className="text-[11px] font-semibold uppercase text-stone-500">
+              {t('metrics.activeCatalog')}
+            </p>
+            <p className="text-xl font-bold font-serif text-stone-900">
+              {t('metrics.productsCount', { count: products.length })}
+            </p>
           </div>
         </div>
 
@@ -137,8 +142,12 @@ export const ProductsScreen: React.FC = () => {
             <Boxes className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase text-stone-500">Saldo en Inventario</p>
-            <p className="text-xl font-bold font-serif text-stone-900">{totalStockUnits} uds</p>
+            <p className="text-[11px] font-semibold uppercase text-stone-500">
+              {t('metrics.inventoryBalance')}
+            </p>
+            <p className="text-xl font-bold font-serif text-stone-900">
+              {t('table.unitsTag', { count: totalStockUnits })}
+            </p>
           </div>
         </div>
 
@@ -147,8 +156,12 @@ export const ProductsScreen: React.FC = () => {
             <AlertTriangle className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase text-stone-500">Stock Crítico (≤ 5)</p>
-            <p className="text-xl font-bold font-serif text-amber-800">{lowStockCount} referencias</p>
+            <p className="text-[11px] font-semibold uppercase text-stone-500">
+              {t('metrics.criticalStock')}
+            </p>
+            <p className="text-xl font-bold font-serif text-amber-800">
+              {t('metrics.referencesCount', { count: lowStockCount })}
+            </p>
           </div>
         </div>
       </div>
@@ -170,7 +183,7 @@ export const ProductsScreen: React.FC = () => {
               }`}
             >
               <Boxes className="w-4 h-4" />
-              <span>{t('inventory.tabStock')} ({products.length})</span>
+              <span>{t('tabStock')} ({products.length})</span>
             </button>
 
             <button
@@ -186,14 +199,14 @@ export const ProductsScreen: React.FC = () => {
               }`}
             >
               <History className="w-4 h-4" />
-              <span>{t('inventory.tabEntries')} ({entries.length})</span>
+              <span>{t('tabEntries')} ({entries.length})</span>
             </button>
           </div>
 
           <span className="text-[11px] text-stone-400 pb-2">
             {activeTab === 'stock'
-              ? 'Saldos consolidados por código de barras'
-              : `Historial de entradas (${totalEntriesUnits} unidades ingresadas en total)`}
+              ? t('hints.consolidatedStock')
+              : t('hints.entriesHistory', { count: totalEntriesUnits })}
           </span>
         </div>
 
@@ -207,8 +220,8 @@ export const ProductsScreen: React.FC = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={
                 activeTab === 'stock'
-                  ? 'Buscar por código, marca o fragancia...'
-                  : 'Buscar por código, fecha o proveedor...'
+                  ? t('filters.searchStockPlaceholder')
+                  : t('filters.searchEntriesPlaceholder')
               }
               className="w-full pl-9 pr-3 py-2 text-xs bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-maribel-600"
             />
@@ -226,7 +239,7 @@ export const ProductsScreen: React.FC = () => {
                 }`}
               >
                 <Filter className="w-3.5 h-3.5" />
-                <span>Solo stock bajo ({lowStockCount})</span>
+                <span>{t('filters.onlyLowStock', { count: lowStockCount })}</span>
               </button>
             </div>
           )}

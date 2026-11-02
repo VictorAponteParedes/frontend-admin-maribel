@@ -4,6 +4,7 @@ import { useStockEntryStore } from '@/store/useStockEntryStore';
 import { formatCurrency, formatGuarani, parseGuarani } from '@/utils/formatters';
 import { AppInput, DatePickerInput } from '@/components/ui';
 import { BarcodeScannerModal } from '@/componentes';
+import { useTranslation } from '@/locale';
 import type { Html5QrcodeResult } from 'html5-qrcode';
 import {
   X,
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 
 export const StockEntryModal: React.FC = () => {
+  const { t } = useTranslation(['inventory', 'translation']);
   const { isEntryModalOpen, closeEntryModal, recordStockEntry } = useStockEntryStore();
   const { products, getByBarcode } = useInventoryStore();
 
@@ -84,17 +86,17 @@ export const StockEntryModal: React.FC = () => {
     setErrorMessage('');
 
     if (!selectedProduct) {
-      setErrorMessage('Debes seleccionar o ingresar un código de barras válido.');
+      setErrorMessage(t('entry.errors.barcodeRequired'));
       return;
     }
 
     if (quantity <= 0) {
-      setErrorMessage('La cantidad ingresada debe ser mayor a 0.');
+      setErrorMessage(t('entry.errors.quantityPositive'));
       return;
     }
 
     if (unitCost < 0) {
-      setErrorMessage('El costo unitario no puede ser negativo.');
+      setErrorMessage(t('entry.errors.costPositive'));
       return;
     }
 
@@ -110,7 +112,7 @@ export const StockEntryModal: React.FC = () => {
       return;
     }
 
-    setSuccessMessage('¡Ingreso registrado y existencias actualizadas con éxito!');
+    setSuccessMessage(t('entry.entrySuccess', { count: quantity, brand: selectedProduct.brand }));
     setTimeout(() => {
       closeEntryModal();
     }, 700);
@@ -138,7 +140,7 @@ export const StockEntryModal: React.FC = () => {
             <div>
               <div className="flex items-center space-x-2">
                 <h3 className="font-serif font-bold text-stone-900 text-lg tracking-tight">
-                  Ingreso de Mercadería
+                  {t('entry.title')}
                 </h3>
                 <span className="px-2 py-0.5 bg-rose-50 border border-rose-100 text-maribel-700 text-[11px] font-semibold rounded-full">
                   Perfumería
@@ -148,7 +150,7 @@ export const StockEntryModal: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-stone-500 mt-0.5">
-                Registra la recepción de lotes, códigos de barra y actualiza saldos al instante
+                {t('entry.subtitle')}
               </p>
             </div>
           </div>
@@ -180,13 +182,13 @@ export const StockEntryModal: React.FC = () => {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs font-semibold text-stone-800 flex items-center space-x-1">
-                <span>Código de barras / SKU</span>
+                <span>{t('entry.barcodeLabel')}</span>
                 <span className="text-rose-500">*</span>
               </label>
 
               <span className="inline-flex items-center space-x-1.5 px-2.5 py-0.5 bg-emerald-50 border border-emerald-200/60 rounded-full text-[11px] font-medium text-emerald-700">
                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                <span>Lector USB Activo</span>
+                <span>{t('entry.usbScannerActive')}</span>
               </span>
             </div>
 
@@ -200,10 +202,10 @@ export const StockEntryModal: React.FC = () => {
                   type="button"
                   onClick={() => setIsScannerOpen(true)}
                   className="px-2.5 py-1 text-[11px] font-medium text-stone-600 bg-white border border-stone-200 rounded-lg hover:bg-stone-50 flex items-center space-x-1.5 transition-colors shadow-2xs active:scale-95"
-                  title="Escanear con cámara"
+                  title={t('entry.cameraButton')}
                 >
                   <Camera className="w-3.5 h-3.5 text-maribel-700" />
-                  <span>Cámara</span>
+                  <span>{t('entry.cameraButton')}</span>
                 </button>
               }
               className="font-mono font-medium"
@@ -215,10 +217,10 @@ export const StockEntryModal: React.FC = () => {
               <div className="flex items-center justify-between text-[11px] mb-1.5">
                 <span className="text-stone-500 flex items-center space-x-1">
                   <Search className="w-3 h-3 text-stone-400" />
-                  <span>Coincidencias rápidas del catálogo:</span>
+                  <span>{t('hints.consolidatedStock')}</span>
                 </span>
                 <span className="text-maribel-700 font-semibold cursor-pointer hover:underline">
-                  + Crear nuevo producto
+                  + {t('newProduct')}
                 </span>
               </div>
 
@@ -255,7 +257,7 @@ export const StockEntryModal: React.FC = () => {
                 <div className="min-w-0">
                   <p className="text-[11px] text-stone-500 font-medium truncate">
                     <strong className="text-stone-800 font-bold">{selectedProduct.brand}</strong> •{' '}
-                    {selectedProduct.size} - Fragancia Fina
+                    {selectedProduct.size}
                   </p>
                   <h4 className="font-serif font-bold text-stone-900 text-sm truncate mt-0.5">
                     {selectedProduct.name}
@@ -265,11 +267,11 @@ export const StockEntryModal: React.FC = () => {
 
               <div className="text-right shrink-0">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
-                  STOCK ACTUAL
+                  {t('detail.currentStockLabel')}
                 </span>
                 <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 mt-0.5">
                   <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                  <span>{selectedProduct.stock} uds</span>
+                  <span>{selectedProduct.stock} {t('units')}</span>
                 </span>
               </div>
             </div>
@@ -281,9 +283,9 @@ export const StockEntryModal: React.FC = () => {
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="text-xs font-semibold text-stone-800">
-                  Cantidad recibida (uds)
+                  {t('entry.qtyToEnter')}
                 </label>
-                <span className="text-[11px] text-stone-400">Pack estándar: 12</span>
+                <span className="text-[11px] text-stone-400">{t('entry.standardPack')}</span>
               </div>
 
               <div className="flex items-center rounded-xl border border-stone-200 bg-stone-50 overflow-hidden focus-within:ring-2 focus-within:ring-maribel-600/20 focus-within:border-maribel-600 focus-within:bg-white transition-all">
@@ -332,7 +334,7 @@ export const StockEntryModal: React.FC = () => {
                       : 'bg-stone-100 hover:bg-stone-200/80 border-transparent text-stone-600'
                   }`}
                 >
-                  +12 (Caja)
+                  {t('entry.boxTag')}
                 </button>
                 <button
                   type="button"
@@ -343,7 +345,7 @@ export const StockEntryModal: React.FC = () => {
                       : 'bg-stone-100 hover:bg-stone-200/80 border-transparent text-stone-600'
                   }`}
                 >
-                  +24 (Master)
+                  {t('entry.masterTag')}
                 </button>
               </div>
             </div>
@@ -352,11 +354,11 @@ export const StockEntryModal: React.FC = () => {
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="text-xs font-semibold text-stone-800">
-                  Costo unitario (Gs.)
+                  {t('entry.purchasePriceLabel')}
                 </label>
                 {estimatedMargin > 0 && (
                   <span className="text-[11px] font-semibold text-maribel-700">
-                    Margen estimado: ~{estimatedMargin}%
+                    {t('detail.marginTag', { margin: estimatedMargin })}
                   </span>
                 )}
               </div>
@@ -372,7 +374,7 @@ export const StockEntryModal: React.FC = () => {
 
               {selectedProduct && (
                 <p className="text-[11px] text-stone-400 mt-1.5">
-                  Precio venta al público actual:{' '}
+                  {t('entry.sellingPriceDesc')}:{' '}
                   <strong className="text-stone-700 font-semibold">
                     {formatCurrency(selectedProduct.price)}
                   </strong>
@@ -385,7 +387,7 @@ export const StockEntryModal: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <DatePickerInput
-                label="Fecha de recepción"
+                label={t('entry.receptionDate')}
                 value={dateInput}
                 onChange={(newDate) => setDateInput(newDate)}
                 placeholder="DD/MM/AAAA"
@@ -401,19 +403,19 @@ export const StockEntryModal: React.FC = () => {
               </div>
               <div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
-                  PROYECCIÓN EN ESTANTERÍA
+                  {t('entry.shelfProjection')}
                 </span>
                 <p className="text-xs text-stone-700">
-                  <span className="font-semibold">{existingStock} uds existentes</span> +{' '}
-                  <strong className="text-emerald-700 font-bold">{quantity} nuevas</strong> ={' '}
-                  <strong className="text-stone-900 font-bold text-sm">{projectedStock} uds totales</strong>
+                  <span className="font-semibold">{existingStock} {t('units')}</span> +{' '}
+                  <strong className="text-emerald-700 font-bold">{quantity}</strong> ={' '}
+                  <strong className="text-stone-900 font-bold text-sm">{projectedStock} {t('units')}</strong>
                 </p>
               </div>
             </div>
 
             <div className="sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-emerald-100/80">
               <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
-                COSTO TOTAL DEL LOTE
+                {t('detail.totalLotCost')}
               </span>
               <p className="text-xl font-bold font-serif text-stone-900">
                 {formatCurrency(totalCost)}
@@ -428,7 +430,7 @@ export const StockEntryModal: React.FC = () => {
               onClick={closeEntryModal}
               className="px-4 py-2.5 rounded-xl text-xs font-semibold text-stone-600 bg-white border border-stone-200 hover:bg-stone-50 transition-colors"
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
             <button
               type="submit"
@@ -436,7 +438,7 @@ export const StockEntryModal: React.FC = () => {
               className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-maribel-800 hover:bg-maribel-900 transition-all shadow-xs disabled:opacity-50"
             >
               <Check className="w-4 h-4 stroke-[2.5]" />
-              <span>Confirmar Ingreso (+{quantity} uds)</span>
+              <span>{t('entry.confirmEntry', { count: quantity })}</span>
             </button>
           </div>
         </form>
