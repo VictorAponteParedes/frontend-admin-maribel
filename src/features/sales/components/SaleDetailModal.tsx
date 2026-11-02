@@ -2,11 +2,12 @@ import React from 'react';
 import { useSalesStore } from '@/store/useSalesStore';
 import { SaleItem } from '@/features/sales/types/sale.types';
 import { formatCurrency } from '@/utils/formatters';
-import { t } from '@/lang';
+import { useTranslation } from '@/locale';
 import { X, Receipt, Barcode } from 'lucide-react';
 import { Button } from '@/components/ui';
 
 export const SaleDetailModal: React.FC = () => {
+  const { t } = useTranslation(['sales', 'translation']);
   const { selectedSaleForDetail, closeDetailModal } = useSalesStore();
 
   if (!selectedSaleForDetail) return null;
@@ -21,10 +22,16 @@ export const SaleDetailModal: React.FC = () => {
             </div>
             <div>
               <h3 className="font-serif font-bold text-stone-900 text-base">
-                {t('sales.saleDetail')} - {selectedSaleForDetail.saleNumber}
+                {t('modalDetail.titleWithNumber', {
+                  title: t('saleDetail'),
+                  number: selectedSaleForDetail.saleNumber,
+                })}
               </h3>
               <p className="text-xs text-stone-500">
-                Fecha: {selectedSaleForDetail.date} • Cliente: {selectedSaleForDetail.customerName}
+                {t('modalDetail.dateMeta', {
+                  date: selectedSaleForDetail.date,
+                  name: selectedSaleForDetail.customerName,
+                })}
               </p>
             </div>
           </div>
@@ -42,12 +49,12 @@ export const SaleDetailModal: React.FC = () => {
             <table className="w-full text-left text-xs">
               <thead className="bg-stone-50 text-stone-500 uppercase tracking-wider text-[11px] border-b border-stone-200">
                 <tr>
-                  <th className="px-4 py-3">Código</th>
-                  <th className="px-4 py-3">Producto / Fragancia</th>
-                  <th className="px-3 py-3">Medida</th>
-                  <th className="px-3 py-3 text-center">Cant.</th>
-                  <th className="px-4 py-3 text-right">Precio Unit.</th>
-                  <th className="px-4 py-3 text-right">Subtotal</th>
+                  <th className="px-4 py-3">{t('modalDetail.code')}</th>
+                  <th className="px-4 py-3">{t('modalDetail.productFragrance')}</th>
+                  <th className="px-3 py-3">{t('size')}</th>
+                  <th className="px-3 py-3 text-center">{t('modalDetail.quantityShort')}</th>
+                  <th className="px-4 py-3 text-right">{t('modalDetail.unitPriceShort')}</th>
+                  <th className="px-4 py-3 text-right">{t('subtotal')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
@@ -81,13 +88,13 @@ export const SaleDetailModal: React.FC = () => {
 
           <div className="flex items-center justify-between p-4 bg-stone-50 rounded-xl border border-stone-200">
             <div>
-              <span className="text-xs text-stone-500">Total de productos:</span>
+              <span className="text-xs text-stone-500">{t('modalDetail.totalProducts')}</span>
               <p className="text-sm font-semibold text-stone-800">
-                {selectedSaleForDetail.totalQuantity} unidades
+                {t('modalDetail.units', { count: selectedSaleForDetail.totalQuantity })}
               </p>
             </div>
             <div className="text-right">
-              <span className="text-xs text-stone-500">Monto total abonado:</span>
+              <span className="text-xs text-stone-500">{t('modalDetail.totalPaid')}</span>
               <p className="text-xl font-bold font-serif text-maribel-800">
                 {formatCurrency(selectedSaleForDetail.total)}
               </p>
@@ -96,7 +103,7 @@ export const SaleDetailModal: React.FC = () => {
 
           <div className="mt-6 flex justify-end">
             <Button variant="outline" onClick={closeDetailModal}>
-              Cerrar
+              {t('modalDetail.close')}
             </Button>
           </div>
         </div>

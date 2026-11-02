@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Customer } from '@/features/customers/types/customer.types';
+import { useTranslation } from '@/locale';
 import { Search, ChevronDown, Check, Phone, MapPin, UserCheck } from 'lucide-react';
 
 export interface CustomerSelectProps {
@@ -13,8 +14,11 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
   selectedCustomer,
   onSelectCustomer,
   customers,
-  label = 'Cliente / Destinatario',
+  label,
 }) => {
+  const { t } = useTranslation(['sales', 'translation']);
+  const displayLabel = label ?? t('form.customerLabel');
+
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -50,7 +54,7 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
   });
 
   const getInitials = (name: string): string => {
-    if (!name || name === 'Cliente casual') return 'CC';
+    if (!name || name === 'Cliente casual' || name === t('customerSelect.casualCustomer')) return 'CC';
     const parts = name.trim().split(/\s+/);
     if (parts.length >= 2) {
       return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
@@ -58,13 +62,16 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
     return name.slice(0, 2).toUpperCase();
   };
 
-  const isCasual = !selectedCustomer || selectedCustomer.name === 'Cliente casual';
+  const isCasual =
+    !selectedCustomer ||
+    selectedCustomer.name === 'Cliente casual' ||
+    selectedCustomer.name === t('customerSelect.casualCustomer');
 
   return (
     <div ref={dropdownRef} className="relative w-full">
-      {label && (
+      {displayLabel && (
         <label className="block text-xs font-semibold text-stone-700 mb-1.5">
-          {label}
+          {displayLabel}
         </label>
       )}
 
@@ -92,14 +99,17 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
           <div className="min-w-0">
             <div className="flex items-center space-x-1.5 flex-wrap">
               <span className="text-xs font-bold text-stone-900 truncate">
-                {selectedCustomer ? selectedCustomer.name : 'Cliente casual (Mostrador)'}
+                {selectedCustomer ? selectedCustomer.name : t('customerSelect.casualCustomerCounter')}
               </span>
-              {selectedCustomer && selectedCustomer.phone && selectedCustomer.phone !== 'Sin teléfono' && (
-                <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                  <Phone className="w-2.5 h-2.5 text-emerald-600" />
-                  <span>{selectedCustomer.phone}</span>
-                </span>
-              )}
+              {selectedCustomer &&
+                selectedCustomer.phone &&
+                selectedCustomer.phone !== 'Sin teléfono' &&
+                selectedCustomer.phone !== t('customerSelect.noPhone') && (
+                  <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                    <Phone className="w-2.5 h-2.5 text-emerald-600" />
+                    <span>{selectedCustomer.phone}</span>
+                  </span>
+                )}
             </div>
 
             <p className="text-[11px] text-stone-400 truncate mt-0.5 flex items-center space-x-1">
@@ -109,7 +119,7 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
                   <span className="truncate">{selectedCustomer.address}</span>
                 </>
               ) : (
-                <span>Venta directa sin registro</span>
+                <span>{t('customerSelect.casualCustomerDesc')}</span>
               )}
             </p>
           </div>
@@ -134,7 +144,7 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Buscar por nombre, teléfono o ciudad..."
+                placeholder={t('customerSelect.searchPlaceholder')}
                 className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-stone-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-maribel-600 focus:border-maribel-600"
               />
             </div>
@@ -149,9 +159,9 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
                 const casual = customers.find((c) => c.name === 'Cliente casual') || {
                   id: 'casual',
                   code: 0,
-                  name: 'Cliente casual',
-                  phone: 'Sin teléfono',
-                  address: 'Mostrador / Venta directa',
+                  name: t('customerSelect.casualCustomer'),
+                  phone: t('customerSelect.noPhone'),
+                  address: t('customerSelect.casualCustomerDesc'),
                   registrationDate: new Date().toISOString(),
                 };
                 onSelectCustomer(casual);
@@ -168,9 +178,11 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
                 </div>
                 <div>
                   <p className="text-xs font-bold text-stone-900">
-                    Cliente casual (Mostrador)
+                    {t('customerSelect.casualCustomerCounter')}
                   </p>
-                  <p className="text-[11px] text-stone-400">Venta rápida en caja sin ficha</p>
+                  <p className="text-[11px] text-stone-400">
+                    {t('customerSelect.casualCustomerQuick')}
+                  </p>
                 </div>
               </div>
               {isCasual && <Check className="w-4 h-4 text-maribel-700" />}
@@ -178,7 +190,7 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
 
             {/* Listado de clientes registrados */}
             {filteredCustomers
-              .filter((c) => c.name !== 'Cliente casual')
+              .filter((c) => c.name !== 'Cliente casual' && c.name !== t('customerSelect.casualCustomer'))
               .map((customer) => {
                 const isSelected = selectedCustomer?.id === customer.id;
 
@@ -211,13 +223,15 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
                         </div>
 
                         <div className="flex items-center space-x-2 text-[11px] text-stone-500 mt-0.5">
-                          {customer.phone && customer.phone !== 'Sin teléfono' ? (
+                          {customer.phone &&
+                          customer.phone !== 'Sin teléfono' &&
+                          customer.phone !== t('customerSelect.noPhone') ? (
                             <span className="font-semibold text-emerald-800 flex items-center space-x-0.5">
                               <Phone className="w-2.5 h-2.5 text-emerald-600" />
                               <span>{customer.phone}</span>
                             </span>
                           ) : (
-                            <span className="text-stone-400">Sin teléfono</span>
+                            <span className="text-stone-400">{t('customerSelect.noPhone')}</span>
                           )}
 
                           {customer.address && (
@@ -236,7 +250,7 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
 
             {filteredCustomers.length === 0 && (
               <div className="p-5 text-center text-xs text-stone-400">
-                No se encontraron clientes que coincidan con "{searchQuery}"
+                {t('customerSelect.noCustomersFound', { query: searchQuery })}
               </div>
             )}
           </div>

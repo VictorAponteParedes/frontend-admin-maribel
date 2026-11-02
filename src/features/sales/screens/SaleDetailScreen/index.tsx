@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useSalesStore } from '@/store/useSalesStore';
 import { formatCurrency } from '@/utils/formatters';
 import { RoutesView } from '@/navigation/routes';
+import { useTranslation } from '@/locale';
 import {
   ArrowLeft,
   Receipt,
@@ -19,6 +20,7 @@ import {
 import { Button } from '@/components/ui';
 
 export const SaleDetailScreen: React.FC = () => {
+  const { t } = useTranslation(['sales', 'translation']);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { getSaleById } = useSalesStore();
@@ -29,12 +31,14 @@ export const SaleDetailScreen: React.FC = () => {
     return (
       <div className="p-8 text-center bg-white rounded-2xl border border-stone-200">
         <Receipt className="w-12 h-12 text-stone-300 mx-auto mb-3" />
-        <h3 className="text-base font-bold text-stone-800">Venta no encontrada</h3>
+        <h3 className="text-base font-bold text-stone-800">
+          {t('detail.notFoundTitle')}
+        </h3>
         <p className="text-xs text-stone-500 mt-1 mb-4">
-          No pudimos localizar la venta solicitada con el identificador {id}.
+          {t('detail.notFoundDesc', { id })}
         </p>
         <Button variant="primary" onClick={() => navigate(RoutesView.SALES)}>
-          Volver a Ventas
+          {t('detail.backButton')}
         </Button>
       </div>
     );
@@ -53,7 +57,7 @@ export const SaleDetailScreen: React.FC = () => {
           className="inline-flex items-center space-x-2 text-xs font-semibold text-stone-600 hover:text-stone-900 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Volver al listado de Ventas</span>
+          <span>{t('detail.backToSales')}</span>
         </Link>
 
         <div className="flex items-center space-x-2">
@@ -62,7 +66,7 @@ export const SaleDetailScreen: React.FC = () => {
             leftIcon={<Printer className="w-4 h-4" />}
             onClick={handlePrint}
           >
-            Imprimir Comprobante
+            {t('detail.printReceipt')}
           </Button>
         </div>
       </div>
@@ -76,21 +80,23 @@ export const SaleDetailScreen: React.FC = () => {
           <div>
             <div className="flex items-center space-x-2">
               <h2 className="font-serif font-bold text-stone-900 text-xl tracking-tight">
-                Venta {sale.saleNumber}
+                {t('detail.saleTitle', { number: sale.saleNumber })}
               </h2>
               <span className="inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                 <CheckCircle2 className="w-3 h-3" />
-                <span>Confirmada</span>
+                <span>{t('detail.confirmed')}</span>
               </span>
             </div>
             <p className="text-xs text-stone-500 mt-0.5">
-              Identificador único de transacción: {sale.id}
+              {t('detail.transactionId', { id: sale.id })}
             </p>
           </div>
         </div>
 
         <div className="md:text-right border-t md:border-t-0 pt-3 md:pt-0 border-stone-100">
-          <span className="text-xs text-stone-500 block">Total de la Operación</span>
+          <span className="text-xs text-stone-500 block">
+            {t('detail.totalOperation')}
+          </span>
           <p className="text-2xl font-bold font-serif text-maribel-800">
             {formatCurrency(sale.total)}
           </p>
@@ -103,14 +109,14 @@ export const SaleDetailScreen: React.FC = () => {
         <div className="bg-white p-5 rounded-2xl border border-stone-200/80 shadow-xs">
           <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-3 flex items-center space-x-2">
             <Calendar className="w-4 h-4 text-maribel-700" />
-            <span>Fecha y Hora de Confirmación</span>
+            <span>{t('detail.confirmationDateTime')}</span>
           </h3>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between p-3 bg-stone-50 rounded-xl">
               <div className="flex items-center space-x-2 text-xs text-stone-700 font-medium">
                 <Calendar className="w-4 h-4 text-stone-400" />
-                <span>Fecha de venta:</span>
+                <span>{t('detail.saleDate')}</span>
               </div>
               <span className="text-xs font-mono font-bold text-stone-900">
                 {sale.date}
@@ -120,7 +126,7 @@ export const SaleDetailScreen: React.FC = () => {
             <div className="flex items-center justify-between p-3 bg-stone-50 rounded-xl">
               <div className="flex items-center space-x-2 text-xs text-stone-700 font-medium">
                 <Clock className="w-4 h-4 text-stone-400" />
-                <span>Hora de confirmación:</span>
+                <span>{t('detail.confirmationTime')}</span>
               </div>
               <span className="text-xs font-mono font-bold text-stone-900">
                 {sale.time}
@@ -133,7 +139,7 @@ export const SaleDetailScreen: React.FC = () => {
         <div className="bg-white p-5 rounded-2xl border border-stone-200/80 shadow-xs">
           <h3 className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-3 flex items-center space-x-2">
             <User className="w-4 h-4 text-maribel-700" />
-            <span>Cliente Asociado a la Venta</span>
+            <span>{t('detail.associatedCustomer')}</span>
           </h3>
 
           <div className="p-3.5 bg-stone-50 rounded-xl space-y-2">
@@ -143,7 +149,7 @@ export const SaleDetailScreen: React.FC = () => {
               </span>
               {sale.customerCode && (
                 <span className="text-[11px] font-mono px-2 py-0.5 bg-stone-200 text-stone-800 rounded-md font-semibold">
-                  Código #{sale.customerCode}
+                  {t('codeTag', { code: sale.customerCode })}
                 </span>
               )}
             </div>
@@ -165,17 +171,18 @@ export const SaleDetailScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Tabla Detallada con TODOS los campos del Excel */}
+      {/* Tabla Detallada con TODOS los campos */}
       <section className="bg-white rounded-2xl border border-stone-200/80 shadow-xs overflow-hidden">
         <div className="p-5 border-b border-stone-100 flex items-center justify-between bg-stone-50/50">
           <div className="flex items-center space-x-2">
             <ShoppingBag className="w-4 h-4 text-maribel-700" />
             <h3 className="font-serif font-bold text-stone-900 text-sm">
-              Artículos y Fragancias Vendidas ({sale.items.length})
+              {t('detail.itemsSoldSection', { count: sale.items.length })}
             </h3>
           </div>
           <span className="text-xs text-stone-500">
-            Total unidades: <strong>{sale.totalQuantity} uds</strong>
+            {t('detail.totalUnitsLabel')}{' '}
+            <strong>{t('unitsTag', { count: sale.totalQuantity })}</strong>
           </span>
         </div>
 
@@ -183,13 +190,13 @@ export const SaleDetailScreen: React.FC = () => {
           <table className="w-full text-left text-xs">
             <thead className="bg-stone-50 text-stone-500 uppercase tracking-wider text-[11px] border-b border-stone-200">
               <tr>
-                <th className="px-5 py-3.5">Código de barras</th>
-                <th className="px-5 py-3.5">Marca del producto</th>
-                <th className="px-5 py-3.5">Descripción del producto</th>
-                <th className="px-5 py-3.5">Medida</th>
-                <th className="px-4 py-3.5 text-center">Cantidad</th>
-                <th className="px-5 py-3.5 text-right">Precio venta</th>
-                <th className="px-5 py-3.5 text-right">Subtotal</th>
+                <th className="px-5 py-3.5">{t('barcode')}</th>
+                <th className="px-5 py-3.5">{t('brand')}</th>
+                <th className="px-5 py-3.5">{t('description')}</th>
+                <th className="px-5 py-3.5">{t('size')}</th>
+                <th className="px-4 py-3.5 text-center">{t('quantity')}</th>
+                <th className="px-5 py-3.5 text-right">{t('unitPrice')}</th>
+                <th className="px-5 py-3.5 text-right">{t('subtotal')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
@@ -212,7 +219,7 @@ export const SaleDetailScreen: React.FC = () => {
                   </td>
                   <td className="px-4 py-3.5 text-center font-bold text-stone-900 whitespace-nowrap">
                     <span className="inline-block px-2.5 py-0.5 bg-stone-100 text-stone-800 rounded-md">
-                      {item.quantity} uds
+                      {t('unitsTag', { count: item.quantity })}
                     </span>
                   </td>
                   <td className="px-5 py-3.5 text-right font-medium text-stone-700 whitespace-nowrap">
@@ -227,13 +234,13 @@ export const SaleDetailScreen: React.FC = () => {
             <tfoot className="bg-stone-50/80 border-t border-stone-200">
               <tr>
                 <td colSpan={4} className="px-5 py-4 text-xs font-semibold text-stone-600">
-                  Total de artículos vendidos
+                  {t('detail.totalItemsSoldLabel')}
                 </td>
                 <td className="px-4 py-4 text-center font-bold text-stone-900">
-                  {sale.totalQuantity} uds
+                  {t('unitsTag', { count: sale.totalQuantity })}
                 </td>
                 <td className="px-5 py-4 text-right text-xs font-semibold text-stone-600">
-                  Total Facturado:
+                  {t('detail.totalBilled')}
                 </td>
                 <td className="px-5 py-4 text-right font-bold text-base font-serif text-maribel-800">
                   {formatCurrency(sale.total)}

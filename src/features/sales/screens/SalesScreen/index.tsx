@@ -7,7 +7,7 @@ import { DetailedSalesTable, DetailedSaleRow } from '@/features/sales/components
 import { SaleFormModal } from '@/features/sales/components/SaleFormModal';
 import { useSalesStore } from '@/store/useSalesStore';
 import { formatCurrency } from '@/utils/formatters';
-import { t } from '@/lang';
+import { useTranslation } from '@/locale';
 import {
   Plus,
   Search,
@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 
 export const SalesScreen: React.FC = () => {
+  const { t } = useTranslation(['sales', 'translation']);
   const { sales, openCreateModal } = useSalesStore();
   const [activeTab, setActiveTab] = useState<'summary' | 'detailed'>('summary');
   const [searchQuery, setSearchQuery] = useState('');
@@ -100,15 +101,15 @@ export const SalesScreen: React.FC = () => {
   return (
     <div>
       <Header
-        title={t('sales.title')}
-        subtitle={t('sales.subtitle')}
+        title={t('title')}
+        subtitle={t('subtitle')}
         action={
           <Button
             variant="primary"
             leftIcon={<Plus className="w-4 h-4" />}
             onClick={openCreateModal}
           >
-            {t('sales.newSale')}
+            {t('newSale')}
           </Button>
         }
       />
@@ -120,7 +121,9 @@ export const SalesScreen: React.FC = () => {
             <DollarSign className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase text-stone-500">Facturación Registrada</p>
+            <p className="text-[11px] font-semibold uppercase text-stone-500">
+              {t('metrics.registeredRevenue')}
+            </p>
             <p className="text-xl font-bold font-serif text-stone-900">
               {formatCurrency(totalRevenue)}
             </p>
@@ -132,9 +135,11 @@ export const SalesScreen: React.FC = () => {
             <ShoppingBag className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase text-stone-500">Unidades Vendidas</p>
+            <p className="text-[11px] font-semibold uppercase text-stone-500">
+              {t('metrics.itemsSold')}
+            </p>
             <p className="text-xl font-bold font-serif text-stone-900">
-              {totalItemsSold} perfumes
+              {t('metrics.perfumesCount', { count: totalItemsSold })}
             </p>
           </div>
         </div>
@@ -144,7 +149,9 @@ export const SalesScreen: React.FC = () => {
             <TrendingUp className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase text-stone-500">Ticket Promedio</p>
+            <p className="text-[11px] font-semibold uppercase text-stone-500">
+              {t('metrics.averageTicket')}
+            </p>
             <p className="text-xl font-bold font-serif text-stone-900">
               {formatCurrency(averageTicket)}
             </p>
@@ -169,7 +176,7 @@ export const SalesScreen: React.FC = () => {
               }`}
             >
               <Receipt className="w-4 h-4" />
-              <span>Resumen por Comprobante ({sales.length})</span>
+              <span>{t('tabs.summary', { count: sales.length })}</span>
             </button>
 
             <button
@@ -185,14 +192,12 @@ export const SalesScreen: React.FC = () => {
               }`}
             >
               <ListOrdered className="w-4 h-4" />
-              <span>Venta Detallada ({allDetailedRows.length} renglones)</span>
+              <span>{t('tabs.detailed', { count: allDetailedRows.length })}</span>
             </button>
           </div>
 
           <span className="text-[11px] text-stone-400 pb-2">
-            {activeTab === 'summary'
-              ? 'Haz clic en "Ver detalle" para ir a la vista completa de la venta'
-              : 'Vista renglón por renglón con cliente y fecha/hora'}
+            {activeTab === 'summary' ? t('tabs.summaryHint') : t('tabs.detailedHint')}
           </span>
         </div>
 
@@ -204,7 +209,7 @@ export const SalesScreen: React.FC = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar por N° venta, cliente, fragancia o código..."
+              placeholder={t('searchPlaceholder')}
               className="w-full pl-9 pr-3 py-2 text-xs bg-stone-50 border border-stone-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-maribel-600"
             />
           </div>

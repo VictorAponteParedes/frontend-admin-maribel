@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sale } from '@/features/sales/types/sale.types';
 import { formatCurrency } from '@/utils/formatters';
+import { useTranslation } from '@/locale';
 import { Barcode, Clock } from 'lucide-react';
 
 export interface DetailedSaleRow {
@@ -28,6 +29,8 @@ export const DetailedSalesTable: React.FC<DetailedSalesTableProps> = ({
   sales = [],
   rows,
 }) => {
+  const { t } = useTranslation(['sales', 'translation']);
+
   // Si se proveen filas ya procesadas (p. ej. paginadas), se usan directamente; sino se desglosan de sales
   const displayRows: DetailedSaleRow[] =
     rows ??
@@ -54,15 +57,15 @@ export const DetailedSalesTable: React.FC<DetailedSalesTableProps> = ({
       <table className="w-full text-left text-xs">
         <thead className="bg-stone-50 text-stone-500 uppercase tracking-wider text-[11px] border-b border-stone-200">
           <tr>
-            <th className="px-5 py-3.5">Código de barras</th>
-            <th className="px-4 py-3.5 text-center">Cantidad</th>
-            <th className="px-4 py-3.5">Fecha y Hora</th>
-            <th className="px-5 py-3.5">Marca del producto</th>
-            <th className="px-5 py-3.5">Descripción del producto</th>
-            <th className="px-4 py-3.5">Medida</th>
-            <th className="px-5 py-3.5 text-right">Precio venta</th>
-            <th className="px-4 py-3.5 text-center">Cód. cliente</th>
-            <th className="px-5 py-3.5">Nombre cliente</th>
+            <th className="px-5 py-3.5">{t('barcode')}</th>
+            <th className="px-4 py-3.5 text-center">{t('quantity')}</th>
+            <th className="px-4 py-3.5">{t('dateTime')}</th>
+            <th className="px-5 py-3.5">{t('brand')}</th>
+            <th className="px-5 py-3.5">{t('description')}</th>
+            <th className="px-4 py-3.5">{t('size')}</th>
+            <th className="px-5 py-3.5 text-right">{t('unitPrice')}</th>
+            <th className="px-4 py-3.5 text-center">{t('customerCodeCol')}</th>
+            <th className="px-5 py-3.5">{t('customerNameCol')}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-stone-100">
@@ -112,7 +115,7 @@ export const DetailedSalesTable: React.FC<DetailedSalesTableProps> = ({
           {displayRows.length === 0 && (
             <tr>
               <td colSpan={9} className="px-5 py-8 text-center text-stone-400">
-                No hay ventas detalladas para mostrar.
+                {t('noDetailedSales')}
               </td>
             </tr>
           )}

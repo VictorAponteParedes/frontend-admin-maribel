@@ -6,7 +6,7 @@ import { useCustomerStore } from '@/store/useCustomerStore';
 import { Sale } from '@/features/sales/types/sale.types';
 import { Customer } from '@/features/customers/types/customer.types';
 import { formatCurrency } from '@/utils/formatters';
-import { t } from '@/lang';
+import { useTranslation } from '@/locale';
 import { AppInput, Button } from '@/components/ui';
 import { CustomerSelect } from './CustomerSelect';
 import {
@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 
 export const SaleFormModal: React.FC = () => {
+  const { t } = useTranslation(['sales', 'translation']);
   const { isCreateModalOpen, closeCreateModal, addSale } = useSalesStore();
   const { products, getByBarcode, deductStock } = useInventoryStore();
   const { customers } = useCustomerStore();
@@ -58,18 +59,18 @@ export const SaleFormModal: React.FC = () => {
     setErrorMessage('');
 
     if (!selectedProduct) {
-      setErrorMessage('Debes seleccionar o escanear un código de barras válido.');
+      setErrorMessage(t('form.errors.invalidBarcode'));
       return;
     }
 
     if (quantity <= 0) {
-      setErrorMessage('La cantidad debe ser mayor a 0.');
+      setErrorMessage(t('form.errors.quantityPositive'));
       return;
     }
 
     if (quantity > selectedProduct.stock) {
       setErrorMessage(
-        `Stock insuficiente. El saldo actual es de ${selectedProduct.stock} unidades.`
+        t('form.errors.insufficientStock', { count: selectedProduct.stock })
       );
       return;
     }
@@ -77,7 +78,7 @@ export const SaleFormModal: React.FC = () => {
     // Descontar del inventario
     const success = deductStock(selectedProduct.barcode, quantity);
     if (!success) {
-      setErrorMessage('Error al actualizar el saldo de inventario.');
+      setErrorMessage(t('form.errors.updateError'));
       return;
     }
 
@@ -96,7 +97,7 @@ export const SaleFormModal: React.FC = () => {
       date: formattedDate,
       time: formattedTime,
       customerCode: selectedCustomer?.code ? String(selectedCustomer.code) : undefined,
-      customerName: selectedCustomer ? selectedCustomer.name : 'Cliente casual',
+      customerName: selectedCustomer ? selectedCustomer.name : t('customerSelect.casualCustomer'),
       customerPhone: selectedCustomer?.phone,
       customerAddress: selectedCustomer?.address,
       status: 'CONFIRMED',
@@ -116,7 +117,7 @@ export const SaleFormModal: React.FC = () => {
     };
 
     addSale(newSale);
-    setSuccessMessage(t('sales.saleSaved'));
+    setSuccessMessage(t('saleSaved'));
 
     setTimeout(() => {
       closeCreateModal();
@@ -153,10 +154,10 @@ export const SaleFormModal: React.FC = () => {
               </div>
               <div>
                 <h3 className="font-serif font-bold text-stone-900 text-lg tracking-tight">
-                  {t('sales.newSale')}
+                  {t('newSale')}
                 </h3>
                 <p className="text-xs text-stone-500">
-                  Registra la salida y descuenta stock al instante
+                  {t('form.modalSubtitle')}
                 </p>
               </div>
             </div>
@@ -188,14 +189,14 @@ export const SaleFormModal: React.FC = () => {
             {/* Código de barras con AppInput */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-stone-800 flex items-center space-x-1">
-                <span>{t('sales.scanBarcode')}</span>
+                <span>{t('scanBarcode')}</span>
                 <span className="text-rose-500">*</span>
               </label>
 
               <AppInput
                 value={barcodeInput}
                 onChange={(e) => setBarcodeInput(e.target.value)}
-                placeholder="Escanea o escribe el código (ej. 6972011068673)"
+                placeholder={t('form.barcodePlaceholder')}
                 leftIcon={<Barcode className="w-4 h-4" />}
                 className="font-mono text-xs"
                 autoFocus
@@ -206,7 +207,7 @@ export const SaleFormModal: React.FC = () => {
                 <div className="pt-2">
                   <p className="text-[11px] text-stone-400 mb-1.5 flex items-center space-x-1">
                     <Search className="w-3 h-3 text-stone-400" />
-                    <span>O elige un perfume con stock del catálogo:</span>
+                    <span>{t('form.catalogChoice')}</span>
                   </p>
                   <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
                     {products.slice(0, 5).map((p) => (
@@ -217,7 +218,9 @@ export const SaleFormModal: React.FC = () => {
                         className="px-2.5 py-1 bg-stone-100 hover:bg-stone-200/80 text-stone-700 text-[11px] font-medium rounded-xl transition-all text-left"
                       >
                         <span className="font-bold">{p.brand}</span> - {p.name.slice(0, 18)}...{' '}
-                        <strong className="text-emerald-700">({p.stock} uds)</strong>
+                        <strong className="text-emerald-700">
+                          ({t('unitsTag', { count: p.stock })})
+                        </strong>
                       </button>
                     ))}
                   </div>
@@ -248,7 +251,7 @@ export const SaleFormModal: React.FC = () => {
 
                   <div className="text-right shrink-0">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-stone-400 block">
-                      PRECIO UNITARIO
+                      {t('form.unitPriceLabel')}
                     </span>
                     <p className="text-sm font-bold text-stone-900 font-serif">
                       {formatCurrency(selectedProduct.price)}
@@ -257,7 +260,7 @@ export const SaleFormModal: React.FC = () => {
                 </div>
 
                 <div className="pt-2 border-t border-rose-100 flex items-center justify-between text-xs">
-                  <span className="text-stone-600 font-medium">Saldo en estantería:</span>
+                  <span className="text-stone-600 font-medium">{t('form.shelfStock')}</span>
                   <span
                     className={`font-semibold px-2.5 py-0.5 rounded-full text-[11px] ${
                       selectedProduct.stock > 3
@@ -265,13 +268,13 @@ export const SaleFormModal: React.FC = () => {
                         : 'bg-amber-50 text-amber-800 border border-amber-200'
                     }`}
                   >
-                    {selectedProduct.stock} unidades disponibles
+                    {t('form.unitsAvailable', { count: selectedProduct.stock })}
                   </span>
                 </div>
               </div>
             ) : (
               <div className="p-5 bg-stone-50 border border-dashed border-stone-200 rounded-2xl text-center text-xs text-stone-400">
-                Escanea o selecciona un perfume para cargar la venta.
+                {t('form.scanOrSelectHint')}
               </div>
             )}
 
@@ -279,11 +282,11 @@ export const SaleFormModal: React.FC = () => {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-semibold text-stone-800">
-                  {t('sales.quantity')}
+                  {t('quantity')}
                 </label>
                 {selectedProduct && (
                   <span className="text-[11px] text-stone-400">
-                    Máx: {selectedProduct.stock} uds
+                    {t('form.maxQuantity', { count: selectedProduct.stock })}
                   </span>
                 )}
               </div>
@@ -318,13 +321,13 @@ export const SaleFormModal: React.FC = () => {
               </div>
             </div>
 
-            {/* Desglose de Cliente Personalizado y Elegante (Nombre + Teléfono) */}
+            {/* Desglose de Cliente Personalizado y Elegante */}
             <div>
               <CustomerSelect
                 selectedCustomer={selectedCustomer}
                 onSelectCustomer={(c) => setSelectedCustomer(c)}
                 customers={customers}
-                label="Cliente / Destinatario"
+                label={t('form.customerLabel')}
               />
             </div>
           </form>
@@ -333,9 +336,12 @@ export const SaleFormModal: React.FC = () => {
           <div className="p-6 border-t border-stone-200/80 bg-stone-50/60 shrink-0 space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-xs text-stone-500 block">Total a cobrar:</span>
+                <span className="text-xs text-stone-500 block">{t('form.totalToCharge')}</span>
                 <span className="text-[11px] text-stone-400">
-                  {quantity} {quantity === 1 ? 'unidad' : 'unidades'} seleccionada(s)
+                  {t('form.selectedUnits', {
+                    count: quantity,
+                    unit: quantity === 1 ? t('form.unitSingular') : t('form.unitPlural'),
+                  })}
                 </span>
               </div>
               <p className="text-2xl font-bold font-serif text-maribel-900">
@@ -359,7 +365,7 @@ export const SaleFormModal: React.FC = () => {
                 disabled={!selectedProduct || selectedProduct.stock < quantity}
                 className="w-2/3 py-2.5 rounded-xl text-xs font-bold"
               >
-                Completar Venta
+                {t('form.completeSale')}
               </Button>
             </div>
           </div>

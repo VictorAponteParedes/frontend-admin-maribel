@@ -10,6 +10,11 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Store,
+  Receipt,
+  Boxes,
+  MessageSquare,
   X,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -19,12 +24,20 @@ import { RoutesView } from '@/navigation/routes';
 import { useTranslation } from '@/locale';
 import { logoAdmin } from '@/assets';
 
+interface SubNavItemConfig {
+  path: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  isActive: boolean;
+}
+
 interface NavItemConfig {
   path: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: number;
   isActive: boolean;
+  subItems?: SubNavItemConfig[];
 }
 
 export const Sidebar: React.FC = () => {
@@ -34,8 +47,19 @@ export const Sidebar: React.FC = () => {
   const { user, logout } = useAuthStore();
   const { orders } = useOrdersStore();
   const { isCollapsed, toggleCollapse, isMobileOpen, closeMobile } = useSidebarStore();
+  const [isSettingsExpanded, setIsSettingsExpanded] = React.useState<boolean>(true);
 
   const pendingOrdersCount = orders.filter((o) => o.status === 'PENDING').length;
+
+  const isSettingsActive =
+    location.pathname === RoutesView.SETTINGS ||
+    location.pathname.startsWith(`${RoutesView.SETTINGS}/`);
+
+  React.useEffect(() => {
+    if (isSettingsActive) {
+      setIsSettingsExpanded(true);
+    }
+  }, [isSettingsActive]);
 
   const handleLogout = () => {
     closeMobile();
@@ -88,12 +112,38 @@ export const Sidebar: React.FC = () => {
         location.pathname.startsWith(`${RoutesView.CUSTOMERS}/`),
     },
     {
-      path: RoutesView.SETTINGS,
+      path: RoutesView.SETTINGS_STORE,
       label: t('nav.settings'),
       icon: Settings,
-      isActive:
-        location.pathname === RoutesView.SETTINGS ||
-        location.pathname.startsWith(`${RoutesView.SETTINGS}/`),
+      isActive: isSettingsActive,
+      subItems: [
+        {
+          path: RoutesView.SETTINGS_STORE,
+          label: 'Datos de la Tienda',
+          icon: Store,
+          isActive:
+            location.pathname === RoutesView.SETTINGS_STORE ||
+            location.pathname === RoutesView.SETTINGS,
+        },
+        {
+          path: RoutesView.SETTINGS_RECEIPTS,
+          label: 'Ventas & Comprobantes',
+          icon: Receipt,
+          isActive: location.pathname === RoutesView.SETTINGS_RECEIPTS,
+        },
+        {
+          path: RoutesView.SETTINGS_INVENTORY,
+          label: 'Inventario & Alertas',
+          icon: Boxes,
+          isActive: location.pathname === RoutesView.SETTINGS_INVENTORY,
+        },
+        {
+          path: RoutesView.SETTINGS_WHATSAPP,
+          label: 'Integración WhatsApp',
+          icon: MessageSquare,
+          isActive: location.pathname === RoutesView.SETTINGS_WHATSAPP,
+        },
+      ],
     },
   ];
 
@@ -199,6 +249,60 @@ export const Sidebar: React.FC = () => {
         <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto overflow-x-hidden">
           {navItems.map((item) => {
             const Icon = item.icon;
+
+            // Renderizado con sub-items desplegables (cuando está expandido)
+            if (item.subItems && !isCollapsed) {
+              return (
+                <div key={item.path} className="space-y-1">
+                  <button
+                    type="button"
+                    onClick={() => setIsSettingsExpanded((prev) => !prev)}
+                    className={`relative w-full flex items-center justify-between rounded-xl text-xs font-medium transition-all px-3 py-2.5 cursor-pointer ${
+                      item.isActive
+                        ? 'bg-stone-800 text-stone-100 font-semibold'
+                        : 'text-stone-400 hover:text-stone-100 hover:bg-stone-800/60'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span className="whitespace-nowrap">{item.label}</span>
+                    </div>
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 text-stone-400 transition-transform duration-200 ${
+                        isSettingsExpanded ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+
+                  {/* Sub-items como vistas independientes */}
+                  {isSettingsExpanded && (
+                    <div className="pl-3 py-1 space-y-1 border-l border-stone-800 ml-5 mr-1">
+                      {item.subItems.map((sub) => {
+                        const SubIcon = sub.icon;
+                        return (
+                          <Link
+                            key={sub.path}
+                            to={sub.path}
+                            onClick={handleNavClick}
+                            className={`flex items-center justify-between px-2.5 py-2 rounded-lg text-xs transition-all ${
+                              sub.isActive
+                                ? 'bg-maribel-700 text-white font-semibold shadow-xs'
+                                : 'text-stone-400 hover:text-stone-200 hover:bg-stone-800/50'
+                            }`}
+                          >
+                            <div className="flex items-center space-x-2.5 truncate">
+                              <SubIcon className="w-3.5 h-3.5 shrink-0" />
+                              <span className="truncate text-[11px]">{sub.label}</span>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={item.path}
