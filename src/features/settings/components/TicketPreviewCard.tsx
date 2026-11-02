@@ -13,7 +13,7 @@ export const TicketPreviewCard: React.FC<TicketPreviewCardProps> = ({
 }) => {
   const {
     tradeName = 'Maribel Tienda de Regalos',
-    legalName = 'Maribel Aponte Paredes',
+    legalName = 'Maribel Escriva',
     taxId = '4815234-7',
     businessPhone = '0986 314 630',
     whatsappNumber = '0986 314 630',

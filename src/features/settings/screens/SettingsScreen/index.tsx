@@ -17,14 +17,12 @@ import {
 } from 'lucide-react';
 import { ControlledInput } from '@/components/ui/ControlledInput';
 import { useSettingsStore, DEFAULT_STORE_SETTINGS } from '../../store/useSettingsStore';
-import { StoreGeneralSettings, SettingsTabId } from '../../types/settings.types';
-import { SettingsNavTabs } from '../../components/SettingsNavTabs';
+import { StoreGeneralSettings } from '../../types/settings.types';
 import { TicketPreviewCard } from '../../components/TicketPreviewCard';
 import { LogoUploader } from '../../components/LogoUploader';
 import { toast } from '@/store/useToastStore';
 
-export const SettingsScreen: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<SettingsTabId>('general');
+export const StoreSettingsScreen: React.FC = () => {
   const [isMonochrome, setIsMonochrome] = useState<boolean>(false);
   const { settings, updateSettings, resetToDefaults } = useSettingsStore();
 
@@ -75,13 +73,15 @@ export const SettingsScreen: React.FC = () => {
           <div className="flex items-center space-x-2 text-xs text-stone-500 mb-1">
             <span>Sistema</span>
             <span>/</span>
-            <span className="text-maribel-700 font-semibold">Configuración</span>
+            <span>Configuración</span>
+            <span>/</span>
+            <span className="text-maribel-700 font-semibold">Datos de la Tienda</span>
           </div>
           <h1 className="text-2xl font-bold font-serif text-stone-900 tracking-tight flex items-center gap-2">
-            Configuración del Sistema
+            Datos de la Tienda (General)
           </h1>
           <p className="text-xs text-stone-500 mt-1">
-            Personaliza los datos institucionales, comprobantes de pago e información de contacto de Maribel Tienda de Regalos.
+            Información institucional que aparece en los tickets, comprobantes y mensajes a clientes.
           </p>
         </div>
 
@@ -112,12 +112,8 @@ export const SettingsScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation Sub-Tabs */}
-      <SettingsNavTabs activeTab={activeTab} onSelectTab={setActiveTab} />
-
-      {/* Tab Content: Datos de la Tienda (General) */}
-      {activeTab === 'general' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      {/* Main Content Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Main Form (7 cols on lg) */}
           <div className="lg:col-span-7 space-y-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -156,7 +152,7 @@ export const SettingsScreen: React.FC = () => {
                       name="legalName"
                       control={control}
                       label="Razón Social / Nombre del Titular *"
-                      placeholder="Ej. Maribel Aponte Paredes"
+                      placeholder="Ej. Maribel Escriva"
                       leftIcon={<Building2 className="w-4 h-4 text-stone-400" />}
                       rules={{
                         required: 'La razón social o titular es obligatoria',
@@ -381,7 +377,8 @@ export const SettingsScreen: React.FC = () => {
             />
           </div>
         </div>
-      )}
     </div>
   );
 };
+
+export const SettingsScreen = StoreSettingsScreen;
