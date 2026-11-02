@@ -7,7 +7,10 @@ export interface Product {
   totalIn: number;         // Ingreso acumulado
   totalSold: number;       // Venta acumulada
   stock: number;           // Saldo Inventario
-  price: number;           // Precio venta
+  costPrice: number;       // Precio unitario de compra
+  price: number;           // Precio unitario de venta
+  profit: number;          // Ganancia unitaria (price - costPrice)
+  receptionDate: string;   // Fecha de recepción (DD/MM/AAAA)
   isActive: boolean;
 }
 
@@ -16,6 +19,8 @@ export interface ProductFormData {
   brand: string;
   name: string;
   size: string;
+  costPrice?: number;
   price: number;
   totalIn: number;
+  receptionDate?: string;
 }

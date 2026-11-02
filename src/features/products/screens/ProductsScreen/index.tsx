@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { Button } from '@/components/ui';
 import { Pagination } from '@/componentes';
 import { ProductTable } from '@/features/products/components/ProductTable';
 import { ProductFormModal } from '@/features/products/components/ProductFormModal';
-import { ProductDetailModal } from '@/features/products/components/ProductDetailModal';
 import { StockEntryTable } from '@/features/products/components/StockEntryTable';
-import { StockEntryModal } from '@/features/products/components/StockEntryModal';
 import { ProductFormData } from '@/features/products/types/product.types';
 import { useInventoryStore } from '@/store/useInventoryStore';
 import { useStockEntryStore } from '@/store/useStockEntryStore';
+import { RoutesView } from '@/navigation/routes';
 import { t } from '@/lang';
 import {
   Plus,
@@ -23,8 +23,9 @@ import {
 } from 'lucide-react';
 
 export const ProductsScreen: React.FC = () => {
-  const { products, addProduct, openProductDetail } = useInventoryStore();
-  const { entries, openEntryModal } = useStockEntryStore();
+  const navigate = useNavigate();
+  const { products, addProduct } = useInventoryStore();
+  const { entries } = useStockEntryStore();
 
   const [activeTab, setActiveTab] = useState<'stock' | 'entries'>('stock');
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -111,7 +112,7 @@ export const ProductsScreen: React.FC = () => {
             <Button
               variant="primary"
               leftIcon={<PackagePlus className="w-4 h-4" />}
-              onClick={openEntryModal}
+              onClick={() => navigate(RoutesView.STOCK_ENTRY)}
             >
               {t('inventory.newEntry')}
             </Button>
@@ -233,10 +234,7 @@ export const ProductsScreen: React.FC = () => {
 
         {/* Tabla activa */}
         {activeTab === 'stock' ? (
-          <ProductTable
-            products={paginatedProducts}
-            onSelectProduct={openProductDetail}
-          />
+          <ProductTable products={paginatedProducts} />
         ) : (
           <StockEntryTable entries={paginatedEntries} />
         )}
@@ -263,15 +261,12 @@ export const ProductsScreen: React.FC = () => {
         )}
       </section>
 
-      {/* Modales */}
+      {/* Modal de Creación Rápida */}
       <ProductFormModal
         isOpen={isProductModalOpen}
         onClose={() => setIsProductModalOpen(false)}
         onSubmitProduct={handleCreateProduct}
       />
-
-      <StockEntryModal />
-      <ProductDetailModal />
     </div>
   );
 };

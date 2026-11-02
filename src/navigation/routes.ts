@@ -5,6 +5,7 @@ export const RoutesView = {
   SALE_DETAIL: '/sales/:id',
   PRODUCTS: '/products',
   PRODUCT_DETAIL: '/products/:id',
+  STOCK_ENTRY: '/products/stock-entry',
   ORDERS: '/orders',
   ORDER_DETAIL: '/orders/:id',
   CUSTOMERS: '/customers',

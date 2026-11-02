@@ -7,7 +7,15 @@ export interface InventoryState {
   addProduct: (productData: ProductFormData) => void;
   deductStock: (barcode: string, quantity: number) => boolean;
   addIncomingStock: (barcode: string, quantity: number) => boolean;
+  recordIncomingStock: (
+    barcode: string,
+    quantity: number,
+    costPrice: number,
+    sellingPrice?: number,
+    receptionDate?: string
+  ) => boolean;
   getByBarcode: (barcode: string) => Product | undefined;
+  getById: (id: string) => Product | undefined;
   openProductDetail: (product: Product) => void;
   closeProductDetail: () => void;
 }
@@ -22,7 +30,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 12,
     totalSold: 1,
     stock: 11,
+    costPrice: 120000,
     price: 185000,
+    profit: 65000,
+    receptionDate: '31/10/2026',
     isActive: true,
   },
   {
@@ -34,7 +45,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 12,
     totalSold: 0,
     stock: 12,
+    costPrice: 130000,
     price: 195000,
+    profit: 65000,
+    receptionDate: '31/10/2026',
     isActive: true,
   },
   {
@@ -46,7 +60,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 12,
     totalSold: 0,
     stock: 12,
+    costPrice: 125000,
     price: 190000,
+    profit: 65000,
+    receptionDate: '01/11/2026',
     isActive: true,
   },
   {
@@ -58,7 +75,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 12,
     totalSold: 1,
     stock: 11,
+    costPrice: 120000,
     price: 185000,
+    profit: 65000,
+    receptionDate: '01/11/2026',
     isActive: true,
   },
   {
@@ -70,7 +90,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 25,
     totalSold: 3,
     stock: 22,
+    costPrice: 75000,
     price: 120000,
+    profit: 45000,
+    receptionDate: '28/10/2026',
     isActive: true,
   },
   {
@@ -82,7 +105,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 12,
     totalSold: 0,
     stock: 12,
+    costPrice: 120000,
     price: 185000,
+    profit: 65000,
+    receptionDate: '29/10/2026',
     isActive: true,
   },
   {
@@ -94,7 +120,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 12,
     totalSold: 0,
     stock: 12,
+    costPrice: 125000,
     price: 190000,
+    profit: 65000,
+    receptionDate: '29/10/2026',
     isActive: true,
   },
   {
@@ -106,7 +135,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 16,
     totalSold: 0,
     stock: 16,
+    costPrice: 105000,
     price: 165000,
+    profit: 60000,
+    receptionDate: '30/10/2026',
     isActive: true,
   },
   {
@@ -118,7 +150,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 10,
     totalSold: 1,
     stock: 9,
+    costPrice: 115000,
     price: 180000,
+    profit: 65000,
+    receptionDate: '01/11/2026',
     isActive: true,
   },
   {
@@ -130,7 +165,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 12,
     totalSold: 0,
     stock: 12,
+    costPrice: 130000,
     price: 195000,
+    profit: 65000,
+    receptionDate: '01/11/2026',
     isActive: true,
   },
   {
@@ -142,7 +180,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 12,
     totalSold: 5,
     stock: 7,
+    costPrice: 60000,
     price: 95000,
+    profit: 35000,
+    receptionDate: '25/10/2026',
     isActive: true,
   },
   {
@@ -154,7 +195,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 12,
     totalSold: 7,
     stock: 5,
+    costPrice: 70000,
     price: 110000,
+    profit: 40000,
+    receptionDate: '26/10/2026',
     isActive: true,
   },
   {
@@ -166,7 +210,10 @@ const INITIAL_PRODUCTS: Product[] = [
     totalIn: 15,
     totalSold: 3,
     stock: 12,
+    costPrice: 75000,
     price: 115000,
+    profit: 40000,
+    receptionDate: '27/10/2026',
     isActive: true,
   },
 ];
@@ -179,13 +226,18 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
   closeProductDetail: () => set({ selectedProductForDetail: null }),
 
   addProduct: (productData: ProductFormData) => {
+    const costPrice = productData.costPrice || Math.round(productData.price * 0.65);
+    const profit = productData.price - costPrice;
     const newProduct: Product = {
       id: `p-${Date.now()}`,
       barcode: productData.barcode,
       brand: productData.brand,
       name: productData.name,
       size: productData.size,
+      costPrice,
       price: productData.price,
+      profit,
+      receptionDate: productData.receptionDate || '02/11/2026',
       totalIn: productData.totalIn,
       totalSold: 0,
       stock: productData.totalIn,
@@ -242,7 +294,43 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     return true;
   },
 
+  recordIncomingStock: (
+    barcode: string,
+    quantity: number,
+    costPrice: number,
+    sellingPrice?: number,
+    receptionDate?: string
+  ): boolean => {
+    const { products } = get();
+    const product = products.find((p) => p.barcode === barcode);
+    if (!product) return false;
+
+    set((state) => ({
+      products: state.products.map((item) => {
+        if (item.barcode === barcode) {
+          const finalPrice = sellingPrice && sellingPrice > 0 ? sellingPrice : item.price;
+          const finalCost = costPrice && costPrice > 0 ? costPrice : item.costPrice;
+          return {
+            ...item,
+            totalIn: item.totalIn + quantity,
+            stock: item.stock + quantity,
+            costPrice: finalCost,
+            price: finalPrice,
+            profit: finalPrice - finalCost,
+            receptionDate: receptionDate || item.receptionDate,
+          };
+        }
+        return item;
+      }),
+    }));
+    return true;
+  },
+
   getByBarcode: (barcode: string): Product | undefined => {
     return get().products.find((p) => p.barcode.trim() === barcode.trim());
+  },
+
+  getById: (id: string): Product | undefined => {
+    return get().products.find((p) => p.id === id);
   },
 }));

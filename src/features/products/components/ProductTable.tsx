@@ -1,86 +1,148 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Product } from '@/features/products/types/product.types';
 import { formatCurrency } from '@/utils/formatters';
-import { t } from '@/lang';
-import { Barcode, Eye } from 'lucide-react';
+import { RoutesView } from '@/navigation/routes';
+import { Barcode, Eye, TrendingUp, Calendar } from 'lucide-react';
 
 export interface ProductTableProps {
   products: Product[];
   onSelectProduct?: (product: Product) => void;
 }
 
-export const ProductTable: React.FC<ProductTableProps> = ({ products, onSelectProduct }) => {
+export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
+  const navigate = useNavigate();
+
+  const handleViewDetail = (productId: string) => {
+    navigate(RoutesView.productDetail(productId));
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left text-xs">
-        <thead className="bg-stone-50 text-stone-500 uppercase tracking-wider text-[11px] border-b border-stone-200">
+        <thead className="bg-stone-50 text-stone-500 uppercase tracking-wider text-[11px] border-b border-stone-200 select-none">
           <tr>
-            <th className="px-5 py-3.5">{t('inventory.barcode')}</th>
-            <th className="px-5 py-3.5">{t('inventory.brand')}</th>
-            <th className="px-5 py-3.5">{t('inventory.description')}</th>
-            <th className="px-5 py-3.5">{t('inventory.size')}</th>
-            <th className="px-5 py-3.5 text-right">{t('inventory.price')}</th>
-            <th className="px-4 py-3.5 text-center">{t('inventory.totalIn')}</th>
-            <th className="px-4 py-3.5 text-center">{t('inventory.totalSold')}</th>
-            <th className="px-5 py-3.5 text-center">{t('inventory.stock')}</th>
-            <th className="px-4 py-3.5 text-center">{t('common.actions')}</th>
+            <th className="px-5 py-3.5">Código / SKU</th>
+            <th className="px-5 py-3.5">Marca & Fragancia</th>
+            <th className="px-4 py-3.5">Medida</th>
+            <th className="px-4 py-3.5 whitespace-nowrap">
+              <span className="flex items-center space-x-1">
+                <Calendar className="w-3.5 h-3.5 text-stone-400" />
+                <span>Fecha Recep.</span>
+              </span>
+            </th>
+            <th className="px-4 py-3.5 text-right whitespace-nowrap">Precio Compra</th>
+            <th className="px-4 py-3.5 text-right whitespace-nowrap">Precio Venta</th>
+            <th className="px-4 py-3.5 text-right whitespace-nowrap">
+              <span className="flex items-center justify-end space-x-1 text-emerald-700">
+                <TrendingUp className="w-3.5 h-3.5" />
+                <span>Ganancia</span>
+              </span>
+            </th>
+            <th className="px-4 py-3.5 text-center">Ingreso</th>
+            <th className="px-4 py-3.5 text-center">Venta</th>
+            <th className="px-4 py-3.5 text-center whitespace-nowrap">Saldo Stock</th>
+            <th className="px-4 py-3.5 text-center">Acciones</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-stone-100">
-          {products.map((product) => (
-            <tr key={product.id} className="hover:bg-stone-50/70 transition-colors">
-              <td className="px-5 py-3.5 font-mono text-[11px] text-stone-600 flex items-center space-x-1.5 whitespace-nowrap">
-                <Barcode className="w-3.5 h-3.5 text-stone-400" />
-                <span>{product.barcode}</span>
-              </td>
-              <td className="px-5 py-3.5 font-semibold text-stone-800 whitespace-nowrap">
-                {product.brand}
-              </td>
-              <td className="px-5 py-3.5 text-stone-700 max-w-xs truncate" title={product.name}>
-                {product.name}
-              </td>
-              <td className="px-5 py-3.5 text-stone-500 whitespace-nowrap">
-                {product.size}
-              </td>
-              <td className="px-5 py-3.5 font-semibold text-stone-900 text-right whitespace-nowrap">
-                {formatCurrency(product.price)}
-              </td>
-              <td className="px-4 py-3.5 text-center text-stone-500 font-medium">
-                {product.totalIn}
-              </td>
-              <td className="px-4 py-3.5 text-center text-maribel-700 font-medium">
-                {product.totalSold}
-              </td>
-              <td className="px-5 py-3.5 text-center whitespace-nowrap">
-                <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                    product.stock === 0
-                      ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                      : product.stock <= 5
-                      ? 'bg-amber-50 text-amber-700 border border-amber-200'
-                      : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                  }`}
-                >
-                  {product.stock} {t('inventory.units')}
-                </span>
-              </td>
-              <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                <button
-                  type="button"
-                  onClick={() => onSelectProduct?.(product)}
-                  className="inline-flex items-center space-x-1 px-2.5 py-1 bg-stone-100 hover:bg-maribel-50 hover:text-maribel-800 text-stone-700 rounded-lg text-xs font-semibold transition-colors"
-                  title="Ver detalle del producto"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>Detalle</span>
-                </button>
-              </td>
-            </tr>
-          ))}
+          {products.map((product) => {
+            const profit = product.profit || product.price - product.costPrice;
+
+            return (
+              <tr key={product.id} className="hover:bg-stone-50/70 transition-colors">
+                {/* Código de barras */}
+                <td className="px-5 py-3.5 font-mono text-[11px] text-stone-600 whitespace-nowrap">
+                  <div className="flex items-center space-x-1.5">
+                    <Barcode className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                    <span>{product.barcode}</span>
+                  </div>
+                </td>
+
+                {/* Marca & Fragancia */}
+                <td className="px-5 py-3.5">
+                  <div className="max-w-xs">
+                    <span className="text-[10px] font-bold tracking-wider uppercase text-stone-400 block">
+                      {product.brand}
+                    </span>
+                    <p className="text-stone-800 font-medium truncate" title={product.name}>
+                      {product.name}
+                    </p>
+                  </div>
+                </td>
+
+                {/* Medida */}
+                <td className="px-4 py-3.5 text-stone-500 whitespace-nowrap text-[11px]">
+                  {product.size}
+                </td>
+
+                {/* Fecha de Recepción */}
+                <td className="px-4 py-3.5 text-stone-600 whitespace-nowrap font-mono text-[11px]">
+                  {product.receptionDate || '02/11/2026'}
+                </td>
+
+                {/* Precio Compra */}
+                <td className="px-4 py-3.5 text-stone-600 text-right whitespace-nowrap font-medium">
+                  {formatCurrency(product.costPrice)}
+                </td>
+
+                {/* Precio Venta */}
+                <td className="px-4 py-3.5 font-bold text-stone-900 text-right whitespace-nowrap">
+                  {formatCurrency(product.price)}
+                </td>
+
+                {/* Ganancia Unitaria */}
+                <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                  <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                    <span>+{formatCurrency(profit)}</span>
+                  </span>
+                </td>
+
+                {/* Ingreso acumulado */}
+                <td className="px-4 py-3.5 text-center text-stone-500 font-medium">
+                  {product.totalIn}
+                </td>
+
+                {/* Venta acumulada */}
+                <td className="px-4 py-3.5 text-center text-maribel-700 font-semibold">
+                  {product.totalSold}
+                </td>
+
+                {/* Saldo Stock */}
+                <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                      product.stock === 0
+                        ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                        : product.stock <= 5
+                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                        : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    }`}
+                  >
+                    {product.stock} uds
+                  </span>
+                </td>
+
+                {/* Botón de Detalle que navega a vista dedicada */}
+                <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                  <button
+                    type="button"
+                    onClick={() => handleViewDetail(product.id)}
+                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-stone-100 hover:bg-maribel-700 hover:text-white text-stone-700 rounded-xl text-xs font-semibold transition-all shadow-2xs active:scale-95"
+                    title="Ver ficha completa del producto"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Detalle</span>
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+
           {products.length === 0 && (
             <tr>
-              <td colSpan={9} className="px-5 py-8 text-center text-stone-400">
-                No se encontraron productos en el inventario.
+              <td colSpan={11} className="px-5 py-12 text-center text-stone-400">
+                No se encontraron productos registrados en el inventario.
               </td>
             </tr>
           )}
