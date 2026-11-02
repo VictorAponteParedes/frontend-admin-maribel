@@ -5,6 +5,7 @@ import { OrderTable } from '@/features/orders/components/OrderTable';
 import { OrderDetailModal } from '@/features/orders/components/OrderDetailModal';
 import { useOrdersStore } from '@/store/useOrdersStore';
 import { OrderStatus } from '@/features/orders/types/order.types';
+import { useTranslation } from '@/locale';
 import {
   Search,
   ShoppingBag,
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 
 export const OrdersScreen: React.FC = () => {
+  const { t } = useTranslation(['orders', 'translation']);
   const {
     orders,
     selectedOrder,
@@ -78,8 +80,8 @@ export const OrdersScreen: React.FC = () => {
   return (
     <div className="space-y-6">
       <Header
-        title="Pedidos Web"
-        subtitle="Control en tiempo real de compras recibidas desde la página web, despachos y ubicaciones GPS"
+        title={t('title')}
+        subtitle={t('subtitle')}
       />
 
       {/* Tarjetas de Métricas Rápidas */}
@@ -88,7 +90,7 @@ export const OrdersScreen: React.FC = () => {
         <div className="bg-white p-4 rounded-2xl border border-stone-200 shadow-xs flex items-center justify-between">
           <div>
             <p className="text-[11px] font-bold text-stone-500 uppercase tracking-wider">
-              Total Pedidos
+              {t('metrics.total')}
             </p>
             <p className="text-2xl font-bold text-stone-900 mt-1 font-mono">
               {totalCount}
@@ -103,7 +105,7 @@ export const OrdersScreen: React.FC = () => {
         <div className="bg-white p-4 rounded-2xl border border-amber-200 bg-amber-50/20 shadow-xs flex items-center justify-between">
           <div>
             <p className="text-[11px] font-bold text-amber-700 uppercase tracking-wider">
-              Nuevos / Pendientes
+              {t('metrics.pending')}
             </p>
             <p className="text-2xl font-bold text-amber-900 mt-1 font-mono">
               {pendingCount}
@@ -118,7 +120,7 @@ export const OrdersScreen: React.FC = () => {
         <div className="bg-white p-4 rounded-2xl border border-sky-200 bg-sky-50/20 shadow-xs flex items-center justify-between">
           <div>
             <p className="text-[11px] font-bold text-sky-700 uppercase tracking-wider">
-              En Proceso / Envío
+              {t('metrics.inProgress')}
             </p>
             <p className="text-2xl font-bold text-sky-900 mt-1 font-mono">
               {preparingCount + shippedCount}
@@ -133,7 +135,7 @@ export const OrdersScreen: React.FC = () => {
         <div className="bg-white p-4 rounded-2xl border border-emerald-200 bg-emerald-50/20 shadow-xs flex items-center justify-between">
           <div>
             <p className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">
-              Entregados
+              {t('metrics.delivered')}
             </p>
             <p className="text-2xl font-bold text-emerald-900 mt-1 font-mono">
               {deliveredCount}
@@ -158,7 +160,7 @@ export const OrdersScreen: React.FC = () => {
                 : 'text-stone-600 hover:bg-stone-100'
             }`}
           >
-            <span>Todos</span>
+            <span>{t('tabs.all')}</span>
             <span
               className={`text-[10px] px-1.5 py-0.2 rounded-full ${
                 statusFilter === 'ALL'
@@ -179,7 +181,7 @@ export const OrdersScreen: React.FC = () => {
                 : 'text-amber-800 bg-amber-50 hover:bg-amber-100'
             }`}
           >
-            <span>🟡 Pendientes</span>
+            <span>{t('tabs.pending')}</span>
             {pendingCount > 0 && (
               <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white text-amber-900 font-bold">
                 {pendingCount}
@@ -196,7 +198,7 @@ export const OrdersScreen: React.FC = () => {
                 : 'text-blue-800 bg-blue-50 hover:bg-blue-100'
             }`}
           >
-            <span>🔵 En Preparación</span>
+            <span>{t('tabs.preparing')}</span>
             {preparingCount > 0 && (
               <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white text-blue-900 font-bold">
                 {preparingCount}
@@ -213,7 +215,7 @@ export const OrdersScreen: React.FC = () => {
                 : 'text-purple-800 bg-purple-50 hover:bg-purple-100'
             }`}
           >
-            <span>🟣 En Reparto</span>
+            <span>{t('tabs.shipped')}</span>
             {shippedCount > 0 && (
               <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white text-purple-900 font-bold">
                 {shippedCount}
@@ -230,7 +232,7 @@ export const OrdersScreen: React.FC = () => {
                 : 'text-emerald-800 bg-emerald-50 hover:bg-emerald-100'
             }`}
           >
-            <span>🟢 Entregados</span>
+            <span>{t('tabs.delivered')}</span>
             {deliveredCount > 0 && (
               <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-white text-emerald-900 font-bold">
                 {deliveredCount}
@@ -246,7 +248,7 @@ export const OrdersScreen: React.FC = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Buscar por cliente, WhatsApp, Nº de pedido, producto o dirección..."
+            placeholder={t('searchPlaceholder')}
             className="w-full pl-9 pr-4 py-2 text-xs bg-stone-50 border border-stone-200 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-maribel-600 focus:border-transparent transition-all"
           />
         </div>

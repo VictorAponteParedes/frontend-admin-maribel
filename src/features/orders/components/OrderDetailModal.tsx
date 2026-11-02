@@ -20,6 +20,7 @@ import {
   getPaymentMethodLabel,
 } from '@/features/orders/utils/orderHelpers';
 import { formatCurrency } from '@/utils/formatters';
+import { useTranslation } from '@/locale';
 
 export interface OrderDetailModalProps {
   order: Order | null;
@@ -34,9 +35,11 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
   onClose,
   onStatusChange,
 }) => {
+  const { t } = useTranslation(['orders', 'translation']);
+
   if (!isOpen || !order) return null;
 
-  const statusConfig = getOrderStatusConfig(order.status);
+  const statusConfig = getOrderStatusConfig(order.status, t);
   const waLink = buildWhatsAppLink(
     order.customerPhone,
     order.customerName,
@@ -70,7 +73,8 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               </div>
               <p className="text-xs text-stone-500 flex items-center gap-1.5 mt-0.5">
                 <Clock className="w-3.5 h-3.5 text-stone-400" />
-                Fecha del pedido: <strong className="text-stone-700 font-medium">{order.date}</strong>
+                {t('modal.orderDate')}{' '}
+                <strong className="text-stone-700 font-medium">{order.date}</strong>
               </p>
             </div>
           </div>
@@ -92,7 +96,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             <div className="bg-stone-50/70 rounded-xl p-4 border border-stone-200 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-stone-400 flex items-center gap-1">
-                  <User className="w-3.5 h-3.5" /> Datos del Cliente
+                  <User className="w-3.5 h-3.5" /> {t('modal.customerData')}
                 </span>
               </div>
               <div>
@@ -100,7 +104,10 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                   {order.customerName}
                 </p>
                 <p className="text-xs text-stone-500 mt-0.5">
-                  WhatsApp: <span className="font-mono font-medium text-stone-700">{order.customerPhone}</span>
+                  WhatsApp:{' '}
+                  <span className="font-mono font-medium text-stone-700">
+                    {order.customerPhone}
+                  </span>
                 </p>
               </div>
 
@@ -112,7 +119,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-xs transition-colors"
               >
                 <MessageCircle className="w-4 h-4" />
-                <span>Chatear por WhatsApp con el Cliente</span>
+                <span>{t('modal.chatWhatsApp')}</span>
               </a>
             </div>
 
@@ -124,7 +131,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 ) : (
                   <Store className="w-3.5 h-3.5 text-amber-600" />
                 )}
-                Modalidad de Entrega
+                {t('modal.deliveryMode')}
               </span>
 
               <div>
@@ -136,32 +143,35 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                   }`}
                 >
                   {order.deliveryType === 'DELIVERY'
-                    ? '🚚 Envío a Domicilio'
-                    : '🏬 Retiro en Local / Tienda'}
+                    ? t('delivery.homeDeliveryLong')
+                    : t('delivery.pickupStoreLong')}
                 </span>
               </div>
 
               {order.deliveryType === 'DELIVERY' && order.location ? (
                 <div className="space-y-1.5 text-xs text-stone-600">
                   <p>
-                    <strong className="text-stone-800">Dirección:</strong>{' '}
-                    {order.location.address || 'Sin dirección especificada'}
+                    <strong className="text-stone-800">{t('modal.address')}</strong>{' '}
+                    {order.location.address || t('modal.noAddress')}
                   </p>
                   {order.location.reference && (
                     <p className="text-stone-500 italic">
-                      <strong className="text-stone-700 not-italic">Referencia:</strong>{' '}
+                      <strong className="text-stone-700 not-italic">
+                        {t('modal.reference')}
+                      </strong>{' '}
                       {order.location.reference}
                     </p>
                   )}
                   {order.location.city && (
                     <p>
-                      <strong className="text-stone-800">Ciudad:</strong> {order.location.city}
+                      <strong className="text-stone-800">{t('modal.city')}</strong>{' '}
+                      {order.location.city}
                     </p>
                   )}
                 </div>
               ) : (
                 <p className="text-xs text-stone-500">
-                  El cliente pasará a retirar personalmente por la sucursal.
+                  {t('delivery.pickupNote')}
                 </p>
               )}
             </div>
@@ -176,13 +186,20 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-stone-900">
-                    Coordenadas GPS de Entrega
+                    {t('modal.gpsTitle')}
                   </h4>
                   <p className="text-xs font-mono text-stone-600 mt-0.5">
-                    Latitud: <span className="font-semibold text-maribel-900">{order.location.latitude}</span> | Longitud: <span className="font-semibold text-maribel-900">{order.location.longitude}</span>
+                    {t('modal.latitude')}{' '}
+                    <span className="font-semibold text-maribel-900">
+                      {order.location.latitude}
+                    </span>{' '}
+                    | {t('modal.longitude')}{' '}
+                    <span className="font-semibold text-maribel-900">
+                      {order.location.longitude}
+                    </span>
                   </p>
                   <p className="text-[11px] text-stone-500 mt-0.5">
-                    Ideal para guiar a tu repartidor directamente al portón o calcular la distancia exacta.
+                    {t('modal.gpsDesc')}
                   </p>
                 </div>
               </div>
@@ -196,7 +213,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-maribel-700 hover:bg-maribel-800 shadow-xs transition-colors shrink-0"
               >
-                <span>Abrir en Google Maps</span>
+                <span>{t('table.openMaps')}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </div>
@@ -210,7 +227,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               </div>
               <div className="text-xs">
                 <h4 className="font-bold text-rose-900">
-                  Notas del Cliente / Dedicatoria de Regalo:
+                  {t('modal.giftNotesTitle')}
                 </h4>
                 <p className="text-rose-800 mt-1 italic leading-relaxed">
                   "{order.notes}"
@@ -222,17 +239,23 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
           {/* Tabla de Productos */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-stone-500 mb-2">
-              Productos Solicitados ({order.totalQuantity} {order.totalQuantity === 1 ? 'unidad' : 'unidades'})
+              {t('modal.requestedProducts', {
+                count: order.totalQuantity,
+                unit:
+                  order.totalQuantity === 1
+                    ? t('table.unitSingular')
+                    : t('table.unitPlural'),
+              })}
             </h4>
             <div className="border border-stone-200 rounded-xl overflow-hidden">
               <table className="w-full text-left text-xs">
                 <thead className="bg-stone-50 border-b border-stone-200 text-stone-600 font-semibold uppercase text-[10px]">
                   <tr>
-                    <th className="py-2.5 px-3">Producto</th>
-                    <th className="py-2.5 px-3">Medida / Presentación</th>
-                    <th className="py-2.5 px-3 text-center">Cant.</th>
-                    <th className="py-2.5 px-3 text-right">Precio Unit.</th>
-                    <th className="py-2.5 px-3 text-right">Subtotal</th>
+                    <th className="py-2.5 px-3">{t('modal.productCol')}</th>
+                    <th className="py-2.5 px-3">{t('modal.sizeCol')}</th>
+                    <th className="py-2.5 px-3 text-center">{t('modal.quantityCol')}</th>
+                    <th className="py-2.5 px-3 text-right">{t('modal.priceCol')}</th>
+                    <th className="py-2.5 px-3 text-right">{t('modal.subtotalCol')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
@@ -246,7 +269,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                           {item.name}
                         </p>
                         <span className="text-[10px] text-stone-400 font-mono">
-                          Cód: {item.barcode}
+                          {t('modal.codePrefix')} {item.barcode}
                         </span>
                       </td>
                       <td className="py-3 px-3 text-stone-600">
@@ -272,13 +295,13 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
           <div className="bg-stone-50 rounded-xl p-4 border border-stone-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="text-xs space-y-1">
               <p className="text-stone-600">
-                Método de pago:{' '}
+                {t('modal.paymentMethod')}{' '}
                 <strong className="text-stone-800">
-                  {getPaymentMethodLabel(order.paymentMethod)}
+                  {getPaymentMethodLabel(order.paymentMethod, t)}
                 </strong>
               </p>
               <p className="text-stone-600">
-                Estado del cobro:{' '}
+                {t('modal.paymentStatus')}{' '}
                 <span
                   className={`font-semibold ${
                     order.paymentStatus === 'PAID'
@@ -287,27 +310,27 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
                   }`}
                 >
                   {order.paymentStatus === 'PAID'
-                    ? '✓ Pagado'
-                    : '⚠ Pendiente de cobro al entregar'}
+                    ? t('payment.paid')
+                    : t('payment.pendingOnDelivery')}
                 </span>
               </p>
             </div>
 
             <div className="w-full sm:w-auto text-right space-y-1 text-xs">
               <div className="flex justify-between sm:justify-end gap-6 text-stone-500">
-                <span>Subtotal productos:</span>
+                <span>{t('modal.subtotalProducts')}</span>
                 <span className="font-mono">{formatCurrency(order.subtotal)}</span>
               </div>
               <div className="flex justify-between sm:justify-end gap-6 text-stone-500">
-                <span>Costo de envío:</span>
+                <span>{t('modal.deliveryFee')}</span>
                 <span className="font-mono">
                   {order.deliveryFee > 0
                     ? formatCurrency(order.deliveryFee)
-                    : 'Gratis / Local'}
+                    : t('modal.freeDelivery')}
                 </span>
               </div>
               <div className="flex justify-between sm:justify-end gap-6 text-sm font-bold text-stone-900 pt-1 border-t border-stone-200">
-                <span>Total a cobrar:</span>
+                <span>{t('modal.totalToCollect')}</span>
                 <span className="text-maribel-700 font-mono text-base">
                   {formatCurrency(order.total)}
                 </span>
@@ -320,7 +343,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-stone-500" />
               <label htmlFor="order-status-select" className="text-xs font-bold text-stone-800">
-                Cambiar Estado del Pedido:
+                {t('modal.changeStatus')}
               </label>
             </div>
             <select
@@ -331,11 +354,11 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
               }
               className={`text-xs font-bold py-1.5 px-3 rounded-lg border cursor-pointer focus:outline-hidden ${statusConfig.className}`}
             >
-              <option value="PENDING">🟡 Pendiente de Revisión</option>
-              <option value="PREPARING">🔵 En Preparación / Empaque</option>
-              <option value="SHIPPED">🟣 En Reparto / Despachado</option>
-              <option value="DELIVERED">🟢 Entregado al Cliente</option>
-              <option value="CANCELLED">🔴 Pedido Cancelado</option>
+              <option value="PENDING">{t('status.selectPending')}</option>
+              <option value="PREPARING">{t('status.selectPreparing')}</option>
+              <option value="SHIPPED">{t('status.selectShipped')}</option>
+              <option value="DELIVERED">{t('status.selectDelivered')}</option>
+              <option value="CANCELLED">{t('status.selectCancelled')}</option>
             </select>
           </div>
         </div>
@@ -348,7 +371,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-stone-700 bg-white border border-stone-200 hover:bg-stone-100 transition-colors"
           >
             <Printer className="w-4 h-4 text-stone-500" />
-            <span>Imprimir Ticket de Despacho</span>
+            <span>{t('modal.printTicket')}</span>
           </button>
 
           <button
@@ -356,7 +379,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-stone-900 hover:bg-stone-800 transition-colors"
           >
-            Cerrar
+            {t('modal.close')}
           </button>
         </div>
       </div>

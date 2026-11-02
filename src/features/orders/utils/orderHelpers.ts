@@ -3,6 +3,7 @@ import {
   PaymentMethod,
 } from '@/features/orders/types/order.types';
 import { formatCurrency } from '@/utils/formatters';
+import { t } from '@/locale';
 
 export const buildWhatsAppLink = (
   phone: string,
@@ -16,9 +17,12 @@ export const buildWhatsAppLink = (
     ? `595${digitsOnly.slice(1)}`
     : digitsOnly;
 
-  const message = `¡Hola ${customerName}! 👋 Te escribimos desde *Maribel Tienda de Regalos* 🎁 con respecto a tu pedido *#${orderNumber}* por un total de ${formatCurrency(
-    total
-  )}. ¿Cómo estás?`;
+  const formattedTotal = formatCurrency(total);
+  const message = t('orders.whatsapp.message', {
+    name: customerName,
+    orderNumber,
+    total: formattedTotal,
+  });
 
   return `https://wa.me/${internationalNumber}?text=${encodeURIComponent(
     message
@@ -34,31 +38,34 @@ export interface StatusBadgeConfig {
   className: string;
 }
 
-export const getOrderStatusConfig = (status: OrderStatus): StatusBadgeConfig => {
+export const getOrderStatusConfig = (
+  status: OrderStatus,
+  translateFn: (key: string) => string = t
+): StatusBadgeConfig => {
   switch (status) {
     case 'PENDING':
       return {
-        label: 'Pendiente',
+        label: translateFn('orders.status.pending'),
         className: 'bg-amber-100 text-amber-800 border-amber-300',
       };
     case 'PREPARING':
       return {
-        label: 'En Preparación',
+        label: translateFn('orders.status.preparing'),
         className: 'bg-blue-100 text-blue-800 border-blue-300',
       };
     case 'SHIPPED':
       return {
-        label: 'En Reparto',
+        label: translateFn('orders.status.shipped'),
         className: 'bg-purple-100 text-purple-800 border-purple-300',
       };
     case 'DELIVERED':
       return {
-        label: 'Entregado',
+        label: translateFn('orders.status.delivered'),
         className: 'bg-emerald-100 text-emerald-800 border-emerald-300',
       };
     case 'CANCELLED':
       return {
-        label: 'Cancelado',
+        label: translateFn('orders.status.cancelled'),
         className: 'bg-rose-100 text-rose-800 border-rose-300',
       };
     default:
@@ -69,16 +76,19 @@ export const getOrderStatusConfig = (status: OrderStatus): StatusBadgeConfig => 
   }
 };
 
-export const getPaymentMethodLabel = (method: PaymentMethod): string => {
+export const getPaymentMethodLabel = (
+  method: PaymentMethod,
+  translateFn: (key: string) => string = t
+): string => {
   switch (method) {
     case 'CASH_ON_DELIVERY':
-      return 'Efectivo contra entrega';
+      return translateFn('orders.payment.cashOnDelivery');
     case 'BANK_TRANSFER':
-      return 'Transferencia bancaria';
+      return translateFn('orders.payment.bankTransfer');
     case 'QR':
-      return 'Pago con QR';
+      return translateFn('orders.payment.qr');
     case 'CARD':
-      return 'Tarjeta de crédito / débito';
+      return translateFn('orders.payment.card');
     default:
       return method;
   }
