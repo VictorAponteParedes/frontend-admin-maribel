@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import {
   Store,
   Building2,
   FileBadge,
   Phone,
-  MessageSquare,
+  MessageCircle,
   MapPin,
   Globe,
   Clock,
-  FileText,
+  Instagram,
   Save,
   RotateCcw,
   ExternalLink,
   ShieldCheck,
+  Sparkles,
 } from 'lucide-react';
 import { ControlledInput } from '@/components/ui/ControlledInput';
 import { useSettingsStore, DEFAULT_STORE_SETTINGS } from '../../store/useSettingsStore';
 import { StoreGeneralSettings } from '../../types/settings.types';
-import { TicketPreviewCard } from '../../components/TicketPreviewCard';
+import { StoreFooterPreviewCard } from '../../components/StoreFooterPreviewCard';
 import { LogoUploader } from '../../components/LogoUploader';
 import { toast } from '@/store/useToastStore';
 
 export const StoreSettingsScreen: React.FC = () => {
-  const [isMonochrome, setIsMonochrome] = useState<boolean>(false);
   const { settings, updateSettings, resetToDefaults } = useSettingsStore();
 
   const {
@@ -42,7 +42,7 @@ export const StoreSettingsScreen: React.FC = () => {
 
   const onSubmit = (data: StoreGeneralSettings) => {
     updateSettings(data);
-    toast.success('Configuración Guardada', 'Los datos generales de la tienda fueron actualizados correctamente.');
+    toast.success('Configuración Guardada', 'Los datos de la tienda online fueron actualizados con éxito.');
   };
 
   const handleReset = () => {
@@ -56,7 +56,7 @@ export const StoreSettingsScreen: React.FC = () => {
   const handleLogoChange = (newLogoUrl: string) => {
     setValue('logoUrl', newLogoUrl, { shouldDirty: true });
     updateSettings({ logoUrl: newLogoUrl });
-    toast.success('Logotipo Actualizado', 'El nuevo logo se mostrará en tickets y pantalla.');
+    toast.success('Logotipo Actualizado', 'El nuevo logo ya está visible en la tienda.');
   };
 
   const handleResetLogo = () => {
@@ -75,13 +75,13 @@ export const StoreSettingsScreen: React.FC = () => {
             <span>/</span>
             <span>Configuración</span>
             <span>/</span>
-            <span className="text-maribel-700 font-semibold">Datos de la Tienda</span>
+            <span className="text-maribel-700 font-semibold">Datos de la Tienda (Web)</span>
           </div>
           <h1 className="text-2xl font-bold font-serif text-stone-900 tracking-tight flex items-center gap-2">
-            Datos de la Tienda (General)
+            Datos de la Tienda & Footer Web
           </h1>
           <p className="text-xs text-stone-500 mt-1">
-            Información institucional que aparece en los tickets, comprobantes y mensajes a clientes.
+            Personaliza la información institucional, redes sociales, horarios y contacto que verán tus clientes en la página web.
           </p>
         </div>
 
@@ -114,269 +114,285 @@ export const StoreSettingsScreen: React.FC = () => {
 
       {/* Main Content Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Main Form (7 cols on lg) */}
-          <div className="lg:col-span-7 space-y-6">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Card 1: Identidad Comercial */}
-              <div className="bg-white border border-stone-200/80 rounded-2xl p-6 shadow-xs space-y-5">
-                <div className="flex items-center space-x-3 pb-3 border-b border-stone-100">
-                  <div className="p-2 bg-rose-50 text-maribel-700 rounded-xl">
-                    <Store className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-stone-900">
-                      Identidad Comercial & Fiscal (Paraguay)
-                    </h3>
-                    <p className="text-xs text-stone-500">
-                      Nombre oficial impreso en comprobantes, facturación y rótulos
-                    </p>
-                  </div>
+        {/* Main Form (7 cols on lg) */}
+        <div className="lg:col-span-7 space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Card 1: Identidad de la Marca & Tienda Web */}
+            <div className="bg-white border border-stone-200/80 rounded-2xl p-6 shadow-xs space-y-5">
+              <div className="flex items-center space-x-3 pb-3 border-b border-stone-100">
+                <div className="p-2 bg-rose-50 text-maribel-700 rounded-xl">
+                  <Store className="w-5 h-5" />
                 </div>
-
-                <div className="space-y-4">
-                  <ControlledInput
-                    name="tradeName"
-                    control={control}
-                    label="Nombre de Fantasía (Marca Comercial) *"
-                    placeholder="Ej. Maribel Tienda de Regalos"
-                    leftIcon={<Store className="w-4 h-4 text-stone-400" />}
-                    rules={{
-                      required: 'El nombre de fantasía es obligatorio',
-                      minLength: { value: 3, message: 'Mínimo 3 caracteres' },
-                    }}
-                    helperText="Encabezado principal visible en tickets y mensajes"
-                  />
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <ControlledInput
-                      name="legalName"
-                      control={control}
-                      label="Razón Social / Nombre del Titular *"
-                      placeholder="Ej. Maribel Escriva"
-                      leftIcon={<Building2 className="w-4 h-4 text-stone-400" />}
-                      rules={{
-                        required: 'La razón social o titular es obligatoria',
-                      }}
-                    />
-
-                    <ControlledInput
-                      name="taxId"
-                      control={control}
-                      label="RUC (Registro Único de Contribuyentes) *"
-                      placeholder="Ej. 4815234-7"
-                      leftIcon={<FileBadge className="w-4 h-4 text-stone-400" />}
-                      rules={{
-                        required: 'El RUC de Paraguay es obligatorio',
-                        pattern: {
-                          value: /^\d{5,8}-\d$/,
-                          message: 'Formato RUC Paraguay válido: ej. 4815234-7',
-                        },
-                      }}
-                      helperText="RUC válido con dígito verificador"
-                    />
-                  </div>
+                <div>
+                  <h3 className="text-sm font-bold text-stone-900">
+                    Identidad Comercial & Presentación Web
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    Nombre visible en el encabezado y descripción de la tienda
+                  </p>
                 </div>
               </div>
 
-              {/* Card 2: Canales de Contacto & WhatsApp */}
-              <div className="bg-white border border-stone-200/80 rounded-2xl p-6 shadow-xs space-y-5">
-                <div className="flex items-center space-x-3 pb-3 border-b border-stone-100">
-                  <div className="p-2 bg-emerald-50 text-emerald-700 rounded-xl">
-                    <MessageSquare className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-stone-900">
-                      Contacto Oficial & Envíos de Comprobantes
-                    </h3>
-                    <p className="text-xs text-stone-500">
-                      Teléfono de cabecera y WhatsApp para emisión automática de comprobantes
-                    </p>
-                  </div>
-                </div>
+              <div className="space-y-4">
+                <ControlledInput
+                  name="tradeName"
+                  control={control}
+                  label="Nombre de la Tienda (Marca Comercial) *"
+                  placeholder="Ej. Maribel Tienda de Regalos"
+                  leftIcon={<Store className="w-4 h-4 text-stone-400" />}
+                  rules={{
+                    required: 'El nombre de la tienda es obligatorio',
+                    minLength: { value: 3, message: 'Mínimo 3 caracteres' },
+                  }}
+                  helperText="Nombre principal desplegado en la web y footer"
+                />
+
+                <ControlledInput
+                  name="storeBio"
+                  control={control}
+                  label="Slogan o Resumen de la Tienda (Visible en Footer) *"
+                  placeholder="Ej. Perfumería fina, fragancias exclusivas y detalles especiales..."
+                  leftIcon={<Sparkles className="w-4 h-4 text-stone-400" />}
+                  rules={{
+                    required: 'La descripción breve de la tienda es obligatoria',
+                  }}
+                  helperText="Frase breve que explica tu catálogo a los visitantes"
+                />
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <ControlledInput
-                    name="businessPhone"
+                    name="legalName"
                     control={control}
-                    label="Teléfono Comercial / Local"
-                    placeholder="Ej. 0986 314 630"
-                    leftIcon={<Phone className="w-4 h-4 text-stone-400" />}
+                    label="Razón Social / Nombre del Titular *"
+                    placeholder="Ej. Maribel Escriva"
+                    leftIcon={<Building2 className="w-4 h-4 text-stone-400" />}
                     rules={{
-                      required: 'El teléfono comercial es requerido',
+                      required: 'El nombre del titular o razón social es obligatorio',
                     }}
-                    helperText="Atención a proveedores y consultas"
+                    helperText="Aparece en el pie legal del sitio"
                   />
 
                   <ControlledInput
-                    name="whatsappNumber"
+                    name="taxId"
                     control={control}
-                    label="WhatsApp Oficial (Comprobantes) *"
-                    placeholder="Ej. 0986 314 630"
-                    leftIcon={<MessageSquare className="w-4 h-4 text-emerald-600" />}
+                    label="RUC Paraguay *"
+                    placeholder="Ej. 4815234-7"
+                    leftIcon={<FileBadge className="w-4 h-4 text-stone-400" />}
                     rules={{
-                      required: 'El número de WhatsApp oficial es requerido',
+                      required: 'El RUC es obligatorio',
                     }}
-                    helperText="Número desde el cual se enviarán tickets a clientes"
+                    helperText="Número de RUC para transparencia comercial"
                   />
                 </div>
               </div>
+            </div>
 
-              {/* Card 3: Ubicación Física & Enlace Maps */}
-              <div className="bg-white border border-stone-200/80 rounded-2xl p-6 shadow-xs space-y-5">
-                <div className="flex items-center space-x-3 pb-3 border-b border-stone-100">
-                  <div className="p-2 bg-sky-50 text-sky-700 rounded-xl">
-                    <MapPin className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-stone-900">
-                      Ubicación Física del Local & Retiros
-                    </h3>
-                    <p className="text-xs text-stone-500">
-                      Dirección para entregas, retiros en puerta y comprobantes impresos
-                    </p>
-                  </div>
+            {/* Card 2: Contacto & Pedidos por WhatsApp */}
+            <div className="bg-white border border-stone-200/80 rounded-2xl p-6 shadow-xs space-y-5">
+              <div className="flex items-center space-x-3 pb-3 border-b border-stone-100">
+                <div className="p-2 bg-emerald-50 text-emerald-700 rounded-xl">
+                  <MessageCircle className="w-5 h-5" />
                 </div>
-
-                <div className="space-y-4">
-                  <ControlledInput
-                    name="address"
-                    control={control}
-                    label="Dirección Física (Calle, Altura, Referencia) *"
-                    placeholder="Ej. Avda. Dr. Francia e/ Tte. Herrero"
-                    leftIcon={<MapPin className="w-4 h-4 text-stone-400" />}
-                    rules={{
-                      required: 'La dirección del local es obligatoria',
-                    }}
-                  />
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <ControlledInput
-                      name="city"
-                      control={control}
-                      label="Ciudad / Departamento *"
-                      placeholder="Ej. Pedro Juan Caballero"
-                      rules={{
-                        required: 'La ciudad es requerida',
-                      }}
-                    />
-
-                    <ControlledInput
-                      name="country"
-                      control={control}
-                      label="País *"
-                      placeholder="Paraguay"
-                      rules={{
-                        required: 'El país es requerido',
-                      }}
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <ControlledInput
-                      name="mapsUrl"
-                      control={control}
-                      label="Enlace de Google Maps (Retiros en tienda)"
-                      placeholder="https://maps.google.com/?q=..."
-                      leftIcon={<Globe className="w-4 h-4 text-stone-400" />}
-                      helperText="Enlace corto que se envía por WhatsApp para que los clientes lleguen al local"
-                    />
-                    {watchedValues.mapsUrl && (
-                      <div className="pt-1">
-                        <a
-                          href={watchedValues.mapsUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center space-x-1 text-[11px] font-semibold text-sky-700 hover:text-sky-800 hover:underline"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                          <span>Probar enlace de Maps en pestaña nueva</span>
-                        </a>
-                      </div>
-                    )}
-                  </div>
+                <div>
+                  <h3 className="text-sm font-bold text-stone-900">
+                    Canales de Contacto Directo & Pedidos
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    Números donde tus clientes harán pedidos y consultas
+                  </p>
                 </div>
               </div>
 
-              {/* Card 4: Horarios & Mensaje al pie del comprobante */}
-              <div className="bg-white border border-stone-200/80 rounded-2xl p-6 shadow-xs space-y-5">
-                <div className="flex items-center space-x-3 pb-3 border-b border-stone-100">
-                  <div className="p-2 bg-amber-50 text-amber-700 rounded-xl">
-                    <Clock className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-stone-900">
-                      Horarios de Atención & Términos en Comprobante
-                    </h3>
-                    <p className="text-xs text-stone-500">
-                      Disponibilidad al público y mensaje de agradecimiento o política de cambios
-                    </p>
-                  </div>
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <ControlledInput
+                  name="whatsappNumber"
+                  control={control}
+                  label="WhatsApp Oficial para Pedidos *"
+                  placeholder="Ej. 0986 314 630"
+                  leftIcon={<MessageCircle className="w-4 h-4 text-emerald-600" />}
+                  rules={{
+                    required: 'El número de WhatsApp es requerido',
+                  }}
+                  helperText="Enlace directo en el botón flotante y footer web"
+                />
 
-                <div className="space-y-4">
+                <ControlledInput
+                  name="businessPhone"
+                  control={control}
+                  label="Teléfono Comercial / Llamadas"
+                  placeholder="Ej. 0986 314 630"
+                  leftIcon={<Phone className="w-4 h-4 text-stone-400" />}
+                  rules={{
+                    required: 'El teléfono de contacto es requerido',
+                  }}
+                  helperText="Línea secundaria de atención al cliente"
+                />
+              </div>
+            </div>
+
+            {/* Card 3: Ubicación Física del Local & Retiros */}
+            <div className="bg-white border border-stone-200/80 rounded-2xl p-6 shadow-xs space-y-5">
+              <div className="flex items-center space-x-3 pb-3 border-b border-stone-100">
+                <div className="p-2 bg-sky-50 text-sky-700 rounded-xl">
+                  <MapPin className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-stone-900">
+                    Local Físico & Ubicación para Retiros
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    Dirección que verán los clientes para ubicar la tienda
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <ControlledInput
+                  name="address"
+                  control={control}
+                  label="Dirección del Local *"
+                  placeholder="Ej. Avda. Dr. Francia e/ Tte. Herrero"
+                  leftIcon={<MapPin className="w-4 h-4 text-stone-400" />}
+                  rules={{
+                    required: 'La dirección es obligatoria',
+                  }}
+                  helperText="Calle, número de local o referencias clave"
+                />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <ControlledInput
-                    name="openingHours"
+                    name="city"
                     control={control}
-                    label="Horarios de Atención al Público *"
-                    placeholder="Ej. Lunes a Sábados: 07:30 a 19:30 hs"
-                    leftIcon={<Clock className="w-4 h-4 text-stone-400" />}
+                    label="Ciudad / Departamento *"
+                    placeholder="Ej. Pedro Juan Caballero"
                     rules={{
-                      required: 'Los horarios de atención son requeridos',
+                      required: 'La ciudad es requerida',
                     }}
-                    helperText="Aparece en pie de ticket e información de la tienda"
                   />
 
                   <ControlledInput
-                    name="receiptFooterMessage"
+                    name="country"
                     control={control}
-                    label="Mensaje al Pie del Comprobante / Ticket *"
-                    placeholder="Ej. ¡Gracias por su preferencia! Cambios con este comprobante dentro de los 5 días hábiles."
-                    leftIcon={<FileText className="w-4 h-4 text-stone-400" />}
+                    label="País *"
+                    placeholder="Paraguay"
                     rules={{
-                      required: 'El mensaje de pie de comprobante es requerido',
+                      required: 'El país es requerido',
                     }}
-                    helperText="Frase institucional o política de cambios impresa al final del ticket"
                   />
                 </div>
-              </div>
 
-              {/* Bottom Submit Action */}
-              <div className="flex items-center justify-between pt-2">
-                <div className="flex items-center space-x-2 text-xs text-stone-500">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                  <span>Configuración persistida en tiempo real y memoria local segura.</span>
+                <div className="space-y-1">
+                  <ControlledInput
+                    name="mapsUrl"
+                    control={control}
+                    label="Enlace de Google Maps (Cómo llegar)"
+                    placeholder="https://maps.google.com/?q=..."
+                    leftIcon={<Globe className="w-4 h-4 text-stone-400" />}
+                    helperText="Enlace que abre Google Maps en el celular del cliente"
+                  />
+                  {watchedValues.mapsUrl && (
+                    <div className="pt-1">
+                      <a
+                        href={watchedValues.mapsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center space-x-1 text-[11px] font-semibold text-sky-700 hover:text-sky-800 hover:underline"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        <span>Probar enlace de Maps en pestaña nueva</span>
+                      </a>
+                    </div>
+                  )}
                 </div>
-
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="flex items-center space-x-2 px-5 py-2.5 text-xs font-bold text-white bg-maribel-700 hover:bg-maribel-800 rounded-xl shadow-xs transition-all cursor-pointer"
-                >
-                  <Save className="w-4 h-4" />
-                  <span>Guardar y Aplicar</span>
-                </button>
               </div>
-            </form>
-          </div>
+            </div>
 
-          {/* Sticky Aside with Logo Uploader & Real-Time Receipt Preview (5 cols on lg) */}
-          <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-6">
-            {/* Logo Manager */}
-            <LogoUploader
-              currentLogoUrl={watchedValues.logoUrl || '/logo-maribel.png'}
-              isMonochromeMode={isMonochrome}
-              onToggleMonochrome={setIsMonochrome}
-              onLogoChange={handleLogoChange}
-              onResetDefault={handleResetLogo}
-            />
+            {/* Card 4: Horarios, Redes Sociales & Pie de Página */}
+            <div className="bg-white border border-stone-200/80 rounded-2xl p-6 shadow-xs space-y-5">
+              <div className="flex items-center space-x-3 pb-3 border-b border-stone-100">
+                <div className="p-2 bg-amber-50 text-amber-700 rounded-xl">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-stone-900">
+                    Horarios de Atención & Redes Sociales
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    Información complementaria visible al pie de la página
+                  </p>
+                </div>
+              </div>
 
-            {/* Live Ticket Preview */}
-            <TicketPreviewCard
-              settings={watchedValues}
-              showMonochrome={isMonochrome}
-            />
-          </div>
+              <div className="space-y-4">
+                <ControlledInput
+                  name="openingHours"
+                  control={control}
+                  label="Horarios de Atención al Público *"
+                  placeholder="Ej. Lunes a Sábados: 07:30 a 19:30 hs"
+                  leftIcon={<Clock className="w-4 h-4 text-stone-400" />}
+                  rules={{
+                    required: 'Los horarios de atención son requeridos',
+                  }}
+                  helperText="Horarios en los que los clientes pueden retirar productos"
+                />
+
+                <ControlledInput
+                  name="instagramUrl"
+                  control={control}
+                  label="Perfil de Instagram *"
+                  placeholder="https://instagram.com/maribel_tiendaderegalos"
+                  leftIcon={<Instagram className="w-4 h-4 text-rose-500" />}
+                  rules={{
+                    required: 'El perfil de Instagram es requerido',
+                  }}
+                  helperText="Enlace para que los clientes te sigan en redes"
+                />
+
+                <ControlledInput
+                  name="footerCopyright"
+                  control={control}
+                  label="Texto de Derechos / Copyright en Footer *"
+                  placeholder="Ej. © 2026 Maribel Tienda de Regalos. Todos los derechos reservados."
+                  rules={{
+                    required: 'El texto de copyright es requerido',
+                  }}
+                  helperText="Línea final al pie de la tienda del cliente"
+                />
+              </div>
+            </div>
+
+            {/* Bottom Submit Action */}
+            <div className="flex items-center justify-between pt-2">
+              <div className="flex items-center space-x-2 text-xs text-stone-500">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span>Cambios guardados localmente y reflejados en tiempo real.</span>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="flex items-center space-x-2 px-5 py-2.5 text-xs font-bold text-white bg-maribel-700 hover:bg-maribel-800 rounded-xl shadow-xs transition-all cursor-pointer"
+              >
+                <Save className="w-4 h-4" />
+                <span>Guardar y Publicar en Web</span>
+              </button>
+            </div>
+          </form>
         </div>
+
+        {/* Sticky Aside with Logo Uploader & Real-Time Web Footer Preview (5 cols on lg) */}
+        <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-6">
+          {/* Logo Manager */}
+          <LogoUploader
+            currentLogoUrl={watchedValues.logoUrl || '/logo-maribel.png'}
+            onLogoChange={handleLogoChange}
+            onResetDefault={handleResetLogo}
+          />
+
+          {/* Live Store Footer Preview */}
+          <StoreFooterPreviewCard settings={watchedValues} />
+        </div>
+      </div>
     </div>
   );
 };

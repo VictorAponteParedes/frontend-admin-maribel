@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Receipt, Boxes, MessageSquare } from 'lucide-react';
+import { Boxes, MessageSquare } from 'lucide-react';
 import lazyLoad from '../../helpers/lazyLoad';
 import { PrivateLayout } from '../../navigation/PrivateLayout';
 import { RoutesView } from '../../navigation/routes';
@@ -32,25 +32,6 @@ export const SETTINGS_ROUTES: RouteConfig[] = [
     isProtected: true,
   },
   {
-    path: RoutesView.SETTINGS_RECEIPTS,
-    element: (
-      <PrivateLayout>
-        <SettingsPlaceholderScreen
-          title="Ventas & Comprobantes"
-          description="Formato de impresión térmica, timbrado, numeración y talonario fiscal para Paraguay."
-          icon={Receipt}
-          bulletPoints={[
-            'Configuración de timbrado y vencimiento según reglamentación SET/DNIT.',
-            'Numeración correlativa de comprobantes (factura, ticket o remisión).',
-            'Selección de ancho de papel térmico (58mm u 80mm).',
-            'Desglose automático de IVA 10% / 5% / Exentas.',
-          ]}
-        />
-      </PrivateLayout>
-    ),
-    isProtected: true,
-  },
-  {
     path: RoutesView.SETTINGS_INVENTORY,
     element: (
       <PrivateLayout>
@@ -75,12 +56,12 @@ export const SETTINGS_ROUTES: RouteConfig[] = [
       <PrivateLayout>
         <SettingsPlaceholderScreen
           title="Integración WhatsApp"
-          description="Plantillas de recibos digitales y mensajes automáticos enviados a clientes."
+          description="Plantillas de mensajes automáticos y enlace flotante para clientes."
           icon={MessageSquare}
           bulletPoints={[
-            'Plantilla personalizada de recibo digital tras concretar venta.',
+            'Plantilla personalizada de bienvenida y confirmación de pedidos.',
             'Mensaje automático con enlace de Google Maps para retiro en local.',
-            'Envío de comprobante en PDF o mensaje formateado por WhatsApp Web o API.',
+            'Enlace directo para canal de ventas y atención por WhatsApp.',
           ]}
         />
       </PrivateLayout>

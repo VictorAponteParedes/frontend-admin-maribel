@@ -12,7 +12,6 @@ import {
   ChevronRight,
   ChevronDown,
   Store,
-  Receipt,
   Boxes,
   MessageSquare,
   X,
@@ -119,17 +118,11 @@ export const Sidebar: React.FC = () => {
       subItems: [
         {
           path: RoutesView.SETTINGS_STORE,
-          label: 'Datos de la Tienda',
+          label: 'Datos de la Tienda (Web)',
           icon: Store,
           isActive:
             location.pathname === RoutesView.SETTINGS_STORE ||
             location.pathname === RoutesView.SETTINGS,
-        },
-        {
-          path: RoutesView.SETTINGS_RECEIPTS,
-          label: 'Ventas & Comprobantes',
-          icon: Receipt,
-          isActive: location.pathname === RoutesView.SETTINGS_RECEIPTS,
         },
         {
           path: RoutesView.SETTINGS_INVENTORY,

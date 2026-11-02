@@ -1,18 +1,14 @@
 import React, { useRef } from 'react';
-import { Image, Upload, RotateCcw, Sparkles } from 'lucide-react';
+import { Image, Upload, RotateCcw, CheckCircle2 } from 'lucide-react';
 
 export interface LogoUploaderProps {
   currentLogoUrl: string;
-  isMonochromeMode: boolean;
-  onToggleMonochrome: (isMonochrome: boolean) => void;
   onLogoChange: (url: string) => void;
   onResetDefault: () => void;
 }
 
 export const LogoUploader: React.FC<LogoUploaderProps> = ({
   currentLogoUrl,
-  isMonochromeMode,
-  onToggleMonochrome,
   onLogoChange,
   onResetDefault,
 }) => {
@@ -44,10 +40,10 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({
           </div>
           <div>
             <h4 className="text-xs font-bold text-stone-900 uppercase tracking-wider">
-              Logotipo de la Tienda
+              Logotipo de la Tienda Web
             </h4>
             <p className="text-[11px] text-stone-500">
-              Personaliza el isotipo para comprobantes y pantalla
+              Imagen de cabecera y pie de página de la tienda del cliente
             </p>
           </div>
         </div>
@@ -66,59 +62,19 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({
       {/* Preview Box & Selector */}
       <div className="flex flex-col sm:flex-row items-center gap-4">
         {/* Visual Box */}
-        <div
-          className={`relative w-28 h-28 rounded-2xl border-2 flex items-center justify-center p-3 transition-all ${
-            isMonochromeMode
-              ? 'bg-stone-100 border-stone-400'
-              : 'bg-rose-50/40 border-rose-200'
-          }`}
-        >
+        <div className="relative w-28 h-28 rounded-2xl border-2 border-rose-200 bg-rose-50/40 flex items-center justify-center p-3 shadow-2xs">
           <img
             src={currentLogoUrl || '/logo-maribel.png'}
             alt="Logo de la tienda"
-            className={`max-w-full max-h-full object-contain transition-all ${
-              isMonochromeMode ? 'grayscale contrast-200' : ''
-            }`}
+            className="max-w-full max-h-full object-contain"
           />
-          {isMonochromeMode && (
-            <span className="absolute bottom-1 right-1 bg-stone-900 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow-xs">
-              B/N
-            </span>
-          )}
         </div>
 
         {/* Action Controls */}
-        <div className="flex-1 space-y-2.5 w-full">
-          <div>
-            <span className="text-xs font-semibold text-stone-800 block mb-1.5">
-              Variante de visualización
-            </span>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => onToggleMonochrome(false)}
-                className={`flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-                  !isMonochromeMode
-                    ? 'bg-rose-50/80 border-maribel-600 text-maribel-800 shadow-2xs'
-                    : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5 text-maribel-600" />
-                <span>Color Oficial</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onToggleMonochrome(true)}
-                className={`flex items-center justify-center space-x-1.5 py-2 px-3 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
-                  isMonochromeMode
-                    ? 'bg-stone-800 border-stone-900 text-white shadow-2xs'
-                    : 'bg-white border-stone-200 text-stone-600 hover:bg-stone-50'
-                }`}
-              >
-                <span>B/N (Térmico)</span>
-              </button>
-            </div>
+        <div className="flex-1 space-y-3 w-full">
+          <div className="flex items-center space-x-2 text-xs text-stone-600">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>Visible en la barra de navegación y en el footer de la web</span>
           </div>
 
           <div>
@@ -132,13 +88,13 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full flex items-center justify-center space-x-2 py-2 px-3 rounded-xl text-xs font-semibold border border-stone-300 bg-white hover:bg-stone-50 text-stone-700 shadow-2xs transition-colors cursor-pointer"
+              className="w-full flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl text-xs font-bold border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 shadow-2xs transition-colors cursor-pointer"
             >
-              <Upload className="w-3.5 h-3.5" />
-              <span>Subir nuevo logo</span>
+              <Upload className="w-3.5 h-3.5 text-maribel-700" />
+              <span>Subir nuevo logotipo</span>
             </button>
-            <span className="text-[10px] text-stone-400 block text-center mt-1">
-              PNG, JPG o SVG (Recomendado 512x512px, máx. 2MB)
+            <span className="text-[10px] text-stone-400 block text-center mt-1.5">
+              PNG transparente, SVG o JPG (512x512px recomendado, máx. 2MB)
             </span>
           </div>
         </div>

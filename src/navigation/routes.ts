@@ -12,7 +12,6 @@ export const RoutesView = {
   USERS: '/users',
   SETTINGS: '/settings',
   SETTINGS_STORE: '/settings/store',
-  SETTINGS_RECEIPTS: '/settings/receipts',
   SETTINGS_INVENTORY: '/settings/inventory',
   SETTINGS_WHATSAPP: '/settings/whatsapp',
 
