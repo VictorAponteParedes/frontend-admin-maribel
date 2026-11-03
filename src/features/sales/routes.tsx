@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import lazyLoad from '@/helpers/lazyLoad';
+import lazyLoad from '@/utils/lazyLoad';
 import { PrivateLayout } from '@/navigation/PrivateLayout';
 import { RoutesView } from '@/navigation/routes';
 import type { RouteConfig } from '@/navigation/types';

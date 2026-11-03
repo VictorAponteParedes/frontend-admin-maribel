@@ -1,4 +1,4 @@
-import lazyLoad from '../../helpers/lazyLoad';
+import lazyLoad from '@/utils/lazyLoad';
 import { RoutesView } from '../../navigation/routes';
 import type { RouteConfig } from '../../navigation/types';
 

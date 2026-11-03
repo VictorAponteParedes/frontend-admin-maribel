@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Boxes, MessageSquare } from 'lucide-react';
-import lazyLoad from '../../helpers/lazyLoad';
+import lazyLoad from '@/utils/lazyLoad';
 import { PrivateLayout } from '../../navigation/PrivateLayout';
 import { RoutesView } from '../../navigation/routes';
 import type { RouteConfig } from '../../navigation/types';

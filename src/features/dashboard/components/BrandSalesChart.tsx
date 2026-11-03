@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MoreHorizontal } from 'lucide-react';
+import { Button } from '@/components/ui';
 import { BrandSaleShare } from '@/features/dashboard/types/dashboard.types';
 import { useTranslation } from '@/locale';
 
@@ -73,13 +74,15 @@ export const BrandSalesChart: React.FC<BrandSalesChartProps> = ({ data }) => {
             {t('brandSales.subtitle')}
           </p>
         </div>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="xs"
           aria-label={t('brandSales.options')}
-          className="text-neutral-400 hover:text-neutral-600 p-1 rounded-lg hover:bg-neutral-50 transition-colors"
+          className="text-neutral-400 hover:text-neutral-600 p-1"
         >
           <MoreHorizontal className="w-5 h-5" />
-        </button>
+        </Button>
       </div>
 
       {/* Donut Chart Graphic */}
