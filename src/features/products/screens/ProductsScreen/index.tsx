@@ -11,7 +11,7 @@ import { ProductsTabsHeader } from '../../components/ProductsTabsHeader';
 import { ProductsFilterBar } from '../../components/ProductsFilterBar';
 import { useProductsList } from '../../hooks/useProductsList';
 import { useTranslation } from '@/locale';
-import { Plus, PackagePlus, FileSpreadsheet } from 'lucide-react';
+import { PackagePlus, FileSpreadsheet } from 'lucide-react';
 
 export const ProductsScreen: React.FC = () => {
   const { t } = useTranslation(['inventory', 'translation']);
@@ -46,14 +46,6 @@ export const ProductsScreen: React.FC = () => {
               onClick={actions.openBulkImportModal}
             >
               Importar Excel
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              leftIcon={<Plus className="w-4 h-4" />}
-              onClick={actions.openProductModal}
-            >
-              {t('newProduct')}
             </Button>
             <Button
               variant="primary"
