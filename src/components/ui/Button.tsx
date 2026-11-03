@@ -1,7 +1,7 @@
 import React, { ButtonHTMLAttributes } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger';
-type ButtonSize = 'sm' | 'md' | 'lg';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost';
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -21,9 +21,10 @@ export const Button: React.FC<ButtonProps> = ({
   ...rest
 }) => {
   const baseStyles =
-    'inline-flex items-center justify-center font-medium rounded-xl transition-all focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed';
+    'inline-flex items-center justify-center font-medium rounded-xl transition-all focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
   const sizeStyles: Record<ButtonSize, string> = {
+    xs: 'px-2 py-1 text-[11px] space-x-1',
     sm: 'px-3 py-1.5 text-xs space-x-1.5',
     md: 'px-4 py-2 text-xs space-x-2',
     lg: 'px-5 py-2.5 text-sm space-x-2.5',
@@ -38,6 +39,8 @@ export const Button: React.FC<ButtonProps> = ({
       'border border-stone-300 text-stone-700 hover:bg-stone-50 active:scale-95',
     danger:
       'bg-rose-600 hover:bg-rose-700 active:scale-95 text-white shadow-xs',
+    ghost:
+      'text-stone-600 hover:text-stone-900 hover:bg-stone-100 active:scale-95',
   };
 
   return (
@@ -51,7 +54,7 @@ export const Button: React.FC<ButtonProps> = ({
       ) : (
         leftIcon
       )}
-      <span>{children}</span>
+      {children && (typeof children === 'string' ? <span>{children}</span> : children)}
     </button>
   );
 };
