@@ -51,13 +51,16 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
               {t('newProduct')}
             </h3>
           </div>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="xs"
             onClick={onClose}
             className="p-1.5 text-stone-400 hover:text-stone-600 rounded-lg"
+            aria-label="Cerrar modal"
           >
             <X className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="p-5 space-y-4">

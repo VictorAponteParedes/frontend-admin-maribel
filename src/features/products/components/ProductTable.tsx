@@ -4,6 +4,7 @@ import { Product } from '@/features/products/types/product.types';
 import { formatCurrency } from '@/utils/formatters';
 import { RoutesView } from '@/navigation/routes';
 import { useTranslation } from '@/locale';
+import { Button } from '@/components/ui';
 import { Barcode, Eye, TrendingUp, Calendar } from 'lucide-react';
 
 export interface ProductTableProps {
@@ -127,15 +128,17 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
 
                 {/* Botón de Detalle que navega a vista dedicada */}
                 <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                  <button
+                  <Button
                     type="button"
+                    variant="secondary"
+                    size="xs"
+                    leftIcon={<Eye className="w-3.5 h-3.5" />}
                     onClick={() => handleViewDetail(product.id)}
-                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-stone-100 hover:bg-maribel-700 hover:text-white text-stone-700 rounded-xl text-xs font-semibold transition-all shadow-2xs active:scale-95"
+                    className="hover:bg-maribel-700 hover:text-white"
                     title={t('table.viewDetailTooltip')}
                   >
-                    <Eye className="w-3.5 h-3.5" />
-                    <span>{t('table.detail')}</span>
-                  </button>
+                    {t('table.detail')}
+                  </Button>
                 </td>
               </tr>
             );
