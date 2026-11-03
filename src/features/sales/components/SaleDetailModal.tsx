@@ -35,13 +35,15 @@ export const SaleDetailModal: React.FC = () => {
               </p>
             </div>
           </div>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="xs"
             onClick={closeDetailModal}
-            className="p-1.5 text-stone-400 hover:text-stone-600 rounded-lg hover:bg-stone-100 transition-colors"
+            aria-label="Cerrar modal"
           >
             <X className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
 
         <div className="p-6">

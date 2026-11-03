@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui';
 import { Sale } from '@/features/sales/types/sale.types';
 import { formatCurrency } from '@/utils/formatters';
 import { RoutesView } from '@/navigation/routes';
@@ -68,14 +69,15 @@ export const SaleTable: React.FC<SaleTableProps> = ({ sales, onSelectSale }) => 
                 {formatCurrency(sale.total)}
               </td>
               <td className="px-5 py-3.5 text-center">
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
+                  size="xs"
                   onClick={() => handleGoToDetail(sale)}
-                  className="inline-flex items-center space-x-1.5 px-3 py-1 bg-stone-100 hover:bg-maribel-50 hover:text-maribel-800 text-stone-700 rounded-lg text-xs font-semibold transition-colors"
+                  leftIcon={<Eye className="w-3.5 h-3.5" />}
                 >
-                  <Eye className="w-3.5 h-3.5" />
                   <span>{t('viewDetail')}</span>
-                </button>
+                </Button>
               </td>
             </tr>
           ))}

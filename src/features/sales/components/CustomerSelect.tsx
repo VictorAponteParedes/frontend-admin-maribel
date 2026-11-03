@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Customer } from '@/features/customers/types/customer.types';
 import { useTranslation } from '@/locale';
+import { AppInput, Button } from '@/components/ui';
 import { Search, ChevronDown, Check, Phone, MapPin, UserCheck } from 'lucide-react';
 
 export interface CustomerSelectProps {
@@ -76,13 +77,14 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
       )}
 
       {/* Botón trigger elegante con Nombre + Teléfono concatenados */}
-      <button
+      <Button
         type="button"
+        variant="ghost"
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`w-full text-left p-3 rounded-2xl border transition-all flex items-center justify-between ${
+        className={`w-full text-left !p-3 !rounded-2xl border transition-all !flex !items-center !justify-between ${
           isOpen
-            ? 'border-maribel-600 ring-2 ring-maribel-600/10 bg-white shadow-xs'
-            : 'border-stone-200 bg-stone-50 hover:bg-white hover:border-stone-300'
+            ? 'border-maribel-600 ring-2 ring-maribel-600/10 !bg-white shadow-xs'
+            : 'border-stone-200 !bg-stone-50 hover:!bg-white hover:border-stone-300'
         }`}
       >
         <div className="flex items-center space-x-3 min-w-0 pr-2">
@@ -130,31 +132,30 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
             isOpen ? 'rotate-180 text-maribel-700' : ''
           }`}
         />
-      </button>
+      </Button>
 
       {/* Menú desplegable flotante con buscador integrado */}
       {isOpen && (
         <div className="absolute z-50 left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
           {/* Buscador dentro del dropdown */}
           <div className="p-3 border-b border-stone-100 bg-stone-50/50">
-            <div className="relative">
-              <Search className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                ref={searchInputRef}
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={t('customerSelect.searchPlaceholder')}
-                className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-stone-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-maribel-600 focus:border-maribel-600"
-              />
-            </div>
+            <AppInput
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('customerSelect.searchPlaceholder')}
+              leftIcon={<Search className="w-4 h-4 text-stone-400" />}
+              className="text-xs bg-white"
+            />
           </div>
 
           {/* Lista de clientes con scroll */}
           <div className="max-h-64 overflow-y-auto divide-y divide-stone-100">
             {/* Opción rápida: Cliente casual */}
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={() => {
                 const casual = customers.find((c) => c.name === 'Cliente casual') || {
                   id: 'casual',
@@ -168,8 +169,8 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
                 setIsOpen(false);
                 setSearchQuery('');
               }}
-              className={`w-full p-3 text-left flex items-center justify-between hover:bg-stone-50 transition-colors ${
-                isCasual ? 'bg-rose-50/60' : ''
+              className={`w-full !p-3 text-left !flex !items-center !justify-between hover:!bg-stone-50 transition-colors !rounded-none ${
+                isCasual ? '!bg-rose-50/60' : ''
               }`}
             >
               <div className="flex items-center space-x-3">
@@ -186,7 +187,7 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
                 </div>
               </div>
               {isCasual && <Check className="w-4 h-4 text-maribel-700" />}
-            </button>
+            </Button>
 
             {/* Listado de clientes registrados */}
             {filteredCustomers
@@ -195,16 +196,17 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
                 const isSelected = selectedCustomer?.id === customer.id;
 
                 return (
-                  <button
+                  <Button
                     key={customer.id}
                     type="button"
+                    variant="ghost"
                     onClick={() => {
                       onSelectCustomer(customer);
                       setIsOpen(false);
                       setSearchQuery('');
                     }}
-                    className={`w-full p-3 text-left flex items-center justify-between hover:bg-stone-50 transition-colors ${
-                      isSelected ? 'bg-rose-50/60' : ''
+                    className={`w-full !p-3 text-left !flex !items-center !justify-between hover:!bg-stone-50 transition-colors !rounded-none ${
+                      isSelected ? '!bg-rose-50/60' : ''
                     }`}
                   >
                     <div className="flex items-center space-x-3 min-w-0 pr-2">
@@ -244,7 +246,7 @@ export const CustomerSelect: React.FC<CustomerSelectProps> = ({
                     </div>
 
                     {isSelected && <Check className="w-4 h-4 text-maribel-700 shrink-0" />}
-                  </button>
+                  </Button>
                 );
               })}
 
