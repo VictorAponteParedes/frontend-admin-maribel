@@ -7,6 +7,7 @@ import {
   Store,
   Eye,
   ShoppingBag,
+  ShoppingCart,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/features/orders/types/order.types';
 import {
@@ -21,12 +22,14 @@ export interface OrderTableProps {
   orders: Order[];
   onViewDetail: (order: Order) => void;
   onStatusChange: (id: string, status: OrderStatus) => void;
+  onProcessSale?: (order: Order) => void;
 }
 
 export const OrderTable: React.FC<OrderTableProps> = ({
   orders,
   onViewDetail,
   onStatusChange,
+  onProcessSale,
 }) => {
   const { t } = useTranslation(['orders', 'translation']);
 
@@ -229,16 +232,40 @@ export const OrderTable: React.FC<OrderTableProps> = ({
                     </select>
                   </td>
 
-                  {/* Botón Ver Detalle */}
+                  {/* Acciones: Facturar Venta y Ver Detalle */}
                   <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                    <button
-                      type="button"
-                      onClick={() => onViewDetail(order)}
-                      className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors"
-                      title={t('table.viewDetailTooltip')}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center justify-center gap-1.5">
+                      {onProcessSale && (
+                        <button
+                          type="button"
+                          onClick={() => onProcessSale(order)}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer ${
+                            order.status === 'DELIVERED'
+                              ? 'bg-stone-100 hover:bg-stone-200 text-stone-600'
+                              : 'bg-maribel-700 hover:bg-maribel-800 text-white shadow-xs active:scale-95'
+                          }`}
+                          title={
+                            order.status === 'DELIVERED'
+                              ? 'Este pedido ya figura como entregado. Haz clic si deseas volver a facturarlo.'
+                              : 'Llevar los productos de este pedido directamente a la caja para facturar'
+                          }
+                        >
+                          <ShoppingCart className="w-3.5 h-3.5" />
+                          <span>
+                            {order.status === 'DELIVERED' ? 'Facturado' : 'Llevar a Venta'}
+                          </span>
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => onViewDetail(order)}
+                        className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
+                        title={t('table.viewDetailTooltip')}
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );

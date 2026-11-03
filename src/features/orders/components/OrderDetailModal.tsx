@@ -11,6 +11,7 @@ import {
   Clock,
   User,
   CheckCircle2,
+  ShoppingCart,
 } from 'lucide-react';
 import { Order, OrderStatus } from '@/features/orders/types/order.types';
 import {
@@ -27,6 +28,7 @@ export interface OrderDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   onStatusChange: (id: string, status: OrderStatus) => void;
+  onProcessSale?: (order: Order) => void;
 }
 
 export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
@@ -34,6 +36,7 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
   isOpen,
   onClose,
   onStatusChange,
+  onProcessSale,
 }) => {
   const { t } = useTranslation(['orders', 'translation']);
 
@@ -364,23 +367,43 @@ export const OrderDetailModal: React.FC<OrderDetailModalProps> = ({
         </div>
 
         {/* Pie del modal con acciones */}
-        <div className="p-4 bg-stone-50 border-t border-stone-200 flex items-center justify-between">
+        <div className="p-4 bg-stone-50 border-t border-stone-200 flex flex-wrap items-center justify-between gap-2">
           <button
             type="button"
             onClick={handlePrint}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-stone-700 bg-white border border-stone-200 hover:bg-stone-100 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-stone-700 bg-white border border-stone-200 hover:bg-stone-100 transition-colors cursor-pointer"
           >
             <Printer className="w-4 h-4 text-stone-500" />
             <span>{t('modal.printTicket')}</span>
           </button>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-stone-900 hover:bg-stone-800 transition-colors"
-          >
-            {t('modal.close')}
-          </button>
+          <div className="flex items-center gap-2">
+            {onProcessSale && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onProcessSale(order);
+                }}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-white bg-maribel-700 hover:bg-maribel-800 transition-colors shadow-xs active:scale-95 cursor-pointer"
+              >
+                <ShoppingCart className="w-4 h-4" />
+                <span>
+                  {order.status === 'DELIVERED'
+                    ? 'Volver a Facturar'
+                    : 'Facturar / Llevar a Venta'}
+                </span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-stone-900 hover:bg-stone-800 transition-colors cursor-pointer"
+            >
+              {t('modal.close')}
+            </button>
+          </div>
         </div>
       </div>
     </div>

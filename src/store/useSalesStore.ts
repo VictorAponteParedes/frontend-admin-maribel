@@ -1,12 +1,32 @@
 import { create } from 'zustand';
 import { Sale } from '@/features/sales/types/sale.types';
 
+export interface PreloadedOrderSale {
+  orderId: string;
+  orderNumber: string;
+  customerName: string;
+  customerPhone?: string;
+  customerAddress?: string;
+  items: {
+    barcode: string;
+    brand: string;
+    name: string;
+    size?: string;
+    quantity: number;
+    unitPrice: number;
+    subtotal: number;
+  }[];
+}
+
 export interface SalesState {
   sales: Sale[];
   isCreateModalOpen: boolean;
   selectedSaleForDetail: Sale | null;
+  pendingOrderSale: PreloadedOrderSale | null;
   openCreateModal: () => void;
+  openCreateModalFromOrder: (orderSale: PreloadedOrderSale) => void;
   closeCreateModal: () => void;
+  clearPendingOrderSale: () => void;
   openDetailModal: (sale: Sale) => void;
   closeDetailModal: () => void;
   addSale: (sale: Sale) => void;
@@ -140,9 +160,13 @@ export const useSalesStore = create<SalesState>((set, get) => ({
   sales: INITIAL_SALES,
   isCreateModalOpen: false,
   selectedSaleForDetail: null,
+  pendingOrderSale: null,
 
-  openCreateModal: () => set({ isCreateModalOpen: true }),
-  closeCreateModal: () => set({ isCreateModalOpen: false }),
+  openCreateModal: () => set({ isCreateModalOpen: true, pendingOrderSale: null }),
+  openCreateModalFromOrder: (orderSale: PreloadedOrderSale) =>
+    set({ isCreateModalOpen: true, pendingOrderSale: orderSale }),
+  closeCreateModal: () => set({ isCreateModalOpen: false, pendingOrderSale: null }),
+  clearPendingOrderSale: () => set({ pendingOrderSale: null }),
 
   openDetailModal: (sale: Sale) => set({ selectedSaleForDetail: sale }),
   closeDetailModal: () => set({ selectedSaleForDetail: null }),

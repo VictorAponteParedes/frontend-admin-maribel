@@ -1,10 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/layout/Header';
 import { Pagination } from '@/componentes';
 import { OrderTable } from '@/features/orders/components/OrderTable';
 import { OrderDetailModal } from '@/features/orders/components/OrderDetailModal';
 import { useOrdersStore } from '@/store/useOrdersStore';
-import { OrderStatus } from '@/features/orders/types/order.types';
+import { useSalesStore } from '@/store/useSalesStore';
+import { Order, OrderStatus } from '@/features/orders/types/order.types';
+import { RoutesView } from '@/navigation/routes';
 import { useTranslation } from '@/locale';
 import {
   Search,
@@ -16,6 +19,8 @@ import {
 
 export const OrdersScreen: React.FC = () => {
   const { t } = useTranslation(['orders', 'translation']);
+  const navigate = useNavigate();
+  const { openCreateModalFromOrder } = useSalesStore();
   const {
     orders,
     selectedOrder,
@@ -24,6 +29,26 @@ export const OrdersScreen: React.FC = () => {
     closeDetailModal,
     updateOrderStatus,
   } = useOrdersStore();
+
+  const handleProcessSale = (order: Order) => {
+    openCreateModalFromOrder({
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+      customerName: order.customerName,
+      customerPhone: order.customerPhone,
+      customerAddress: order.location?.address || order.location?.reference,
+      items: order.items.map((item) => ({
+        barcode: item.barcode,
+        brand: item.brand,
+        name: item.name,
+        size: item.size,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        subtotal: item.subtotal,
+      })),
+    });
+    navigate(RoutesView.SALES);
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | OrderStatus>('ALL');
@@ -259,6 +284,7 @@ export const OrdersScreen: React.FC = () => {
         orders={paginatedOrders}
         onViewDetail={openDetailModal}
         onStatusChange={updateOrderStatus}
+        onProcessSale={handleProcessSale}
       />
 
       {/* Paginación */}
@@ -282,6 +308,7 @@ export const OrdersScreen: React.FC = () => {
         isOpen={isDetailModalOpen}
         onClose={closeDetailModal}
         onStatusChange={updateOrderStatus}
+        onProcessSale={handleProcessSale}
       />
     </div>
   );
