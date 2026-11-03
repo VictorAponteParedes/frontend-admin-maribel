@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 import { toast } from '@/store/useToastStore';
 import { RoutesView } from '@/navigation/routes';
 import { LoginFormData } from '../types/auth.types';
+import { authService } from '../services/auth.service';
 
 export const useLoginForm = () => {
   const navigate = useNavigate();
@@ -16,8 +17,8 @@ export const useLoginForm = () => {
 
   const form = useForm<LoginFormData>({
     defaultValues: {
-      email: 'maribel@gmail.com',
-      password: 'Admin123.',
+      email: 'admin@maribelregalos.com',
+      password: 'admin123456',
     },
     mode: 'onTouched',
   });
@@ -25,15 +26,15 @@ export const useLoginForm = () => {
   const { control, handleSubmit, setValue } = form;
 
   const handleFillCredentials = () => {
-    setValue('email', 'maribel@gmail.com', { shouldValidate: true, shouldDirty: true });
-    setValue('password', 'Admin123.', { shouldValidate: true, shouldDirty: true });
-    toast.info('Credenciales aplicadas', 'maribel@gmail.com / Admin123.');
+    setValue('email', 'admin@maribelregalos.com', { shouldValidate: true, shouldDirty: true });
+    setValue('password', 'admin123456', { shouldValidate: true, shouldDirty: true });
+    toast.info('Credenciales aplicadas', 'admin@maribelregalos.com / admin123456');
   };
 
   const handleSupportClick = () => {
     toast.info(
       'Soporte Técnico',
-      'Comunícate con soporte@maribel.com para la asignación de accesos.'
+      'Comunícate con soporte@maribelregalos.com para la asignación de accesos.'
     );
   };
 
@@ -48,24 +49,16 @@ export const useLoginForm = () => {
     setIsLoading(true);
 
     try {
-      // Simulación de autenticación elegante
-      await new Promise((resolve) => setTimeout(resolve, 550));
+      const response = await authService.login(data);
 
-      login(
-        {
-          id: 'admin-1',
-          email: data.email,
-          fullName: 'Maribel Admin',
-          role: 'ADMIN',
-          permissions: ['*'],
-        },
-        'token-jwt-maribel-admin'
-      );
+      login(response.user, response.token);
 
-      toast.success('¡Bienvenida a la Maison!', 'Sesión iniciada correctamente.');
+      toast.success('¡Bienvenido!', 'Sesión iniciada correctamente.');
       navigate(RoutesView.DASHBOARD);
-    } catch {
-      toast.error('Error de autenticación', 'Verifica tus credenciales.');
+    } catch (error: any) {
+      const serverMessage =
+        error?.response?.data?.message || 'Error de autenticación. Verifica tus credenciales.';
+      toast.error('Error de acceso', serverMessage);
     } finally {
       setIsLoading(false);
     }

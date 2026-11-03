@@ -1,5 +1,5 @@
 export const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+  import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 export const APP_STORAGE_KEYS = {
   AUTH_TOKEN: 'admin_auth_token',
