@@ -32,6 +32,8 @@
   },
   "table": {
     "codeSku": "Código / SKU",
+    "brand": "Marca",
+    "description": "Descripción",
     "brandFragrance": "Marca & Fragancia",
     "receptionDate": "Fecha Recep.",
     "purchasePrice": "Precio Compra",

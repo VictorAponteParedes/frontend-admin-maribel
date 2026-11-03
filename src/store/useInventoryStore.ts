@@ -1,10 +1,19 @@
 import { create } from 'zustand';
-import { Product, ProductFormData } from '@/features/products/types/product.types';
+import {
+  BulkImportProductItem,
+  BulkImportSummary,
+  Product,
+  ProductFormData,
+} from '@/features/products/types/product.types';
+import { productsService } from '@/features/products/services/products.service';
 
 export interface InventoryState {
   products: Product[];
+  isLoading: boolean;
   selectedProductForDetail: Product | null;
-  addProduct: (productData: ProductFormData) => void;
+  fetchProducts: () => Promise<void>;
+  bulkImport: (items: BulkImportProductItem[]) => Promise<BulkImportSummary>;
+  addProduct: (productData: ProductFormData) => Promise<void>;
   deductStock: (barcode: string, quantity: number) => boolean;
   addIncomingStock: (barcode: string, quantity: number) => boolean;
   recordIncomingStock: (
@@ -224,29 +233,69 @@ const INITIAL_PRODUCTS: Product[] = [
 export const useInventoryStore = create<InventoryState>((set, get) => ({
   products: INITIAL_PRODUCTS,
   selectedProductForDetail: null,
+  isLoading: false,
 
   openProductDetail: (product: Product) => set({ selectedProductForDetail: product }),
   closeProductDetail: () => set({ selectedProductForDetail: null }),
 
-  addProduct: (productData: ProductFormData) => {
-    const costPrice = productData.costPrice || Math.round(productData.price * 0.65);
-    const profit = productData.price - costPrice;
-    const newProduct: Product = {
-      id: `p-${Date.now()}`,
-      barcode: productData.barcode,
-      brand: productData.brand,
-      name: productData.name,
-      size: productData.size,
-      costPrice,
-      price: productData.price,
-      profit,
-      receptionDate: productData.receptionDate || '02/11/2026',
-      totalIn: productData.totalIn,
-      totalSold: 0,
-      stock: productData.totalIn,
-      isActive: true,
-    };
-    set((state) => ({ products: [newProduct, ...state.products] }));
+  fetchProducts: async () => {
+    set({ isLoading: true });
+    try {
+      const items = await productsService.fetchProducts();
+      if (items && items.length > 0) {
+        set({ products: items });
+      }
+    } catch {
+      // Si el backend no está disponible o falla, mantiene los datos en memoria
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  bulkImport: async (items: BulkImportProductItem[]) => {
+    set({ isLoading: true });
+    try {
+      const summary = await productsService.bulkImport(items);
+      try {
+        const refreshed = await productsService.fetchProducts();
+        if (refreshed && refreshed.length > 0) {
+          set({ products: refreshed });
+        }
+      } catch {
+        // En caso de que falle la recarga
+      }
+      return summary;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  addProduct: async (productData: ProductFormData) => {
+    try {
+      await productsService.createProduct(productData);
+      const refreshed = await productsService.fetchProducts();
+      set({ products: refreshed });
+    } catch {
+      // Fallback local si no hay conexión al backend
+      const costPrice = productData.costPrice || Math.round(productData.price * 0.65);
+      const profit = productData.price - costPrice;
+      const newProduct: Product = {
+        id: `p-${Date.now()}`,
+        barcode: productData.barcode,
+        brand: productData.brand,
+        name: productData.name,
+        size: productData.size,
+        costPrice,
+        price: productData.price,
+        profit,
+        receptionDate: productData.receptionDate || new Date().toLocaleDateString('es-ES'),
+        totalIn: productData.totalIn,
+        totalSold: 0,
+        stock: productData.totalIn,
+        isActive: true,
+      };
+      set((state) => ({ products: [newProduct, ...state.products] }));
+    }
   },
 
   deductStock: (barcode: string, quantity: number): boolean => {

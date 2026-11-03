@@ -26,7 +26,8 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
         <thead className="bg-stone-50 text-stone-500 uppercase tracking-wider text-[11px] border-b border-stone-200 select-none">
           <tr>
             <th className="px-5 py-3.5">{t('table.codeSku')}</th>
-            <th className="px-5 py-3.5">{t('table.brandFragrance')}</th>
+            <th className="px-4 py-3.5 whitespace-nowrap">{t('table.brand')}</th>
+            <th className="px-5 py-3.5">{t('table.description')}</th>
             <th className="px-4 py-3.5">{t('size')}</th>
             <th className="px-4 py-3.5 whitespace-nowrap">
               <span className="flex items-center space-x-1">
@@ -62,16 +63,18 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                   </div>
                 </td>
 
-                {/* Marca & Fragancia */}
+                {/* Marca */}
+                <td className="px-4 py-3.5 whitespace-nowrap">
+                  <span className="text-[11px] font-bold tracking-wider uppercase text-stone-700 bg-stone-100 px-2 py-0.5 rounded-md inline-block">
+                    {product.brand}
+                  </span>
+                </td>
+
+                {/* Descripción */}
                 <td className="px-5 py-3.5">
-                  <div className="max-w-xs">
-                    <span className="text-[10px] font-bold tracking-wider uppercase text-stone-400 block">
-                      {product.brand}
-                    </span>
-                    <p className="text-stone-800 font-medium truncate" title={product.name}>
-                      {product.name}
-                    </p>
-                  </div>
+                  <p className="text-stone-900 font-medium text-xs truncate max-w-xs" title={product.name}>
+                    {product.name}
+                  </p>
                 </td>
 
                 {/* Medida */}
@@ -146,7 +149,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
 
           {products.length === 0 && (
             <tr>
-              <td colSpan={11} className="px-5 py-12 text-center text-stone-400">
+              <td colSpan={12} className="px-5 py-12 text-center text-stone-400">
                 {t('table.noProductsFound')}
               </td>
             </tr>

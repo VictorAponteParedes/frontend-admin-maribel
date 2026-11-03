@@ -4,13 +4,14 @@ import { Button } from '@/components/ui';
 import { Pagination } from '@/componentes';
 import { ProductTable } from '../../components/ProductTable';
 import { ProductFormModal } from '../../components/ProductFormModal';
+import { BulkImportModal } from '../../components/BulkImportModal';
 import { StockEntryTable } from '../../components/StockEntryTable';
 import { ProductsMetricsBar } from '../../components/ProductsMetricsBar';
 import { ProductsTabsHeader } from '../../components/ProductsTabsHeader';
 import { ProductsFilterBar } from '../../components/ProductsFilterBar';
 import { useProductsList } from '../../hooks/useProductsList';
 import { useTranslation } from '@/locale';
-import { Plus, PackagePlus } from 'lucide-react';
+import { Plus, PackagePlus, FileSpreadsheet } from 'lucide-react';
 
 export const ProductsScreen: React.FC = () => {
   const { t } = useTranslation(['inventory', 'translation']);
@@ -21,6 +22,7 @@ export const ProductsScreen: React.FC = () => {
     setSearchQuery,
     filterLowStock,
     isProductModalOpen,
+    isBulkImportModalOpen,
     metrics,
     stockPagination,
     entriesPagination,
@@ -37,6 +39,14 @@ export const ProductsScreen: React.FC = () => {
         subtitle={t('subtitle')}
         action={
           <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              leftIcon={<FileSpreadsheet className="w-4 h-4 text-emerald-600" />}
+              onClick={actions.openBulkImportModal}
+            >
+              Importar Excel
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -97,6 +107,11 @@ export const ProductsScreen: React.FC = () => {
         isOpen={isProductModalOpen}
         onClose={actions.closeProductModal}
         onSubmitProduct={actions.handleCreateProduct}
+      />
+
+      <BulkImportModal
+        isOpen={isBulkImportModalOpen}
+        onClose={actions.closeBulkImportModal}
       />
     </div>
   );

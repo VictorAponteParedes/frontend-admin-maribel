@@ -24,3 +24,23 @@ export interface ProductFormData {
   totalIn: number;
   receptionDate?: string;
 }
+
+export interface BulkImportProductItem {
+  barcode: string;
+  name: string;
+  brandName: string;
+  size?: string;
+  category?: string;
+  costPrice?: number;
+  sellingPrice?: number;
+  quantity?: number;
+  receptionDate?: string;
+}
+
+export interface BulkImportSummary {
+  totalProcessed: number;
+  inserted: number;
+  updated: number;
+  errorsCount: number;
+  errors: Array<{ barcode: string; error: string }>;
+}

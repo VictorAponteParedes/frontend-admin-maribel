@@ -1,12 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useInventoryStore } from '@/store/useInventoryStore';
-import { useStockEntryStore } from '@/store/useStockEntryStore';
-import { RoutesView } from '@/navigation/routes';
-import { ProductFormData, Product } from '../types/product.types';
-import { StockEntry } from '../types/stockEntry.types';
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { useInventoryStore } from "@/store/useInventoryStore";
+import { useStockEntryStore } from "@/store/useStockEntryStore";
+import { RoutesView } from "@/navigation/routes";
+import { ProductFormData, Product } from "../types/product.types";
+import { StockEntry } from "../types/stockEntry.types";
 
-export type ProductTab = 'stock' | 'entries';
+export type ProductTab = "stock" | "entries";
 
 export interface ProductsMetrics {
   totalCatalogCount: number;
@@ -17,15 +17,20 @@ export interface ProductsMetrics {
 
 export const useProductsList = () => {
   const navigate = useNavigate();
-  const { products, addProduct } = useInventoryStore();
+  const { products, addProduct, fetchProducts, isLoading } =
+    useInventoryStore();
   const { entries } = useStockEntryStore();
 
-  const [activeTab, setActiveTab] = useState<ProductTab>('stock');
+  const [activeTab, setActiveTab] = useState<ProductTab>("stock");
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [filterLowStock, setFilterLowStock] = useState(false);
 
-  // Estados de paginación
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
   const [productsPage, setProductsPage] = useState<number>(1);
   const [productsPageSize, setProductsPageSize] = useState<number>(10);
   const [entriesPage, setEntriesPage] = useState<number>(1);
@@ -120,6 +125,8 @@ export const useProductsList = () => {
     setFilterLowStock,
     isProductModalOpen,
     setIsProductModalOpen,
+    isBulkImportModalOpen,
+    isLoading,
     metrics,
     stockPagination: {
       currentPage: productsPage,
@@ -143,6 +150,9 @@ export const useProductsList = () => {
       toggleFilterLowStock: () => setFilterLowStock((prev) => !prev),
       openProductModal: () => setIsProductModalOpen(true),
       closeProductModal: () => setIsProductModalOpen(false),
+      openBulkImportModal: () => setIsBulkImportModalOpen(true),
+      closeBulkImportModal: () => setIsBulkImportModalOpen(false),
+      refreshProducts: fetchProducts,
     },
   };
 };
