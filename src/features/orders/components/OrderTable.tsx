@@ -9,12 +9,13 @@ import {
   ShoppingBag,
   ShoppingCart,
 } from 'lucide-react';
+import { Button } from '@/components/ui';
 import { Order, OrderStatus } from '@/features/orders/types/order.types';
 import {
   buildWhatsAppLink,
   buildGoogleMapsLink,
   getOrderStatusConfig,
-} from '@/features/orders/utils/orderHelpers';
+} from '@/features/orders/utils/order.utils';
 import { formatCurrency } from '@/utils/formatters';
 import { useTranslation } from '@/locale';
 
@@ -236,14 +237,11 @@ export const OrderTable: React.FC<OrderTableProps> = ({
                   <td className="py-3.5 px-4 text-center whitespace-nowrap">
                     <div className="flex items-center justify-center gap-1.5">
                       {onProcessSale && (
-                        <button
+                        <Button
                           type="button"
+                          variant={order.status === 'DELIVERED' ? 'secondary' : 'primary'}
+                          size="xs"
                           onClick={() => onProcessSale(order)}
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer ${
-                            order.status === 'DELIVERED'
-                              ? 'bg-stone-100 hover:bg-stone-200 text-stone-600'
-                              : 'bg-maribel-700 hover:bg-maribel-800 text-white shadow-xs active:scale-95'
-                          }`}
                           title={
                             order.status === 'DELIVERED'
                               ? 'Este pedido ya figura como entregado. Haz clic si deseas volver a facturarlo.'
@@ -254,17 +252,18 @@ export const OrderTable: React.FC<OrderTableProps> = ({
                           <span>
                             {order.status === 'DELIVERED' ? 'Facturado' : 'Llevar a Venta'}
                           </span>
-                        </button>
+                        </Button>
                       )}
 
-                      <button
+                      <Button
                         type="button"
+                        variant="ghost"
+                        size="xs"
                         onClick={() => onViewDetail(order)}
-                        className="p-1.5 rounded-xl text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer"
                         title={t('table.viewDetailTooltip')}
                       >
                         <Eye className="w-4 h-4" />
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>
