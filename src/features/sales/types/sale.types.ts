@@ -1,3 +1,14 @@
+export interface CartItem {
+  barcode: string;
+  brand: string;
+  name: string;
+  size: string;
+  unitPrice: number;
+  stock: number;
+  quantity: number;
+  subtotal: number;
+}
+
 export interface SaleItem {
   barcode: string;
   brand: string;

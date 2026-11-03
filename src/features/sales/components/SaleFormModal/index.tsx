@@ -2,7 +2,7 @@ import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AlertCircle, CheckCircle } from 'lucide-react';
 import { CustomerSelect } from '../CustomerSelect';
-import { useSaleFormModal } from './useSaleFormModal';
+import { useSaleFormModal } from './hooks';
 import { SaleFormModalHeader } from './SaleFormModalHeader';
 import { SaleFormLinkedOrderBanner } from './SaleFormLinkedOrderBanner';
 import { SaleFormProductScanner } from './SaleFormProductScanner';

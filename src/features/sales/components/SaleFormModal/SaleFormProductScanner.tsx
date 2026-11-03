@@ -2,7 +2,7 @@ import React from 'react';
 import { Barcode, Search, Plus, X } from 'lucide-react';
 import { AppInput, Button } from '@/components/ui';
 import { Product } from '@/features/products/types/product.types';
-import { CartItem } from './useSaleFormModal';
+import { CartItem } from '@/features/sales/types/sale.types';
 import { formatCurrency } from '@/utils/formatters';
 import { useTranslation } from '@/locale';
 
@@ -95,7 +95,7 @@ export const SaleFormProductScanner: React.FC<SaleFormProductScannerProps> = ({
               type="button"
               variant="ghost"
               onClick={() => onAddToCart(prod, 1)}
-              className="w-full p-2 hover:!bg-rose-50/70 rounded-xl flex items-center justify-between text-left text-xs transition-colors group cursor-pointer justify-between"
+              className="w-full p-2 hover:!bg-rose-50/70 rounded-xl flex items-center justify-between text-left text-xs transition-colors group cursor-pointer"
             >
               <div className="truncate pr-2 text-left">
                 <span className="text-[10px] font-bold text-maribel-700 uppercase block">

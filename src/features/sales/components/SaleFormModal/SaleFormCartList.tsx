@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingBag, Package, Minus, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui';
-import { CartItem } from './useSaleFormModal';
+import { CartItem } from '@/features/sales/types/sale.types';
 import { formatCurrency } from '@/utils/formatters';
 import { useTranslation } from '@/locale';
 
