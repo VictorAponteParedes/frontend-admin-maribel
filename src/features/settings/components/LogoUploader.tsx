@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Image, Upload, RotateCcw, CheckCircle2 } from 'lucide-react';
+import { Button } from '@/components/ui';
 
 export interface LogoUploaderProps {
   currentLogoUrl: string;
@@ -48,15 +49,16 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({
           </div>
         </div>
 
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="xs"
           onClick={onResetDefault}
-          className="text-[11px] text-stone-500 hover:text-stone-700 flex items-center space-x-1 font-medium transition-colors cursor-pointer"
+          leftIcon={<RotateCcw className="w-3 h-3" />}
           title="Restablecer logo predeterminado"
         >
-          <RotateCcw className="w-3 h-3" />
           <span>Restablecer</span>
-        </button>
+        </Button>
       </div>
 
       {/* Preview Box & Selector */}
@@ -85,14 +87,15 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({
               className="hidden"
               onChange={handleFileChange}
             />
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={() => fileInputRef.current?.click()}
-              className="w-full flex items-center justify-center space-x-2 py-2.5 px-3 rounded-xl text-xs font-bold border border-stone-300 bg-white hover:bg-stone-50 text-stone-800 shadow-2xs transition-colors cursor-pointer"
+              leftIcon={<Upload className="w-3.5 h-3.5 text-maribel-700" />}
+              className="w-full py-2.5 font-bold text-stone-800"
             >
-              <Upload className="w-3.5 h-3.5 text-maribel-700" />
               <span>Subir nuevo logotipo</span>
-            </button>
+            </Button>
             <span className="text-[10px] text-stone-400 block text-center mt-1.5">
               PNG transparente, SVG o JPG (512x512px recomendado, máx. 2MB)
             </span>

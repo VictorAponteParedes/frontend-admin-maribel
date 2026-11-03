@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowLeft, Clock, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui';
 import { RoutesView } from '@/navigation/routes';
 
 export interface SettingsPlaceholderScreenProps {
@@ -38,14 +39,15 @@ export const SettingsPlaceholderScreen: React.FC<SettingsPlaceholderScreenProps>
           <p className="text-xs text-stone-500 mt-1">{description}</p>
         </div>
 
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          size="sm"
           onClick={() => navigate(RoutesView.SETTINGS_STORE)}
-          className="inline-flex items-center space-x-2 px-3.5 py-2 text-xs font-semibold text-stone-600 bg-white border border-stone-200 hover:bg-stone-50 rounded-xl transition-colors shadow-2xs cursor-pointer"
+          leftIcon={<ArrowLeft className="w-3.5 h-3.5" />}
         >
-          <ArrowLeft className="w-3.5 h-3.5" />
           <span>Ir a Datos de la Tienda</span>
-        </button>
+        </Button>
       </div>
 
       {/* Placeholder Card */}
