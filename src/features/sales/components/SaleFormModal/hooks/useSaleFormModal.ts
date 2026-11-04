@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Customer } from '@/features/customers/types/customer.types';
-import { Sale, CartItem } from '@/features/sales/types/sale.types';
+import { CartItem } from '@/features/sales/types/sale.types';
 import { useSalesStore } from '@/store/useSalesStore';
 import { useInventoryStore } from '@/store/useInventoryStore';
 import { useOrdersStore } from '@/store/useOrdersStore';
@@ -52,7 +52,7 @@ export const useSaleFormModal = () => {
   });
 
   // 4. Registro y Cierre de Venta
-  const handleSaveSale = (e: React.FormEvent) => {
+  const handleSaveSale = async (e: React.FormEvent) => {
     e.preventDefault();
     clearErrors();
 
@@ -75,64 +75,52 @@ export const useSaleFormModal = () => {
       }
     }
 
-    // Descontar inventario
+    // Descontar inventario local optimista
     for (const item of cart.cartItems) {
       deductStock(item.barcode, item.quantity);
     }
 
-    const today = new Date();
-    const formattedDate = `${String(today.getDate()).padStart(2, '0')}/${String(
-      today.getMonth() + 1
-    ).padStart(2, '0')}/${today.getFullYear()}`;
-    const formattedTime = `${String(today.getHours()).padStart(2, '0')}:${String(
-      today.getMinutes()
-    ).padStart(2, '0')} hs`;
+    try {
+      const createdSale = await addSale({
+        orderId: preload.pendingOrderSale?.orderId,
+        customerId: selectedCustomer?.id,
+        customerCode: selectedCustomer?.code ? String(selectedCustomer.code) : undefined,
+        customerName: selectedCustomer ? selectedCustomer.name : t('customerSelect.casualCustomer'),
+        customerPhone: selectedCustomer?.phone,
+        customerAddress: selectedCustomer?.address,
+        status: 'CONFIRMED',
+        items: cart.cartItems.map((item) => ({
+          barcode: item.barcode,
+          brand: item.brand,
+          name: item.name,
+          size: item.size,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+        })),
+      });
 
-    const newSaleNumber = `V-${today.getFullYear()}-${String(Date.now()).slice(-4)}`;
+      setSuccessMessage(t('saleSaved'));
 
-    const newSale: Sale = {
-      id: `sale-${Date.now()}`,
-      saleNumber: newSaleNumber,
-      date: formattedDate,
-      time: formattedTime,
-      customerCode: selectedCustomer?.code ? String(selectedCustomer.code) : undefined,
-      customerName: selectedCustomer ? selectedCustomer.name : t('customerSelect.casualCustomer'),
-      customerPhone: selectedCustomer?.phone,
-      customerAddress: selectedCustomer?.address,
-      status: 'CONFIRMED',
-      totalQuantity: cart.totalQuantity,
-      total: cart.totalAmount,
-      items: cart.cartItems.map((item) => ({
-        barcode: item.barcode,
-        brand: item.brand,
-        name: item.name,
-        size: item.size,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        subtotal: item.subtotal,
-      })),
-    };
+      if (preload.pendingOrderSale) {
+        useOrdersStore.getState().updateOrderStatus(preload.pendingOrderSale.orderId, 'DELIVERED');
+        toast.success(
+          '¡Venta completada!',
+          `Pedido #${preload.pendingOrderSale.orderNumber} facturado y actualizado a "Entregado"`
+        );
+        clearPendingOrderSale();
+      } else {
+        toast.success(
+          '¡Venta completada!',
+          `${createdSale.saleNumber} • ${cart.totalQuantity} unidades registradas`
+        );
+      }
 
-    addSale(newSale);
-    setSuccessMessage(t('saleSaved'));
-
-    if (preload.pendingOrderSale) {
-      useOrdersStore.getState().updateOrderStatus(preload.pendingOrderSale.orderId, 'DELIVERED');
-      toast.success(
-        '¡Venta completada!',
-        `Pedido #${preload.pendingOrderSale.orderNumber} facturado y actualizado a "Entregado"`
-      );
-      clearPendingOrderSale();
-    } else {
-      toast.success(
-        '¡Venta completada!',
-        `${newSale.saleNumber} • ${cart.totalQuantity} unidades registradas`
-      );
+      setTimeout(() => {
+        closeCreateModal();
+      }, 600);
+    } catch {
+      setErrorMessage(t('errors.saveFailed') || 'Error al registrar la venta en el servidor.');
     }
-
-    setTimeout(() => {
-      closeCreateModal();
-    }, 600);
   };
 
   return {
