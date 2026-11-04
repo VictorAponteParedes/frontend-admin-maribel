@@ -10,6 +10,7 @@ export interface DatePickerInputProps {
   error?: string;
   placeholder?: string;
   allowClear?: boolean;
+  align?: 'left' | 'right';
 }
 
 const MONTH_NAMES = [
@@ -26,6 +27,7 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
   error,
   placeholder = 'DD/MM/AAAA',
   allowClear = false,
+  align = 'left',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -162,7 +164,11 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 top-full mt-1.5 z-50 w-72 bg-white rounded-2xl shadow-xl border border-stone-200 p-3.5 select-none animate-in fade-in zoom-in-95 duration-150">
+        <div
+          className={`absolute ${
+            align === 'right' ? 'right-0' : 'left-0'
+          } top-full mt-1.5 z-50 w-72 bg-white rounded-2xl shadow-xl border border-stone-200 p-3.5 select-none animate-in fade-in zoom-in-95 duration-150`}
+        >
           {/* Header con Mes/Año y botones */}
           <div className="flex items-center justify-between mb-3 px-1">
             <span className="text-xs font-bold text-stone-800 font-serif">

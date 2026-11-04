@@ -96,7 +96,7 @@ export const CustomerFilterDrawer: React.FC<CustomerFilterDrawerProps> = ({
               </div>
 
               {/* Formulario de Campos */}
-              <div className="p-6 space-y-5 overflow-y-auto flex-1">
+              <div className="p-6 space-y-5 overflow-y-auto overflow-x-hidden flex-1">
                 {/* Filtro por Código */}
                 <AppInput
                   label="Código de Cliente"
@@ -148,6 +148,7 @@ export const CustomerFilterDrawer: React.FC<CustomerFilterDrawerProps> = ({
                       onChange={(val) => onChangeFilter('startDate', val)}
                       placeholder="DD/MM/AAAA"
                       allowClear
+                      align="left"
                     />
 
                     <DatePickerInput
@@ -156,6 +157,7 @@ export const CustomerFilterDrawer: React.FC<CustomerFilterDrawerProps> = ({
                       onChange={(val) => onChangeFilter('endDate', val)}
                       placeholder="DD/MM/AAAA"
                       allowClear
+                      align="right"
                     />
                   </div>
                 </div>
