@@ -1,40 +1,80 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useCustomerStore } from '@/store/useCustomerStore';
-import { Customer, CustomerFormData } from '../types/customer.types';
+import { toast } from '@/store/useToastStore';
+import { CustomerFormData } from '../types/customer.types';
+import { CustomerFiltersState } from '../components/CustomerFilterDrawer';
+
+const INITIAL_FILTERS: CustomerFiltersState = {
+  code: '',
+  name: '',
+  phone: '',
+  startDate: '',
+  endDate: '',
+};
 
 export const useCustomersList = () => {
-  const { customers, addCustomer } = useCustomerStore();
+  const { customers, totalItems, addCustomer, fetchCustomers, isLoading } =
+    useCustomerStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filters, setFilters] = useState<CustomerFiltersState>(INITIAL_FILTERS);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
 
-  // Reiniciar a la primera página si cambia la búsqueda
+  // Reiniciar a la primera página si cambia la búsqueda o los filtros
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, filters]);
 
-  const filteredCustomers = useMemo<Customer[]>(() => {
-    const q = searchQuery.toLowerCase().trim();
-    if (!q) return customers;
+  // Carga y filtrado directamente desde el backend (con debounce para no saturar peticiones)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchCustomers({
+        search: searchQuery.trim() || undefined,
+        code: filters.code.trim() ? Number(filters.code) : undefined,
+        name: filters.name.trim() || undefined,
+        phone: filters.phone.trim() || undefined,
+        startDate: filters.startDate.trim() || undefined,
+        endDate: filters.endDate.trim() || undefined,
+        page: currentPage,
+        limit: pageSize,
+      });
+    }, 250);
 
-    return customers.filter(
-      (c) =>
-        c.name.toLowerCase().includes(q) ||
-        String(c.code).includes(q) ||
-        c.phone.includes(q) ||
-        c.address.toLowerCase().includes(q)
-    );
-  }, [customers, searchQuery]);
+    return () => clearTimeout(timer);
+  }, [searchQuery, filters, currentPage, pageSize, fetchCustomers]);
 
-  const paginatedCustomers = useMemo<Customer[]>(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredCustomers.slice(start, start + pageSize);
-  }, [filteredCustomers, currentPage, pageSize]);
+  const handleChangeFilter = useCallback(
+    (key: keyof CustomerFiltersState, value: string) => {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    },
+    [],
+  );
 
-  const handleCreateCustomer = (data: CustomerFormData) => {
-    addCustomer(data);
+  const handleResetFilters = useCallback(() => {
+    setFilters(INITIAL_FILTERS);
+  }, []);
+
+  const activeFiltersCount = useMemo(() => {
+    return Object.values(filters).filter((val) => Boolean(val && val.trim()))
+      .length;
+  }, [filters]);
+
+  const handleCreateCustomer = async (data: CustomerFormData) => {
+    try {
+      await addCustomer(data);
+      toast.success(
+        'Cliente registrado',
+        `${data.name} fue guardado correctamente.`,
+      );
+    } catch {
+      toast.error(
+        'Error al registrar',
+        'No se pudo guardar el cliente en el servidor.',
+      );
+    }
   };
 
   const handlePageSizeChange = (newSize: number) => {
@@ -46,11 +86,15 @@ export const useCustomersList = () => {
     searchQuery,
     setSearchQuery,
     isModalOpen,
+    isFilterDrawerOpen,
+    filters,
+    activeFiltersCount,
+    isLoading,
     pagination: {
       currentPage,
       pageSize,
-      totalItems: filteredCustomers.length,
-      items: paginatedCustomers,
+      totalItems,
+      items: customers,
       onPageChange: setCurrentPage,
       onPageSizeChange: handlePageSizeChange,
     },
@@ -58,6 +102,21 @@ export const useCustomersList = () => {
       handleCreateCustomer,
       openModal: () => setIsModalOpen(true),
       closeModal: () => setIsModalOpen(false),
+      openFilterDrawer: () => setIsFilterDrawerOpen(true),
+      closeFilterDrawer: () => setIsFilterDrawerOpen(false),
+      handleChangeFilter,
+      handleResetFilters,
+      refreshCustomers: () =>
+        fetchCustomers({
+          search: searchQuery.trim() || undefined,
+          code: filters.code.trim() ? Number(filters.code) : undefined,
+          name: filters.name.trim() || undefined,
+          phone: filters.phone.trim() || undefined,
+          startDate: filters.startDate.trim() || undefined,
+          endDate: filters.endDate.trim() || undefined,
+          page: currentPage,
+          limit: pageSize,
+        }),
     },
   };
 };

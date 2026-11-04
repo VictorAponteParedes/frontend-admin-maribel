@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { AppInput } from './AppInput';
+import { Button } from './Button';
 
 export interface DatePickerInputProps {
   label?: string;
@@ -8,6 +9,7 @@ export interface DatePickerInputProps {
   onChange: (date: string) => void;
   error?: string;
   placeholder?: string;
+  allowClear?: boolean;
 }
 
 const MONTH_NAMES = [
@@ -23,6 +25,7 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
   onChange,
   error,
   placeholder = 'DD/MM/AAAA',
+  allowClear = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -129,16 +132,31 @@ export const DatePickerInput: React.FC<DatePickerInputProps> = ({
           readOnly
           className="cursor-pointer font-mono font-medium"
           rightElement={
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsOpen((prev) => !prev);
-              }}
-              className="p-1 text-stone-400 hover:text-maribel-700 transition-colors"
-            >
-              <CalendarIcon className="w-4 h-4" />
-            </button>
+            <div className="flex items-center space-x-1">
+              {allowClear && Boolean(value) && (
+                <Button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onChange('');
+                  }}
+                  className="p-1 text-stone-300 hover:text-stone-600 transition-colors"
+                  title="Limpiar fecha"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </Button>
+              )}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsOpen((prev) => !prev);
+                }}
+                className="p-1 text-stone-400 hover:text-maribel-700 transition-colors"
+              >
+                <CalendarIcon className="w-4 h-4" />
+              </button>
+            </div>
           }
         />
       </div>
