@@ -43,7 +43,7 @@ export const SalesScreen: React.FC = () => {
         <SalesTabsHeader
           activeTab={state.activeTab}
           onTabChange={actions.setActiveTab}
-          summaryCount={state.sales.length}
+          summaryCount={state.totalItems}
           detailedCount={state.allDetailedRows.length}
         />
 
@@ -64,7 +64,7 @@ export const SalesScreen: React.FC = () => {
         {state.activeTab === 'summary' ? (
           <Pagination
             currentPage={state.salesPage}
-            totalItems={state.filteredSales.length}
+            totalItems={state.totalItems}
             pageSize={state.salesPageSize}
             pageSizeOptions={[10, 25, 50, 100]}
             onPageChange={actions.setSalesPage}

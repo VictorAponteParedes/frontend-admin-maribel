@@ -1,5 +1,12 @@
 import { create } from 'zustand';
 import { Sale } from '@/features/sales/types/sale.types';
+import {
+  salesService,
+  SaleQueryParams,
+  SaleMetrics,
+  CreateSalePayload,
+} from '@/features/sales/services/sales.service';
+import { useInventoryStore } from './useInventoryStore';
 
 export interface PreloadedOrderSale {
   orderId: string;
@@ -20,6 +27,9 @@ export interface PreloadedOrderSale {
 
 export interface SalesState {
   sales: Sale[];
+  totalItems: number;
+  isLoading: boolean;
+  metrics: SaleMetrics;
   isCreateModalOpen: boolean;
   selectedSaleForDetail: Sale | null;
   pendingOrderSale: PreloadedOrderSale | null;
@@ -29,152 +39,153 @@ export interface SalesState {
   clearPendingOrderSale: () => void;
   openDetailModal: (sale: Sale) => void;
   closeDetailModal: () => void;
-  addSale: (sale: Sale) => void;
+  fetchSales: (params?: SaleQueryParams) => Promise<void>;
+  fetchMetrics: () => Promise<void>;
+  addSale: (saleData: CreateSalePayload | Sale) => Promise<Sale>;
   getSaleById: (id: string) => Sale | undefined;
 }
 
-const INITIAL_SALES: Sale[] = [
-  {
-    id: 'sale-001',
-    saleNumber: 'V-2026-001',
-    date: '28/10/2026',
-    time: '16:45 hs',
-    customerCode: '1',
-    customerName: 'Pablo Ariel Melgarejo Servian',
-    customerPhone: '0986 314 630',
-    customerAddress: 'Pedro Juan Caballero',
-    status: 'CONFIRMED',
-    totalQuantity: 2,
-    total: 240000,
-    items: [
-      {
-        barcode: '6936664300856',
-        brand: 'STORY OF FLOWER',
-        name: 'PERFUME eau de toilette',
-        size: '50 ml / 1.7 FL. OZ.',
-        quantity: 2,
-        unitPrice: 120000,
-        subtotal: 240000,
-      },
-    ],
-  },
-  {
-    id: 'sale-002',
-    saleNumber: 'V-2026-002',
-    date: '28/10/2026',
-    time: '14:20 hs',
-    customerCode: '4',
-    customerName: 'Kevin Mendoza',
-    customerPhone: '0985 549 093',
-    customerAddress: 'Ypané',
-    status: 'CONFIRMED',
-    totalQuantity: 1,
-    total: 180000,
-    items: [
-      {
-        barcode: '6936664321950',
-        brand: 'COOL GIRL',
-        name: 'Eau de Toilette Natural Spray ("IT\'S SO GOOD TO BE)',
-        size: '85 ml (2.9 fl. oz)',
-        quantity: 1,
-        unitPrice: 180000,
-        subtotal: 180000,
-      },
-    ],
-  },
-  {
-    id: 'sale-003',
-    saleNumber: 'V-2026-003',
-    date: '27/10/2026',
-    time: '18:10 hs',
-    customerCode: '2',
-    customerName: 'Cliente casual',
-    customerPhone: 'Sin teléfono',
-    customerAddress: 'Mostrador / Venta directa',
-    status: 'CONFIRMED',
-    totalQuantity: 1,
-    total: 110000,
-    items: [
-      {
-        barcode: '6936664357003',
-        brand: 'MYSTICAL',
-        name: 'ZANZIBARA ASADA - EAU DE PARFUM (MYSTICAL)',
-        size: '30 ml / 1.0 fl.oz.',
-        quantity: 1,
-        unitPrice: 110000,
-        subtotal: 110000,
-      },
-    ],
-  },
-  {
-    id: 'sale-004',
-    saleNumber: 'V-2026-004',
-    date: '26/10/2026',
-    time: '11:30 hs',
-    customerCode: '3',
-    customerName: 'Marlene Roman',
-    customerPhone: '0982 653 625',
-    customerAddress: 'Profesor Luis Migone Battilana',
-    status: 'CONFIRMED',
-    totalQuantity: 2,
-    total: 230000,
-    items: [
-      {
-        barcode: '6936664367507',
-        brand: 'MYSTICAL',
-        name: 'Eau de Parfum ELIXIR (ASADA / أسد)',
-        size: '30 ml / 1.0 fl. oz.',
-        quantity: 2,
-        unitPrice: 115000,
-        subtotal: 230000,
-      },
-    ],
-  },
-  {
-    id: 'sale-005',
-    saleNumber: 'V-2026-005',
-    date: '26/10/2026',
-    time: '10:15 hs',
-    customerCode: '7',
-    customerName: 'Claudia Centurion',
-    customerPhone: '0991 552 447',
-    customerAddress: 'Coronel Oviedo',
-    status: 'CONFIRMED',
-    totalQuantity: 3,
-    total: 285000,
-    items: [
-      {
-        barcode: '6936664373669',
-        brand: 'Cireline',
-        name: 'Berry On Top - Give Me Gourmand (Classic Collection)',
-        size: '15 ml / 12 pcs',
-        quantity: 3,
-        unitPrice: 95000,
-        subtotal: 285000,
-      },
-    ],
-  },
-];
+const DEFAULT_METRICS: SaleMetrics = {
+  totalCount: 0,
+  totalAmount: 0,
+  totalUnits: 0,
+  todayAmount: 0,
+};
 
 export const useSalesStore = create<SalesState>((set, get) => ({
-  sales: INITIAL_SALES,
+  sales: [],
+  totalItems: 0,
+  isLoading: false,
+  metrics: DEFAULT_METRICS,
   isCreateModalOpen: false,
   selectedSaleForDetail: null,
   pendingOrderSale: null,
 
-  openCreateModal: () => set({ isCreateModalOpen: true, pendingOrderSale: null }),
-  openCreateModalFromOrder: (orderSale: PreloadedOrderSale) =>
-    set({ isCreateModalOpen: true, pendingOrderSale: orderSale }),
-  closeCreateModal: () => set({ isCreateModalOpen: false, pendingOrderSale: null }),
-  clearPendingOrderSale: () => set({ pendingOrderSale: null }),
+  openCreateModal: () => {
+    set({ isCreateModalOpen: true });
+  },
 
-  openDetailModal: (sale: Sale) => set({ selectedSaleForDetail: sale }),
-  closeDetailModal: () => set({ selectedSaleForDetail: null }),
+  openCreateModalFromOrder: (orderSale: PreloadedOrderSale) => {
+    set({
+      pendingOrderSale: orderSale,
+      isCreateModalOpen: true,
+    });
+  },
 
-  addSale: (sale: Sale) =>
-    set((state) => ({ sales: [sale, ...state.sales] })),
+  closeCreateModal: () => {
+    set({ isCreateModalOpen: false });
+  },
 
-  getSaleById: (id: string): Sale | undefined => {
-    return get().sales.find((s) => s.id === id || s.saleNumber === id);
+  clearPendingOrderSale: () => {
+    set({ pendingOrderSale: null });
+  },
+
+  openDetailModal: (sale: Sale) => {
+    set({ selectedSaleForDetail: sale });
+  },
+
+  closeDetailModal: () => {
+    set({ selectedSaleForDetail: null });
+  },
+
+  fetchSales: async (params?: SaleQueryParams) => {
+    set({ isLoading: true });
+    try {
+      const data = await salesService.fetchSales(params);
+      set({
+        sales: data.items || [],
+        totalItems: data.meta?.total ?? (data.items ? data.items.length : 0),
+      });
+    } catch {
+      // Si el backend no responde, mantiene el estado actual
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  fetchMetrics: async () => {
+    try {
+      const metrics = await salesService.fetchSaleMetrics();
+      if (metrics) {
+        set({ metrics });
+      }
+    } catch {
+      // Ignora fallo silenciosamente
+    }
+  },
+
+  addSale: async (saleData: CreateSalePayload | Sale): Promise<Sale> => {
+    // Si viene como Sale (interfaz legacy del front), mapear a CreateSalePayload
+    let payload: CreateSalePayload;
+
+    if ('items' in saleData && saleData.items.length > 0 && 'barcode' in saleData.items[0]) {
+      const legacySale = saleData as Sale & { orderId?: string; customerId?: string };
+      payload = {
+        orderId: legacySale.orderId,
+        customerId: legacySale.customerId,
+        customerCode: legacySale.customerCode,
+        customerName: legacySale.customerName,
+        customerPhone: legacySale.customerPhone,
+        customerAddress: legacySale.customerAddress,
+        items: legacySale.items.map((it) => ({
+          barcode: it.barcode,
+          brand: it.brand,
+          name: it.name,
+          size: it.size,
+          quantity: it.quantity,
+          unitPrice: it.unitPrice,
+        })),
+        status: 'CONFIRMED',
+      };
+    } else {
+      payload = saleData as CreateSalePayload;
+    }
+
+    try {
+      const createdSale = await salesService.createSale(payload);
+
+      set((state) => ({
+        sales: [createdSale, ...state.sales],
+        totalItems: state.totalItems + 1,
+      }));
+
+      // Sincronizar métricas de ventas y stock de productos en segundo plano
+      get().fetchMetrics();
+      useInventoryStore.getState().fetchProducts();
+
+      return createdSale;
+    } catch (error) {
+      // Fallback local si el backend está desconectado
+      const today = new Date();
+      const fallbackSale: Sale = {
+        id: `sale-${Date.now()}`,
+        saleNumber: `V-${today.getFullYear()}-${String(Date.now()).slice(-4)}`,
+        date: today.toLocaleDateString('es-ES'),
+        time: today.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+        customerCode: payload.customerCode,
+        customerName: payload.customerName,
+        customerPhone: payload.customerPhone,
+        customerAddress: payload.customerAddress,
+        items: payload.items.map((it) => ({
+          ...it,
+          size: it.size || '100 ml',
+          subtotal: it.unitPrice * it.quantity,
+        })),
+        totalQuantity: payload.items.reduce((acc, it) => acc + it.quantity, 0),
+        total: payload.items.reduce((acc, it) => acc + it.unitPrice * it.quantity, 0),
+        status: 'CONFIRMED',
+      };
+
+      set((state) => ({
+        sales: [fallbackSale, ...state.sales],
+        totalItems: state.totalItems + 1,
+      }));
+
+      throw error;
+    }
+  },
+
+  getSaleById: (id: string) => {
+    return get().sales.find((s) => s.id === id);
   },
 }));

@@ -23,13 +23,17 @@ export const useSidebarNav = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
-  const { orders } = useOrdersStore();
+  const { orders, metrics, fetchMetrics } = useOrdersStore();
   const { isCollapsed, toggleCollapse, isMobileOpen, closeMobile } = useSidebarStore();
   const [isSettingsExpanded, setIsSettingsExpanded] = useState<boolean>(true);
 
+  useEffect(() => {
+    fetchMetrics();
+  }, [fetchMetrics]);
+
   const pendingOrdersCount = useMemo(
-    () => orders.filter((o) => o.status === 'PENDING').length,
-    [orders]
+    () => metrics.pendingCount || orders.filter((o) => o.status === 'PENDING').length,
+    [metrics.pendingCount, orders]
   );
 
   const isSettingsActive = useMemo(

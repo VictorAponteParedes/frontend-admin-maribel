@@ -3,7 +3,9 @@ import { useSalesStore } from '@/store/useSalesStore';
 import { DetailedSaleRow } from '@/features/sales/components/DetailedSalesTable';
 
 export const useSalesList = () => {
-  const { sales, openCreateModal } = useSalesStore();
+  const { sales, totalItems, metrics, isLoading, fetchSales, fetchMetrics, openCreateModal } =
+    useSalesStore();
+
   const [activeTab, setActiveTab] = useState<'summary' | 'detailed'>('summary');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -15,38 +17,33 @@ export const useSalesList = () => {
   const [detailedPage, setDetailedPage] = useState<number>(1);
   const [detailedPageSize, setDetailedPageSize] = useState<number>(10);
 
+  // Cargar métricas al montar
+  useEffect(() => {
+    fetchMetrics();
+  }, [fetchMetrics]);
+
   // Reiniciar a la primera página si cambia la búsqueda
   useEffect(() => {
     setSalesPage(1);
     setDetailedPage(1);
   }, [searchQuery]);
 
-  const filteredSales = useMemo(() => {
-    if (!searchQuery.trim()) return sales;
-    const q = searchQuery.toLowerCase();
-    return sales.filter(
-      (sale) =>
-        sale.saleNumber.toLowerCase().includes(q) ||
-        sale.customerName.toLowerCase().includes(q) ||
-        sale.date.includes(q) ||
-        sale.items.some(
-          (i) =>
-            i.brand.toLowerCase().includes(q) ||
-            i.name.toLowerCase().includes(q) ||
-            i.barcode.includes(q)
-        )
-    );
-  }, [sales, searchQuery]);
+  // Cargar ventas del backend con debounce para la búsqueda
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchSales({
+        search: searchQuery.trim() || undefined,
+        page: salesPage,
+        limit: salesPageSize,
+      });
+    }, 250);
 
-  // Paginación para ventas por comprobante
-  const paginatedSales = useMemo(() => {
-    const start = (salesPage - 1) * salesPageSize;
-    return filteredSales.slice(start, start + salesPageSize);
-  }, [filteredSales, salesPage, salesPageSize]);
+    return () => clearTimeout(timer);
+  }, [searchQuery, salesPage, salesPageSize, fetchSales]);
 
-  // Todos los renglones detallados de las ventas filtradas
+  // Todos los renglones detallados de las ventas actuales
   const allDetailedRows = useMemo<DetailedSaleRow[]>(() => {
-    return filteredSales.flatMap((sale) =>
+    return sales.flatMap((sale) =>
       sale.items.map((item, idx) => ({
         rowKey: `${sale.id}-${item.barcode}-${idx}`,
         saleNumber: sale.saleNumber,
@@ -61,9 +58,9 @@ export const useSalesList = () => {
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         subtotal: item.subtotal,
-      }))
+      })),
     );
-  }, [filteredSales]);
+  }, [sales]);
 
   // Renglones paginados
   const paginatedDetailedRows = useMemo(() => {
@@ -71,18 +68,11 @@ export const useSalesList = () => {
     return allDetailedRows.slice(start, start + detailedPageSize);
   }, [allDetailedRows, detailedPage, detailedPageSize]);
 
-  const totalRevenue = useMemo(
-    () => sales.reduce((acc, s) => acc + s.total, 0),
-    [sales]
-  );
-  const totalItemsSold = useMemo(
-    () => sales.reduce((acc, s) => acc + s.totalQuantity, 0),
-    [sales]
-  );
-  const averageTicket = useMemo(
-    () => (sales.length > 0 ? Math.round(totalRevenue / sales.length) : 0),
-    [sales.length, totalRevenue]
-  );
+  // Métricas reales consolidadas del backend
+  const totalRevenue = metrics.totalAmount;
+  const totalItemsSold = metrics.totalUnits;
+  const averageTicket =
+    metrics.totalCount > 0 ? Math.round(metrics.totalAmount / metrics.totalCount) : 0;
 
   const handleSalesPageSizeChange = (newSize: number) => {
     setSalesPageSize(newSize);
@@ -106,14 +96,16 @@ export const useSalesList = () => {
   return {
     state: {
       sales,
+      totalItems,
+      isLoading,
       activeTab,
       searchQuery,
       salesPage,
       salesPageSize,
       detailedPage,
       detailedPageSize,
-      filteredSales,
-      paginatedSales,
+      filteredSales: sales,
+      paginatedSales: sales,
       allDetailedRows,
       paginatedDetailedRows,
       totalRevenue,
@@ -128,6 +120,14 @@ export const useSalesList = () => {
       handleSalesPageSizeChange,
       handleDetailedPageSizeChange,
       openCreateModal,
+      refreshSales: () => {
+        fetchSales({
+          search: searchQuery.trim() || undefined,
+          page: salesPage,
+          limit: salesPageSize,
+        });
+        fetchMetrics();
+      },
     },
   };
 };

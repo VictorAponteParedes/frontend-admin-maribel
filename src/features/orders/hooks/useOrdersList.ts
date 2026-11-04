@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useOrdersStore } from '@/store/useOrdersStore';
 import { useSalesStore } from '@/store/useSalesStore';
@@ -10,24 +10,46 @@ export const useOrdersList = () => {
   const { openCreateModalFromOrder } = useSalesStore();
   const {
     orders,
+    totalItems,
+    isLoading,
+    metrics,
     selectedOrder,
     isDetailModalOpen,
     openDetailModal,
     closeDetailModal,
+    fetchOrders,
+    fetchMetrics,
     updateOrderStatus,
   } = useOrdersStore();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | OrderStatus>('ALL');
-
-  // Paginación
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
+
+  // Cargar métricas globales de órdenes al montar
+  useEffect(() => {
+    fetchMetrics();
+  }, [fetchMetrics]);
 
   // Reiniciar a la primera página si cambia la búsqueda o el filtro
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, statusFilter]);
+
+  // Cargar órdenes desde el backend con debounce para la búsqueda
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchOrders({
+        search: searchQuery.trim() || undefined,
+        status: statusFilter === 'ALL' ? undefined : statusFilter,
+        page: currentPage,
+        limit: pageSize,
+      });
+    }, 250);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, statusFilter, currentPage, pageSize, fetchOrders]);
 
   const handleProcessSale = (order: Order) => {
     openCreateModalFromOrder({
@@ -49,55 +71,12 @@ export const useOrdersList = () => {
     navigate(RoutesView.SALES);
   };
 
-  // Contadores para métricas y tabs
-  const pendingCount = useMemo(
-    () => orders.filter((o) => o.status === 'PENDING').length,
-    [orders]
-  );
-  const preparingCount = useMemo(
-    () => orders.filter((o) => o.status === 'PREPARING').length,
-    [orders]
-  );
-  const shippedCount = useMemo(
-    () => orders.filter((o) => o.status === 'SHIPPED').length,
-    [orders]
-  );
-  const deliveredCount = useMemo(
-    () => orders.filter((o) => o.status === 'DELIVERED').length,
-    [orders]
-  );
-  const totalCount = orders.length;
-
-  // Filtrado
-  const filteredOrders = useMemo(() => {
-    return orders.filter((order) => {
-      if (statusFilter !== 'ALL' && order.status !== statusFilter) {
-        return false;
-      }
-
-      if (!searchQuery.trim()) return true;
-
-      const q = searchQuery.toLowerCase();
-      const matchNumber = order.orderNumber.toLowerCase().includes(q);
-      const matchCustomer = order.customerName.toLowerCase().includes(q);
-      const matchPhone = order.customerPhone.includes(q);
-      const matchAddress = order.location?.address?.toLowerCase().includes(q) || false;
-      const matchItem = order.items.some(
-        (it) =>
-          it.name.toLowerCase().includes(q) ||
-          it.brand.toLowerCase().includes(q) ||
-          it.barcode.includes(q)
-      );
-
-      return matchNumber || matchCustomer || matchPhone || matchAddress || matchItem;
-    });
-  }, [orders, statusFilter, searchQuery]);
-
-  // Paginado
-  const paginatedOrders = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredOrders.slice(start, start + pageSize);
-  }, [filteredOrders, currentPage, pageSize]);
+  // Contadores para métricas y tabs tomados del backend
+  const pendingCount = metrics.pendingCount;
+  const preparingCount = metrics.preparingCount;
+  const shippedCount = metrics.shippedCount;
+  const deliveredCount = metrics.deliveredCount;
+  const totalCount = metrics.totalCount;
 
   return {
     state: {
@@ -105,15 +84,17 @@ export const useOrdersList = () => {
       statusFilter,
       currentPage,
       pageSize,
+      isLoading,
       selectedOrder,
       isDetailModalOpen,
       totalCount,
+      totalItems,
       pendingCount,
       preparingCount,
       shippedCount,
       deliveredCount,
-      filteredOrders,
-      paginatedOrders,
+      filteredOrders: orders,
+      paginatedOrders: orders,
     },
     actions: {
       setSearchQuery,
@@ -124,6 +105,15 @@ export const useOrdersList = () => {
       closeDetailModal,
       updateOrderStatus,
       handleProcessSale,
+      refreshOrders: () => {
+        fetchOrders({
+          search: searchQuery.trim() || undefined,
+          status: statusFilter === 'ALL' ? undefined : statusFilter,
+          page: currentPage,
+          limit: pageSize,
+        });
+        fetchMetrics();
+      },
     },
   };
 };

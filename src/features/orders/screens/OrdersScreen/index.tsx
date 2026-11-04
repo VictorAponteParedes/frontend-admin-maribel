@@ -57,11 +57,11 @@ export const OrdersScreen: React.FC = () => {
       />
 
       {/* Paginación */}
-      {state.filteredOrders.length > 0 && (
+      {state.totalItems > 0 && (
         <Pagination
           currentPage={state.currentPage}
           pageSize={state.pageSize}
-          totalItems={state.filteredOrders.length}
+          totalItems={state.totalItems}
           onPageChange={actions.setCurrentPage}
           onPageSizeChange={(newSize: number) => {
             actions.setPageSize(newSize);
