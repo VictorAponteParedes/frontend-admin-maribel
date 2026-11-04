@@ -102,7 +102,7 @@ export const useStockEntryForm = () => {
     navigate(RoutesView.PRODUCTS);
   };
 
-  const onSubmit = (data: StockEntryFormValues) => {
+  const onSubmit = async (data: StockEntryFormValues) => {
     const cleanBarcode = data.barcode.trim();
     const cleanBrand = data.brand.trim();
     const cleanName = data.name.trim();
@@ -112,43 +112,48 @@ export const useStockEntryForm = () => {
       toast.warning('Margen negativo', t('entry.errors.negativeMarginWarning'));
     }
 
-    recordStockEntry({
-      barcode: cleanBarcode,
-      quantity: data.quantity,
-      unitCost: data.costPrice,
-      date: data.receptionDate,
-    });
+    try {
+      if (existingProduct) {
+        await recordIncomingStock(
+          cleanBarcode,
+          data.quantity,
+          data.costPrice,
+          data.sellingPrice,
+          data.receptionDate,
+          cleanBrand,
+          cleanName,
+          cleanSize,
+          data.batchNumber
+        );
+      } else {
+        await addProduct({
+          barcode: cleanBarcode,
+          brand: cleanBrand,
+          name: cleanName,
+          size: cleanSize,
+          costPrice: data.costPrice,
+          price: data.sellingPrice,
+          totalIn: data.quantity,
+          receptionDate: data.receptionDate,
+        });
+      }
 
-    if (existingProduct) {
-      recordIncomingStock(
-        cleanBarcode,
-        data.quantity,
-        data.costPrice,
-        data.sellingPrice,
-        data.receptionDate,
-        cleanBrand,
-        cleanName,
-        cleanSize
-      );
-    } else {
-      addProduct({
+      recordStockEntry({
         barcode: cleanBarcode,
-        brand: cleanBrand,
-        name: cleanName,
-        size: cleanSize,
-        costPrice: data.costPrice,
-        price: data.sellingPrice,
-        totalIn: data.quantity,
-        receptionDate: data.receptionDate,
+        quantity: data.quantity,
+        unitCost: data.costPrice,
+        date: data.receptionDate,
       });
+
+      const successMsg = t('entry.entrySuccess', { count: data.quantity, brand: cleanBrand });
+      toast.success('Ingreso registrado', successMsg);
+
+      setTimeout(() => {
+        navigate(RoutesView.PRODUCTS);
+      }, 600);
+    } catch {
+      toast.error('Error al registrar ingreso', 'No se pudo guardar la entrada en el servidor.');
     }
-
-    const successMsg = t('entry.entrySuccess', { count: data.quantity, brand: cleanBrand });
-    toast.success('Ingreso registrado', successMsg);
-
-    setTimeout(() => {
-      navigate(RoutesView.PRODUCTS);
-    }, 600);
   };
 
   const isFormValid =

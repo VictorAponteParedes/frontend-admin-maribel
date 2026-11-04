@@ -5,6 +5,7 @@ import {
   Product,
   ProductFormData,
 } from '../types/product.types';
+import { StockEntry } from '../types/stockEntry.types';
 
 export interface ProductsResponseData {
   items: Product[];
@@ -14,6 +15,22 @@ export interface ProductsResponseData {
     limit: number;
     totalPages: number;
   };
+}
+
+function normalizeToIsoDate(dateStr?: string): string | undefined {
+  if (!dateStr) return undefined;
+  const trimmed = dateStr.trim();
+  if (!trimmed) return undefined;
+  if (trimmed.includes('/')) {
+    const parts = trimmed.split('/');
+    if (parts.length === 3) {
+      const day = parts[0].padStart(2, '0');
+      const month = parts[1].padStart(2, '0');
+      const year = parts[2];
+      return `${year}-${month}-${day}`;
+    }
+  }
+  return trimmed;
 }
 
 export const productsService = {
@@ -36,6 +53,11 @@ export const productsService = {
     return data.items || [];
   },
 
+  fetchStockEntries: async (): Promise<StockEntry[]> => {
+    const response = await httpClient.get('/products/stock-entries');
+    return response.data.data || [];
+  },
+
   bulkImport: async (
     items: BulkImportProductItem[],
   ): Promise<BulkImportSummary> => {
@@ -52,7 +74,7 @@ export const productsService = {
       costPrice: productData.costPrice,
       sellingPrice: productData.price,
       initialStock: productData.totalIn ?? 0,
-      receptionDate: productData.receptionDate,
+      receptionDate: normalizeToIsoDate(productData.receptionDate),
     };
 
     const response = await httpClient.post('/products', payload);
@@ -66,11 +88,20 @@ export const productsService = {
       unitCost?: number;
       batchNumber?: string;
       notes?: string;
+      entryDate?: string;
     },
   ) => {
+    const payload = {
+      quantity: entryData.quantity,
+      unitCost: entryData.unitCost,
+      batchNumber: entryData.batchNumber,
+      notes: entryData.notes,
+      entryDate: normalizeToIsoDate(entryData.entryDate),
+    };
+
     const response = await httpClient.post(
       `/products/${productId}/stock-entry`,
-      entryData,
+      payload,
     );
     return response.data.data;
   },

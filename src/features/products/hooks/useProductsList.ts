@@ -19,7 +19,7 @@ export const useProductsList = () => {
   const navigate = useNavigate();
   const { products, addProduct, fetchProducts, isLoading } =
     useInventoryStore();
-  const { entries } = useStockEntryStore();
+  const { entries, fetchEntries } = useStockEntryStore();
 
   const [activeTab, setActiveTab] = useState<ProductTab>("stock");
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -29,7 +29,8 @@ export const useProductsList = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
+    fetchEntries();
+  }, [fetchProducts, fetchEntries]);
 
   const [productsPage, setProductsPage] = useState<number>(1);
   const [productsPageSize, setProductsPageSize] = useState<number>(10);

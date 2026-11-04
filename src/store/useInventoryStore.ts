@@ -1,11 +1,11 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 import {
   BulkImportProductItem,
   BulkImportSummary,
   Product,
   ProductFormData,
-} from '@/features/products/types/product.types';
-import { productsService } from '@/features/products/services/products.service';
+} from "@/features/products/types/product.types";
+import { productsService } from "@/features/products/services/products.service";
 
 export interface InventoryState {
   products: Product[];
@@ -24,8 +24,9 @@ export interface InventoryState {
     receptionDate?: string,
     brand?: string,
     name?: string,
-    size?: string
-  ) => boolean;
+    size?: string,
+    batchNumber?: string,
+  ) => Promise<boolean>;
   getByBarcode: (barcode: string) => Product | undefined;
   getById: (id: string) => Product | undefined;
   openProductDetail: (product: Product) => void;
@@ -37,7 +38,8 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
   selectedProductForDetail: null,
   isLoading: false,
 
-  openProductDetail: (product: Product) => set({ selectedProductForDetail: product }),
+  openProductDetail: (product: Product) =>
+    set({ selectedProductForDetail: product }),
   closeProductDetail: () => set({ selectedProductForDetail: null }),
 
   fetchProducts: async () => {
@@ -75,7 +77,8 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
       set({ products: refreshed || [] });
     } catch {
       // Fallback local si no hay conexión al backend
-      const costPrice = productData.costPrice || Math.round(productData.price * 0.65);
+      const costPrice =
+        productData.costPrice || Math.round(productData.price * 0.65);
       const profit = productData.price - costPrice;
       const newProduct: Product = {
         id: `p-${Date.now()}`,
@@ -86,7 +89,8 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
         costPrice,
         price: productData.price,
         profit,
-        receptionDate: productData.receptionDate || new Date().toLocaleDateString('es-ES'),
+        receptionDate:
+          productData.receptionDate || new Date().toLocaleDateString("es-ES"),
         totalIn: productData.totalIn,
         totalSold: 0,
         stock: productData.totalIn,
@@ -144,7 +148,7 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     return true;
   },
 
-  recordIncomingStock: (
+  recordIncomingStock: async (
     barcode: string,
     quantity: number,
     costPrice: number,
@@ -152,34 +156,50 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     receptionDate?: string,
     brand?: string,
     name?: string,
-    size?: string
-  ): boolean => {
+    size?: string,
+    batchNumber?: string,
+  ): Promise<boolean> => {
     const { products } = get();
     const product = products.find((p) => p.barcode === barcode);
     if (!product) return false;
 
-    set((state) => ({
-      products: state.products.map((item) => {
-        if (item.barcode === barcode) {
-          const finalPrice = sellingPrice && sellingPrice > 0 ? sellingPrice : item.price;
-          const finalCost = costPrice && costPrice > 0 ? costPrice : item.costPrice;
-          return {
-            ...item,
-            brand: brand?.trim() || item.brand,
-            name: name?.trim() || item.name,
-            size: size?.trim() || item.size,
-            totalIn: item.totalIn + quantity,
-            stock: item.stock + quantity,
-            costPrice: finalCost,
-            price: finalPrice,
-            profit: finalPrice - finalCost,
-            receptionDate: receptionDate || item.receptionDate,
-          };
-        }
-        return item;
-      }),
-    }));
-    return true;
+    try {
+      await productsService.addStockEntry(product.id, {
+        quantity,
+        unitCost: costPrice,
+        batchNumber,
+        entryDate: receptionDate,
+      });
+
+      const refreshed = await productsService.fetchProducts();
+      set({ products: refreshed || [] });
+      return true;
+    } catch {
+      set((state) => ({
+        products: state.products.map((item) => {
+          if (item.barcode === barcode) {
+            const finalPrice =
+              sellingPrice && sellingPrice > 0 ? sellingPrice : item.price;
+            const finalCost =
+              costPrice && costPrice > 0 ? costPrice : item.costPrice;
+            return {
+              ...item,
+              brand: brand?.trim() || item.brand,
+              name: name?.trim() || item.name,
+              size: size?.trim() || item.size,
+              totalIn: item.totalIn + quantity,
+              stock: item.stock + quantity,
+              costPrice: finalCost,
+              price: finalPrice,
+              profit: finalPrice - finalCost,
+              receptionDate: receptionDate || item.receptionDate,
+            };
+          }
+          return item;
+        }),
+      }));
+      return true;
+    }
   },
 
   getByBarcode: (barcode: string): Product | undefined => {
