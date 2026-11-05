@@ -33,6 +33,19 @@ interface WebCatalogState {
     items: ComboItemSelection[];
     isActive: boolean;
   }) => Promise<WebCombo | null>;
+  updateCombo: (
+    id: string,
+    data: {
+      title?: string;
+      kicker?: string;
+      description?: string;
+      price?: number;
+      imageId?: string;
+      imageUrl?: string;
+      items?: ComboItemSelection[];
+      isActive?: boolean;
+    }
+  ) => Promise<WebCombo | null>;
   deleteCombo: (id: string) => Promise<boolean>;
 }
 
@@ -238,6 +251,44 @@ export const useWebCatalogStore = create<WebCatalogState>((set, get) => ({
       const message =
         err instanceof Error ? err.message : 'No se pudo crear el combo.';
       toast.error('Error al crear combo', message);
+      return null;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  updateCombo: async (id, data) => {
+    set({ isLoading: true });
+    try {
+      const updated = await combosService.updateCombo(id, {
+        title: data.title,
+        kicker: data.kicker,
+        description: data.description,
+        price: data.price,
+        imageId: data.imageId,
+        imageUrl: data.imageUrl,
+        isActive: data.isActive,
+        items: data.items
+          ? data.items.map((i) => ({
+              productId: i.productId,
+              quantity: i.quantity,
+            }))
+          : undefined,
+      });
+
+      set((state) => ({
+        combos: state.combos.map((c) => (c.id === id ? updated : c)),
+      }));
+
+      toast.success(
+        'Combo Actualizado',
+        `"${updated.title}" se guardó con éxito.`
+      );
+      return updated;
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'No se pudo actualizar el combo.';
+      toast.error('Error al actualizar combo', message);
       return null;
     } finally {
       set({ isLoading: false });

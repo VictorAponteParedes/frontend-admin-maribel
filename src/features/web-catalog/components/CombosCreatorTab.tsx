@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Gift, Plus, Trash2, Sparkles, CheckCircle2, Loader2 } from 'lucide-react';
+import { Gift, Plus, Trash2, Sparkles, CheckCircle2, Loader2, Edit3 } from 'lucide-react';
 import { useWebCatalogStore } from '../store/useWebCatalogStore';
 import { WebCombo } from '../types/webCatalog.types';
 import { Button } from '@/components/ui';
 import { ToggleSwitch, ConfirmModal } from '@/componentes';
 import { resolveImageUrl } from '@/services/files.service';
 import { CreateComboModal } from './CreateComboModal/index';
+import { EditComboModal } from './EditComboModal/index';
 
 export const CombosCreatorTab: React.FC = () => {
   const combos = useWebCatalogStore((state) => state.combos);
@@ -14,6 +15,7 @@ export const CombosCreatorTab: React.FC = () => {
   const deleteCombo = useWebCatalogStore((state) => state.deleteCombo);
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [comboToEdit, setComboToEdit] = useState<WebCombo | null>(null);
   const [comboToDelete, setComboToDelete] = useState<WebCombo | null>(null);
 
   const activeCombosCount = combos.filter((c) => c.isActive).length;
@@ -162,6 +164,16 @@ export const CombosCreatorTab: React.FC = () => {
                     </span>
                   </div>
 
+                  {/* Botón Editar Combo */}
+                  <button
+                    type="button"
+                    onClick={() => setComboToEdit(combo)}
+                    className="p-1.5 text-stone-400 hover:text-maribel-700 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                    title="Editar combo"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => setComboToDelete(combo)}
@@ -192,10 +204,16 @@ export const CombosCreatorTab: React.FC = () => {
         </div>
       )}
 
-      {/* Modal */}
+      {/* Modals */}
       <CreateComboModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
+      />
+
+      <EditComboModal
+        combo={comboToEdit}
+        isOpen={!!comboToEdit}
+        onClose={() => setComboToEdit(null)}
       />
 
       {/* Modal de Confirmación de Eliminación */}

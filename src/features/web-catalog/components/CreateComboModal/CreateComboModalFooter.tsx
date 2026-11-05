@@ -2,16 +2,18 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui';
 
-interface CreateComboModalFooterProps {
+export interface CreateComboModalFooterProps {
   onCancel: () => void;
   isSubmitDisabled: boolean;
   isLoading?: boolean;
+  submitText?: string;
 }
 
 export const CreateComboModalFooter: React.FC<CreateComboModalFooterProps> = ({
   onCancel,
   isSubmitDisabled,
   isLoading = false,
+  submitText = 'Guardar Combo en Catálogo',
 }) => {
   return (
     <div className="pt-4 border-t border-stone-100 flex items-center justify-end gap-3 flex-shrink-0">
@@ -32,7 +34,7 @@ export const CreateComboModalFooter: React.FC<CreateComboModalFooterProps> = ({
         isLoading={isLoading}
         leftIcon={<Check className="w-4 h-4" />}
       >
-        Guardar Combo en Catálogo
+        {submitText}
       </Button>
     </div>
   );
