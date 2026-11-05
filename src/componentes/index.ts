@@ -4,3 +4,5 @@ export * from './Toast';
 export * from './ToastContainer';
 export * from './BarcodeScannerModal';
 export * from './ToggleSwitch';
+export * from './ConfirmModal';
+export * from './CategorySelect';

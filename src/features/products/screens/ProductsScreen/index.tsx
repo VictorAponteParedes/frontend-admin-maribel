@@ -20,6 +20,8 @@ export const ProductsScreen: React.FC = () => {
     setActiveTab,
     searchQuery,
     setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
     filterLowStock,
     isProductModalOpen,
     isBulkImportModalOpen,
@@ -73,9 +75,11 @@ export const ProductsScreen: React.FC = () => {
         <ProductsFilterBar
           activeTab={activeTab}
           searchQuery={searchQuery}
+          selectedCategory={selectedCategory}
           filterLowStock={filterLowStock}
           lowStockCount={metrics.lowStockCount}
           onSearchChange={setSearchQuery}
+          onCategoryChange={setSelectedCategory}
           onToggleLowStock={actions.toggleFilterLowStock}
         />
 

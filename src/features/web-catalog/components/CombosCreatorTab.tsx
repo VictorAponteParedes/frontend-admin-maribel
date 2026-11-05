@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
-import { Gift, Plus, Trash2, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Gift, Plus, Trash2, Sparkles, CheckCircle2, Loader2 } from 'lucide-react';
 import { useWebCatalogStore } from '../store/useWebCatalogStore';
+import { WebCombo } from '../types/webCatalog.types';
 import { Button } from '@/components/ui';
-import { ToggleSwitch } from '@/componentes';
+import { ToggleSwitch, ConfirmModal } from '@/componentes';
+import { resolveImageUrl } from '@/services/files.service';
 import { CreateComboModal } from './CreateComboModal/index';
 
 export const CombosCreatorTab: React.FC = () => {
   const combos = useWebCatalogStore((state) => state.combos);
+  const isLoading = useWebCatalogStore((state) => state.isLoading);
   const toggleActive = useWebCatalogStore((state) => state.toggleComboActive);
   const deleteCombo = useWebCatalogStore((state) => state.deleteCombo);
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [comboToDelete, setComboToDelete] = useState<WebCombo | null>(null);
 
   const activeCombosCount = combos.filter((c) => c.isActive).length;
   const totalSavings = combos.reduce((sum, c) => sum + c.savingsAmount, 0);
@@ -90,7 +94,7 @@ export const CombosCreatorTab: React.FC = () => {
             {/* Combo Image with Badges */}
             <div className="relative aspect-[16/10] bg-stone-100 overflow-hidden">
               <img
-                src={combo.imageUrl}
+                src={resolveImageUrl(combo.imageUrl)}
                 alt={combo.title}
                 className="w-full h-full object-cover"
               />
@@ -160,11 +164,7 @@ export const CombosCreatorTab: React.FC = () => {
 
                   <button
                     type="button"
-                    onClick={() => {
-                      if (window.confirm(`¿Seguro que deseas eliminar el combo "${combo.title}"?`)) {
-                        deleteCombo(combo.id);
-                      }
-                    }}
+                    onClick={() => setComboToDelete(combo)}
                     className="p-1.5 text-stone-400 hover:text-rose-600 rounded-lg hover:bg-stone-100 transition-colors cursor-pointer"
                     title="Eliminar combo"
                   >
@@ -177,7 +177,14 @@ export const CombosCreatorTab: React.FC = () => {
         ))}
       </div>
 
-      {combos.length === 0 && (
+      {isLoading && combos.length === 0 && (
+        <div className="py-16 text-center text-maribel-700 bg-white rounded-2xl border border-stone-200">
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2" />
+          <p className="font-serif text-sm font-semibold">Cargando combos promocionales...</p>
+        </div>
+      )}
+
+      {!isLoading && combos.length === 0 && (
         <div className="py-16 text-center text-stone-400 bg-white rounded-2xl border border-dashed border-stone-200">
           <Gift className="w-10 h-10 text-stone-300 mx-auto mb-2" />
           <p className="font-serif text-sm text-stone-700">Aún no tienes combos creados</p>
@@ -189,6 +196,24 @@ export const CombosCreatorTab: React.FC = () => {
       <CreateComboModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
+      />
+
+      {/* Modal de Confirmación de Eliminación */}
+      <ConfirmModal
+        isOpen={!!comboToDelete}
+        onClose={() => setComboToDelete(null)}
+        onConfirm={() => {
+          if (comboToDelete) {
+            deleteCombo(comboToDelete.id);
+            setComboToDelete(null);
+          }
+        }}
+        title="¿Eliminar combo promocional?"
+        itemTitle={comboToDelete?.title}
+        description="Esta acción eliminará el combo y dejará de exhibirse en la tienda online. No afecta el inventario de las fragancias individuales."
+        confirmText="Sí, eliminar"
+        cancelText="Cancelar"
+        variant="danger"
       />
     </div>
   );

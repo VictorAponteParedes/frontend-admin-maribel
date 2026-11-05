@@ -1,20 +1,33 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useWebCatalogStore } from '../../store/useWebCatalogStore';
 import { ComboItemSelection } from '../../types/webCatalog.types';
+import { filesService } from '@/services/files.service';
 import { formatGuarani, parseGuarani } from '@/utils/formatters';
+import { toast } from '@/store/useToastStore';
 
 export const useCreateComboForm = (onClose: () => void) => {
   const products = useWebCatalogStore((state) => state.products);
+  const fetchProducts = useWebCatalogStore((state) => state.fetchProducts);
   const createCombo = useWebCatalogStore((state) => state.createCombo);
 
   const [title, setTitle] = useState('');
   const [kicker, setKicker] = useState('★ FAVORITO BOUTIQUE');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [imageId, setImageId] = useState<string | undefined>(undefined);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedItems, setSelectedItems] = useState<ComboItemSelection[]>([]);
   const [promoPrice, setPromoPrice] = useState<string>('');
   const [isActive, setIsActive] = useState(true);
   const [searchProduct, setSearchProduct] = useState('');
+
+  // Asegurar que los productos estén cargados
+  useEffect(() => {
+    if (products.length === 0) {
+      fetchProducts();
+    }
+  }, [products.length, fetchProducts]);
 
   // Cálculo en tiempo real de la suma de precios individuales
   const normalSum = selectedItems.reduce(
@@ -83,36 +96,57 @@ export const useCreateComboForm = (onClose: () => void) => {
     setSelectedItems(selectedItems.filter((i) => i.productId !== productId));
   };
 
-  const handleSimulateUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const simulatedUrl = URL.createObjectURL(file);
-      setImageUrl(simulatedUrl);
+    if (!file) return;
+
+    // Mostrar previsualización instantánea
+    const localUrl = URL.createObjectURL(file);
+    setImageUrl(localUrl);
+
+    try {
+      setIsUploadingImage(true);
+      const uploaded = await filesService.uploadFile(file, `Combo: ${title || 'Set Promocional'}`);
+      setImageId(uploaded.id);
+      setImageUrl(uploaded.url);
+      toast.success('Imagen subida', 'La foto del estuche se cargó exitosamente.');
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Error al subir la imagen al servidor.';
+      toast.error('Error al subir imagen', message);
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!title.trim() || selectedItems.length === 0 || numericPromoPrice <= 0) {
+    if (!title.trim() || selectedItems.length === 0 || numericPromoPrice <= 0 || isSubmitting) {
       return;
     }
 
-    createCombo({
-      title: title.trim(),
-      kicker: kicker.trim() || 'EDICIÓN ESPECIAL',
-      description:
-        description.trim() ||
-        `Incluye: ${selectedItems.map((i) => `${i.productName} (x${i.quantity})`).join(' + ')} en estuche rígido con dedicatoria.`,
-      price: numericPromoPrice,
-      imageUrl:
-        imageUrl.trim() ||
-        'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=600&q=80',
-      items: selectedItems,
-      isActive,
-    });
+    setIsSubmitting(true);
+    try {
+      const created = await createCombo({
+        title: title.trim(),
+        kicker: kicker.trim() || '★ FAVORITO BOUTIQUE',
+        description:
+          description.trim() ||
+          `Incluye: ${selectedItems.map((i) => `${i.productName} (x${i.quantity})`).join(' + ')} en estuche rígido con dedicatoria.`,
+        price: numericPromoPrice,
+        imageId,
+        imageUrl: imageUrl.trim() || undefined,
+        items: selectedItems,
+        isActive,
+      });
 
-    onClose();
+      if (created) {
+        onClose();
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const filteredStock = products.filter(
@@ -127,6 +161,9 @@ export const useCreateComboForm = (onClose: () => void) => {
       kicker,
       description,
       imageUrl,
+      imageId,
+      isUploadingImage,
+      isSubmitting,
       selectedItems,
       promoPrice,
       isActive,
@@ -148,7 +185,7 @@ export const useCreateComboForm = (onClose: () => void) => {
       handleAddItem,
       handleDecreaseQuantity,
       handleRemoveItem,
-      handleSimulateUpload,
+      handleImageUpload,
       handleSubmit,
     },
   };

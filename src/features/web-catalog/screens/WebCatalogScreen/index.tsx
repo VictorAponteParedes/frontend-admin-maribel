@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Sparkles, Gift, ExternalLink, Globe } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Sparkles, Gift, ExternalLink, Globe, Loader2 } from 'lucide-react';
 import { Header } from '@/components/layout/Header';
 import { useWebCatalogStore } from '../../store/useWebCatalogStore';
 import { IndividualProductsTab } from '../../components/IndividualProductsTab';
@@ -12,6 +12,12 @@ export const WebCatalogScreen: React.FC = () => {
 
   const products = useWebCatalogStore((state) => state.products);
   const combos = useWebCatalogStore((state) => state.combos);
+  const isLoading = useWebCatalogStore((state) => state.isLoading);
+  const fetchCatalogData = useWebCatalogStore((state) => state.fetchCatalogData);
+
+  useEffect(() => {
+    fetchCatalogData();
+  }, [fetchCatalogData]);
 
   const publishedProductsCount = products.filter((p) => p.isWebVisible).length;
   const activeCombosCount = combos.filter((c) => c.isActive).length;
@@ -22,16 +28,24 @@ export const WebCatalogScreen: React.FC = () => {
         title="Catálogo Web & Combos"
         subtitle="Administra qué perfumes de tu inventario se exhiben en la tienda web y crea sets de regalo irresistibles."
         action={
-          <a
-            href="https://web-maribel-perfum.onrender.com/"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-maribel-700 text-white hover:bg-maribel-800 transition-colors shadow-xs"
-          >
-            <Globe className="w-3.5 h-3.5" />
-            <span>Ver Tienda Online</span>
-            <ExternalLink className="w-3 h-3 opacity-70" />
-          </a>
+          <div className="flex items-center gap-3">
+            {isLoading && (
+              <div className="flex items-center gap-1.5 text-xs text-maribel-700 font-medium bg-rose-50 px-2.5 py-1.5 rounded-lg border border-rose-100">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Sincronizando...</span>
+              </div>
+            )}
+            <a
+              href="https://web-maribel-perfum.onrender.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-maribel-700 text-white hover:bg-maribel-800 transition-colors shadow-xs"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span>Ver Tienda Online</span>
+              <ExternalLink className="w-3 h-3 opacity-70" />
+            </a>
+          </div>
         }
       />
 

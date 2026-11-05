@@ -25,6 +25,7 @@ export const useProductsList = () => {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [isBulkImportModalOpen, setIsBulkImportModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("Todos");
   const [filterLowStock, setFilterLowStock] = useState(false);
 
   useEffect(() => {
@@ -41,12 +42,19 @@ export const useProductsList = () => {
   useEffect(() => {
     setProductsPage(1);
     setEntriesPage(1);
-  }, [searchQuery, filterLowStock]);
+  }, [searchQuery, selectedCategory, filterLowStock]);
 
   // Filtrado de productos
   const filteredProducts = useMemo<Product[]>(() => {
     const q = searchQuery.toLowerCase().trim();
     return products.filter((product) => {
+      const matchesCategory =
+        selectedCategory === "Todos" ||
+        (product.category &&
+          product.category.toLowerCase() === selectedCategory.toLowerCase());
+
+      if (!matchesCategory) return false;
+
       const matchesSearch =
         !q ||
         product.name.toLowerCase().includes(q) ||
@@ -58,7 +66,7 @@ export const useProductsList = () => {
       }
       return matchesSearch;
     });
-  }, [products, searchQuery, filterLowStock]);
+  }, [products, searchQuery, selectedCategory, filterLowStock]);
 
   // Filtrado de ingresos
   const filteredEntries = useMemo<StockEntry[]>(() => {
@@ -122,6 +130,8 @@ export const useProductsList = () => {
     setActiveTab,
     searchQuery,
     setSearchQuery,
+    selectedCategory,
+    setSelectedCategory,
     filterLowStock,
     setFilterLowStock,
     isProductModalOpen,

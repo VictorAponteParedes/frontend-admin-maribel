@@ -1,6 +1,7 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { ControlledInput, Button } from '@/components/ui';
+import { CategorySelect } from '@/componentes';
 import { ProductFormData } from '@/features/products/types/product.types';
 import { useTranslation } from '@/locale';
 import { X, Barcode } from 'lucide-react';
@@ -23,6 +24,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       brand: '',
       name: '',
       size: '85 ml / 2.9 fl. oz',
+      category: '',
       price: 0,
       totalIn: 10,
     },
@@ -34,6 +36,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   const handleFormSubmit = (data: ProductFormData) => {
     onSubmitProduct({
       ...data,
+      category: data.category?.trim() || undefined,
       price: Number(data.price),
       totalIn: Number(data.totalIn),
     });
@@ -95,6 +98,20 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
             label={t('description')}
             placeholder="e.g. IT'S SO GOOD TO BE BAD - EAU DE PARFUM"
             rules={{ required: t('entry.errors.descRequired') }}
+          />
+
+          {/* Selector de Categoría traída de la Base de Datos */}
+          <Controller
+            control={control}
+            name="category"
+            render={({ field }) => (
+              <CategorySelect
+                label="Categoría"
+                placeholder="Seleccionar categoría de la base de datos"
+                value={field.value || ''}
+                onChange={field.onChange}
+              />
+            )}
           />
 
           <div className="grid grid-cols-2 gap-4">

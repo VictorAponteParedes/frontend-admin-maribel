@@ -4,6 +4,9 @@ export interface Product {
   brand: string;           // Marca del producto
   name: string;            // Descripción del producto
   size: string;            // Medida (ej: 85 ml / 2.9 fl. oz)
+  category?: string;       // Nombre de categoría
+  categoryId?: string | null;
+  categorySlug?: string | null;
   totalIn: number;         // Ingreso acumulado
   totalSold: number;       // Venta acumulada
   stock: number;           // Saldo Inventario
@@ -12,6 +15,11 @@ export interface Product {
   profit: number;          // Ganancia unitaria (price - costPrice)
   receptionDate: string;   // Fecha de recepción (DD/MM/AAAA)
   isActive: boolean;
+  isWebVisible?: boolean;
+  webBadge?: string | null;
+  webPrice?: number | null;
+  imageUrl?: string | null;
+  imageId?: string | null;
 }
 
 export interface ProductFormData {
@@ -19,6 +27,8 @@ export interface ProductFormData {
   brand: string;
   name: string;
   size: string;
+  category?: string;
+  categoryId?: string;
   costPrice?: number;
   price: number;
   totalIn: number;

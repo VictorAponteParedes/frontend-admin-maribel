@@ -13,7 +13,7 @@ export interface EditWebProductModalProps {
   product: WebProduct | null;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (id: string, updates: Partial<WebProduct>) => void;
+  onSave: (id: string, updates: Partial<WebProduct>) => Promise<boolean | void> | void;
 }
 
 export const EditWebProductModal: React.FC<EditWebProductModalProps> = ({
@@ -42,7 +42,8 @@ export const EditWebProductModal: React.FC<EditWebProductModalProps> = ({
           <EditWebProductImageUploader
             imageUrl={state.imageUrl}
             onImageUrlChange={actions.setImageUrl}
-            onFileUpload={actions.handleSimulateUpload}
+            onFileUpload={actions.handleImageUpload}
+            isUploading={state.isUploadingImage}
           />
 
           {/* Switch de Visibilidad */}
@@ -71,7 +72,10 @@ export const EditWebProductModal: React.FC<EditWebProductModalProps> = ({
           />
 
           {/* Footer de Acciones */}
-          <EditWebProductFooter onCancel={onClose} />
+          <EditWebProductFooter
+            onCancel={onClose}
+            isLoading={state.isSubmitting}
+          />
         </form>
       </div>
     </div>

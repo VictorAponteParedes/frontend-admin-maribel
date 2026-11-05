@@ -71,6 +71,8 @@ export const productsService = {
       name: productData.name,
       brandName: productData.brand,
       size: productData.size,
+      categoryName: productData.category,
+      categoryId: productData.categoryId,
       costPrice: productData.costPrice,
       sellingPrice: productData.price,
       initialStock: productData.totalIn ?? 0,
@@ -103,6 +105,24 @@ export const productsService = {
       `/products/${productId}/stock-entry`,
       payload,
     );
+    return response.data.data;
+  },
+
+  updateProduct: async (
+    id: string,
+    updates: {
+      isWebVisible?: boolean;
+      webBadge?: string;
+      webPrice?: number;
+      categoryId?: string;
+      categoryName?: string;
+      imageId?: string;
+      name?: string;
+      price?: number;
+      costPrice?: number;
+    }
+  ): Promise<Product> => {
+    const response = await httpClient.patch(`/products/${id}`, updates);
     return response.data.data;
   },
 };

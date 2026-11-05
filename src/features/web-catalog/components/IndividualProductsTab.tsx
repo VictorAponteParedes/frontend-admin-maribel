@@ -1,9 +1,19 @@
 import React, { useState } from 'react';
-import { Search, Globe, Edit3, Sparkles } from 'lucide-react';
-import { ToggleSwitch } from '@/componentes';
+import {
+  Search,
+  Globe,
+  Edit3,
+  Sparkles,
+  Tag,
+  X,
+} from 'lucide-react';
+import { ToggleSwitch, CategorySelect } from '@/componentes';
+import { resolveImageUrl } from '@/services/files.service';
 import { useWebCatalogStore } from '../store/useWebCatalogStore';
 import { WebProduct } from '../types/webCatalog.types';
 import { EditWebProductModal } from './EditWebProductModal/index';
+
+type VisibilityFilter = 'Todos' | 'Publicados' | 'Ocultos';
 
 export const IndividualProductsTab: React.FC = () => {
   const products = useWebCatalogStore((state) => state.products);
@@ -12,45 +22,81 @@ export const IndividualProductsTab: React.FC = () => {
 
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
+  const [visibilityFilter, setVisibilityFilter] = useState<VisibilityFilter>('Todos');
   const [selectedProductToEdit, setSelectedProductToEdit] = useState<WebProduct | null>(null);
 
-  const categories = ['Todos', 'Femenino', 'Masculino', 'Árabe', 'Unisex', 'Publicados', 'Ocultos'];
-
   const filtered = products.filter((prod) => {
-    if (selectedCategory === 'Publicados' && !prod.isWebVisible) return false;
-    if (selectedCategory === 'Ocultos' && prod.isWebVisible) return false;
+    if (visibilityFilter === 'Publicados' && !prod.isWebVisible) return false;
+    if (visibilityFilter === 'Ocultos' && prod.isWebVisible) return false;
+
     if (
       selectedCategory !== 'Todos' &&
-      selectedCategory !== 'Publicados' &&
-      selectedCategory !== 'Ocultos' &&
-      prod.webCategory !== selectedCategory
+      prod.webCategory.toLowerCase() !== selectedCategory.toLowerCase()
     ) {
       return false;
     }
 
     if (!search.trim()) return true;
     const q = search.toLowerCase();
-    return prod.name.toLowerCase().includes(q) || prod.brand.toLowerCase().includes(q) || prod.barcode.includes(q);
+    return (
+      prod.name.toLowerCase().includes(q) ||
+      prod.brand.toLowerCase().includes(q) ||
+      prod.barcode.includes(q)
+    );
   });
 
   const publishedCount = products.filter((p) => p.isWebVisible).length;
 
   return (
     <div className="space-y-4">
-      {/* Search & Category Filter Pills */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por nombre, marca o código..."
-            className="w-full bg-white border border-stone-200 rounded-xl pl-9 pr-3.5 py-2 text-xs text-stone-800 outline-none focus:border-maribel-700 shadow-xs"
-          />
+      {/* Search, Category Dropdown & Status Filter */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1">
+          {/* Buscador */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por nombre, marca o código..."
+              className="w-full bg-white border border-stone-200 rounded-xl pl-9 pr-3.5 py-2 text-xs text-stone-800 outline-none focus:border-maribel-700 shadow-xs"
+            />
+          </div>
+
+          {/* Selector Desplegable Reutilizable de Categorías (desde BD) */}
+          <div className="min-w-[240px]">
+            <CategorySelect
+              value={selectedCategory}
+              onChange={setSelectedCategory}
+              includeAllOption
+              allOptionLabel="Todas las categorías"
+              placeholder="Filtrar por categoría"
+              size="sm"
+            />
+          </div>
+
+          {/* Filtro rápido de Estado Web (Todos / Publicados / Ocultos) */}
+          <div className="inline-flex items-center bg-stone-100/80 p-1 rounded-xl border border-stone-200/80 self-start sm:self-auto">
+            {(['Todos', 'Publicados', 'Ocultos'] as VisibilityFilter[]).map((status) => (
+              <button
+                key={status}
+                type="button"
+                onClick={() => setVisibilityFilter(status)}
+                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  visibilityFilter === status
+                    ? 'bg-maribel-700 text-white shadow-xs'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs text-stone-500">
+        {/* Contador de visibles en web */}
+        <div className="flex items-center gap-2 text-xs text-stone-500 shrink-0">
           <Globe className="w-4 h-4 text-emerald-600" />
           <span>
             <strong>{publishedCount}</strong> de {products.length} visibles en la web
@@ -58,23 +104,24 @@ export const IndividualProductsTab: React.FC = () => {
         </div>
       </div>
 
-      {/* Category Filter Pills */}
-      <div className="flex gap-1.5 overflow-x-auto pb-1 no-scrollbar">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            type="button"
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-              selectedCategory === cat
-                ? 'bg-maribel-700 text-white shadow-xs'
-                : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-50'
-            }`}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
+      {/* Chip informativo si hay una categoría activa */}
+      {selectedCategory !== 'Todos' && (
+        <div className="flex items-center gap-2 text-xs text-stone-600">
+          <span>Filtrando por categoría:</span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-50 border border-rose-200 text-maribel-800 font-semibold">
+            <Tag className="w-3 h-3 text-maribel-700" />
+            <span>{selectedCategory}</span>
+            <button
+              type="button"
+              onClick={() => setSelectedCategory('Todos')}
+              className="hover:text-maribel-950 cursor-pointer"
+              title="Quitar filtro"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </span>
+        </div>
+      )}
 
       {/* Table of Products */}
       <div className="bg-white rounded-2xl border border-stone-200 shadow-xs overflow-hidden">
@@ -103,9 +150,13 @@ export const IndividualProductsTab: React.FC = () => {
                         title="Clic para cambiar foto"
                       >
                         <img
-                          src={prod.imageUrl}
+                          src={resolveImageUrl(prod.imageUrl)}
                           alt={prod.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=500&q=80';
+                          }}
                         />
                       </div>
                       <div className="min-w-0">

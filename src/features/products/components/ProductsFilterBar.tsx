@@ -1,46 +1,66 @@
 import React from 'react';
 import { Search, Filter } from 'lucide-react';
 import { AppInput, Button } from '@/components/ui';
+import { CategorySelect } from '@/componentes';
 import { useTranslation } from '@/locale';
 import { ProductTab } from '../hooks/useProductsList';
 
 export interface ProductsFilterBarProps {
   activeTab: ProductTab;
   searchQuery: string;
+  selectedCategory?: string;
   filterLowStock: boolean;
   lowStockCount: number;
   onSearchChange: (query: string) => void;
+  onCategoryChange?: (category: string) => void;
   onToggleLowStock: () => void;
 }
 
 export const ProductsFilterBar: React.FC<ProductsFilterBarProps> = ({
   activeTab,
   searchQuery,
+  selectedCategory = 'Todos',
   filterLowStock,
   lowStockCount,
   onSearchChange,
+  onCategoryChange,
   onToggleLowStock,
 }) => {
   const { t } = useTranslation(['inventory', 'translation']);
 
   return (
-    <div className="p-4 border-b border-stone-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-      <div className="relative flex-1 max-w-md">
-        <AppInput
-          value={searchQuery}
-          onChange={(e) => onSearchChange(e.target.value)}
-          placeholder={
-            activeTab === 'stock'
-              ? t('filters.searchStockPlaceholder')
-              : t('filters.searchEntriesPlaceholder')
-          }
-          leftIcon={<Search className="w-4 h-4" />}
-          className="text-xs"
-        />
+    <div className="p-4 border-b border-stone-100 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+        <div className="relative flex-1 max-w-md">
+          <AppInput
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder={
+              activeTab === 'stock'
+                ? t('filters.searchStockPlaceholder')
+                : t('filters.searchEntriesPlaceholder')
+            }
+            leftIcon={<Search className="w-4 h-4" />}
+            className="text-xs"
+          />
+        </div>
+
+        {activeTab === 'stock' && onCategoryChange && (
+          <div className="w-full sm:w-60 shrink-0">
+            <CategorySelect
+              value={selectedCategory}
+              onChange={onCategoryChange}
+              includeAllOption
+              allOptionLabel="Todas las categorías"
+              placeholder="Filtrar por categoría"
+              size="sm"
+            />
+          </div>
+        )}
       </div>
 
       {activeTab === 'stock' && (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 shrink-0">
           <Button
             type="button"
             variant={filterLowStock ? 'outline' : 'secondary'}

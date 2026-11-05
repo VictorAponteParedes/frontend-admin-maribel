@@ -21,7 +21,8 @@ export const CreateComboModal: React.FC<CreateComboModalProps> = ({ isOpen, onCl
   const isSubmitDisabled =
     state.selectedItems.length === 0 ||
     state.numericPromoPrice <= 0 ||
-    !state.title.trim();
+    !state.title.trim() ||
+    state.isUploadingImage;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 sm:p-6 md:p-8 animate-in fade-in duration-200">
@@ -43,7 +44,8 @@ export const CreateComboModal: React.FC<CreateComboModalProps> = ({ isOpen, onCl
             <CreateComboImageUploader
               imageUrl={state.imageUrl}
               onImageUrlChange={actions.setImageUrl}
-              onFileUpload={actions.handleSimulateUpload}
+              onFileUpload={actions.handleImageUpload}
+              isUploading={state.isUploadingImage}
             />
           </div>
 
@@ -74,6 +76,7 @@ export const CreateComboModal: React.FC<CreateComboModalProps> = ({ isOpen, onCl
           <CreateComboModalFooter
             onCancel={onClose}
             isSubmitDisabled={isSubmitDisabled}
+            isLoading={state.isSubmitting}
           />
         </form>
       </div>

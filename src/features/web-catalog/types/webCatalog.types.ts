@@ -1,4 +1,4 @@
-export type WebCategory = 'Femenino' | 'Masculino' | 'Árabe' | 'Unisex';
+export type WebCategory = string;
 
 export type WebBadge = 'Más Vendido' | 'Tendencia' | 'Exclusivo' | 'Favorito' | 'Ninguno';
 
@@ -13,6 +13,7 @@ export interface WebProduct {
   webPrice?: number;
   stockQuantity: number;
   imageUrl: string;
+  imageId?: string | null;
   isWebVisible: boolean;
   webCategory: WebCategory;
   webBadge?: WebBadge;

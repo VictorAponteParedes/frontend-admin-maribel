@@ -5,7 +5,7 @@ import { formatCurrency } from '@/utils/formatters';
 import { RoutesView } from '@/navigation/routes';
 import { useTranslation } from '@/locale';
 import { Button } from '@/components/ui';
-import { Barcode, Eye, TrendingUp, Calendar } from 'lucide-react';
+import { Barcode, Eye, TrendingUp, Calendar, Tag } from 'lucide-react';
 
 export interface ProductTableProps {
   products: Product[];
@@ -28,6 +28,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
             <th className="px-5 py-3.5">{t('table.codeSku')}</th>
             <th className="px-4 py-3.5 whitespace-nowrap">{t('table.brand')}</th>
             <th className="px-5 py-3.5">{t('table.description')}</th>
+            <th className="px-4 py-3.5 whitespace-nowrap">Categoría</th>
             <th className="px-4 py-3.5">{t('size')}</th>
             <th className="px-4 py-3.5 whitespace-nowrap">
               <span className="flex items-center space-x-1">
@@ -75,6 +76,18 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                   <p className="text-stone-900 font-medium text-xs truncate max-w-xs" title={product.name}>
                     {product.name}
                   </p>
+                </td>
+
+                {/* Categoría */}
+                <td className="px-4 py-3.5 whitespace-nowrap">
+                  {product.category ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-rose-50/80 text-maribel-800 border border-rose-200/60">
+                      <Tag className="w-3 h-3 text-maribel-700" />
+                      <span>{product.category}</span>
+                    </span>
+                  ) : (
+                    <span className="text-stone-300 text-[11px]">-</span>
+                  )}
                 </td>
 
                 {/* Medida */}
@@ -149,7 +162,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
 
           {products.length === 0 && (
             <tr>
-              <td colSpan={12} className="px-5 py-12 text-center text-stone-400">
+              <td colSpan={13} className="px-5 py-12 text-center text-stone-400">
                 {t('table.noProductsFound')}
               </td>
             </tr>
