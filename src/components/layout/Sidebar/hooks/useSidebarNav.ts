@@ -10,6 +10,7 @@ import {
   Store,
   Boxes,
   MessageSquare,
+  Globe,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useOrdersStore } from '@/store/useOrdersStore';
@@ -91,6 +92,14 @@ export const useSidebarNav = () => {
         isActive:
           location.pathname === RoutesView.PRODUCTS ||
           location.pathname.startsWith(`${RoutesView.PRODUCTS}/`),
+      },
+      {
+        path: RoutesView.WEB_CATALOG,
+        label: 'Catálogo Web',
+        icon: Globe,
+        isActive:
+          location.pathname === RoutesView.WEB_CATALOG ||
+          location.pathname.startsWith(`${RoutesView.WEB_CATALOG}/`),
       },
       {
         path: RoutesView.CUSTOMERS,

@@ -5,6 +5,7 @@ import { ProtectedRoute } from '@/navigation/ProtectedRoute';
 import { AUTH_ROUTES } from '@/features/auth/routes';
 import { DASHBOARD_ROUTES } from '@/features/dashboard/routes';
 import { PRODUCTS_ROUTES } from '@/features/products/routes';
+import { WEB_CATALOG_ROUTES } from '@/features/web-catalog/routes';
 import { SALES_ROUTES } from '@/features/sales/routes';
 import { ORDERS_ROUTES } from '@/features/orders/routes';
 import { CUSTOMERS_ROUTES } from '@/features/customers/routes';
@@ -18,6 +19,7 @@ export const ALL_APP_ROUTES: RouteConfig[] = [
   ...SALES_ROUTES,
   ...ORDERS_ROUTES,
   ...PRODUCTS_ROUTES,
+  ...WEB_CATALOG_ROUTES,
   ...CUSTOMERS_ROUTES,
   ...SETTINGS_ROUTES,
 ];

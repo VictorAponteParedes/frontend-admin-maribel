@@ -6,6 +6,7 @@ export const RoutesView = {
   PRODUCTS: '/products',
   PRODUCT_DETAIL: '/products/:id',
   STOCK_ENTRY: '/products/stock-entry',
+  WEB_CATALOG: '/web-catalog',
   ORDERS: '/orders',
   ORDER_DETAIL: '/orders/:id',
   CUSTOMERS: '/customers',
