@@ -80,16 +80,17 @@ export const useSaleFormModal = () => {
       }
     }
 
-    // Validación de stock: solo si el producto existe en el catálogo físico y no tiene stock suficiente
+    // Validación estricta de stock contra inventario físico
     for (const item of cart.cartItems) {
       const product =
         getByBarcode(item.barcode) ||
         useInventoryStore.getState().getById(item.barcode);
+      const availableStock = product ? product.stock : item.stock;
 
-      if (product && product.stock < item.quantity) {
+      if (availableStock < item.quantity) {
         const errorMsg = t('form.errors.insufficientStock', {
           product: item.name,
-          count: product.stock,
+          count: availableStock,
         });
         setErrorMessage(errorMsg);
         toast.error('Stock insuficiente', errorMsg);

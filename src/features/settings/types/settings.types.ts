@@ -18,6 +18,9 @@ export interface StoreGeneralSettings {
   announcementText: string;     // Mensaje publicitario o promocional en el cintillo superior de la web
   announcementActive: boolean;  // Estado de activación del cintillo en la web
   freeShippingThreshold?: number; // Monto mínimo para envío gratuito (Gs.)
+  showStockInWeb?: boolean;     // Mostrar o no la cantidad de stock disponible en la tienda web
+  lowStockThreshold?: number;   // Umbral numérico de stock crítico (por defecto 5)
+  blockOutOfStockOrders?: boolean; // Bloquear pedidos/ventas sin stock disponible
 }
 
 export type SettingsTabId = 'store' | 'inventory' | 'whatsapp' | 'users';

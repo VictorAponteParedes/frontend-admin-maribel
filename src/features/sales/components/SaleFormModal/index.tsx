@@ -107,6 +107,7 @@ export const SaleFormModal: React.FC = () => {
             cartItemsCount={state.cartItems.length}
             totalQuantity={state.totalQuantity}
             totalAmount={state.totalAmount}
+            hasStockError={state.cartItems.some((item) => item.quantity > item.stock)}
             onClose={actions.closeCreateModal}
             onSaveSale={actions.handleSaveSale}
             isLoading={state.isSubmitting}

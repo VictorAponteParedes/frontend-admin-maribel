@@ -155,32 +155,6 @@ export const useSalesStore = create<SalesState>((set, get) => ({
 
       return createdSale;
     } catch (error) {
-      // Fallback local si el backend está desconectado
-      const today = new Date();
-      const fallbackSale: Sale = {
-        id: `sale-${Date.now()}`,
-        saleNumber: `V-${today.getFullYear()}-${String(Date.now()).slice(-4)}`,
-        date: today.toLocaleDateString('es-ES'),
-        time: today.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-        customerCode: payload.customerCode,
-        customerName: payload.customerName,
-        customerPhone: payload.customerPhone,
-        customerAddress: payload.customerAddress,
-        items: payload.items.map((it) => ({
-          ...it,
-          size: it.size || '100 ml',
-          subtotal: it.unitPrice * it.quantity,
-        })),
-        totalQuantity: payload.items.reduce((acc, it) => acc + it.quantity, 0),
-        total: payload.items.reduce((acc, it) => acc + it.unitPrice * it.quantity, 0),
-        status: 'CONFIRMED',
-      };
-
-      set((state) => ({
-        sales: [fallbackSale, ...state.sales],
-        totalItems: state.totalItems + 1,
-      }));
-
       throw error;
     }
   },

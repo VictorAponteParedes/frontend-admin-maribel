@@ -7,6 +7,7 @@ interface SaleFormModalFooterProps {
   cartItemsCount: number;
   totalQuantity: number;
   totalAmount: number;
+  hasStockError?: boolean;
   onClose: () => void;
   onSaveSale: (e: React.FormEvent) => void;
   isLoading?: boolean;
@@ -16,6 +17,7 @@ export const SaleFormModalFooter: React.FC<SaleFormModalFooterProps> = ({
   cartItemsCount,
   totalQuantity,
   totalAmount,
+  hasStockError = false,
   onClose,
   onSaveSale,
   isLoading = false,
@@ -54,11 +56,13 @@ export const SaleFormModalFooter: React.FC<SaleFormModalFooterProps> = ({
           type="button"
           variant="primary"
           onClick={onSaveSale}
-          disabled={cartItemsCount === 0 || isLoading}
+          disabled={cartItemsCount === 0 || isLoading || hasStockError}
           isLoading={isLoading}
           className="w-2/3 py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-50"
         >
-          {t('form.completeSale')} {totalQuantity > 0 ? `(${totalQuantity})` : ''}
+          {hasStockError
+            ? 'Stock insuficiente para facturar'
+            : `${t('form.completeSale')} ${totalQuantity > 0 ? `(${totalQuantity})` : ''}`}
         </Button>
       </div>
     </div>

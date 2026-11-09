@@ -19,7 +19,7 @@ export const useSalePreload = ({
   onFocusSearch,
 }: UseSalePreloadProps) => {
   const { isCreateModalOpen, pendingOrderSale } = useSalesStore();
-  const { getByBarcode } = useInventoryStore();
+  const { products, getByBarcode, getById } = useInventoryStore();
   const { customers } = useCustomerStore();
 
   useEffect(() => {
@@ -37,21 +37,29 @@ export const useSalePreload = ({
     onResetMessages();
 
     if (pendingOrderSale) {
-      // Precargar productos desde la orden vinculada
+      // Precargar productos desde la orden vinculada cruzando stock real
       const preloadedCart: CartItem[] = pendingOrderSale.items.map((item) => {
+        const normalizedCode = (item.barcode || '').trim().toLowerCase();
         const invProduct =
           getByBarcode(item.barcode) ||
-          useInventoryStore.getState().getById(item.barcode);
+          getById(item.barcode) ||
+          products.find(
+            (p) =>
+              p.barcode.trim().toLowerCase() === normalizedCode ||
+              p.id.trim().toLowerCase() === normalizedCode ||
+              (p.name.trim().toLowerCase() === item.name.trim().toLowerCase() &&
+                p.brand.trim().toLowerCase() === item.brand.trim().toLowerCase())
+          );
 
         return {
-          barcode: item.barcode,
-          brand: item.brand,
-          name: item.name,
+          barcode: invProduct ? invProduct.barcode : item.barcode,
+          brand: invProduct ? invProduct.brand : item.brand,
+          name: invProduct ? invProduct.name : item.name,
           size: item.size || invProduct?.size || '100 ml',
           unitPrice: item.unitPrice,
-          stock: invProduct ? invProduct.stock : 99,
+          stock: invProduct ? invProduct.stock : 0,
           quantity: item.quantity,
-          subtotal: item.subtotal,
+          subtotal: item.unitPrice * item.quantity,
         };
       });
       onPreloadCart(preloadedCart);
@@ -81,7 +89,7 @@ export const useSalePreload = ({
     }
 
     onFocusSearch();
-  }, [isCreateModalOpen, pendingOrderSale, customers, getByBarcode]);
+  }, [isCreateModalOpen, pendingOrderSale, customers, products, getByBarcode, getById]);
 
   return {
     isCreateModalOpen,

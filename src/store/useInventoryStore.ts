@@ -211,10 +211,16 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
   },
 
   getByBarcode: (barcode: string): Product | undefined => {
-    return get().products.find((p) => p.barcode.trim() === barcode.trim());
+    const clean = barcode.trim().toLowerCase();
+    return get().products.find(
+      (p) =>
+        p.barcode.trim().toLowerCase() === clean ||
+        p.id.trim().toLowerCase() === clean
+    );
   },
 
   getById: (id: string): Product | undefined => {
-    return get().products.find((p) => p.id === id);
+    const clean = id.trim().toLowerCase();
+    return get().products.find((p) => p.id.trim().toLowerCase() === clean);
   },
 }));

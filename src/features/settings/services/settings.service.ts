@@ -22,6 +22,9 @@ export interface BackendWebSettings {
   announcementText?: string;
   announcementActive?: boolean;
   freeShippingThreshold?: number;
+  showStockInWeb?: boolean;
+  lowStockThreshold?: number;
+  blockOutOfStockOrders?: boolean;
   bankDetails?: Array<{
     bank: string;
     accountType: string;
@@ -67,6 +70,12 @@ export const mapBackendSettingsToStoreSettings = (
       raw.announcementActive !== undefined ? raw.announcementActive : true,
     freeShippingThreshold:
       raw.freeShippingThreshold !== undefined ? Number(raw.freeShippingThreshold) : 250000,
+    showStockInWeb:
+      raw.showStockInWeb !== undefined ? raw.showStockInWeb : true,
+    lowStockThreshold:
+      raw.lowStockThreshold !== undefined ? Number(raw.lowStockThreshold) : 5,
+    blockOutOfStockOrders:
+      raw.blockOutOfStockOrders !== undefined ? raw.blockOutOfStockOrders : true,
   };
 };
 
@@ -101,6 +110,9 @@ export const settingsService = {
       announcementText: data.announcementText,
       announcementActive: data.announcementActive,
       freeShippingThreshold: data.freeShippingThreshold,
+      showStockInWeb: data.showStockInWeb,
+      lowStockThreshold: data.lowStockThreshold,
+      blockOutOfStockOrders: data.blockOutOfStockOrders,
     };
 
     const response = await httpClient.patch('/web-settings', payload);

@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Boxes, MessageSquare } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import lazyLoad from '@/utils/lazyLoad';
 import { PrivateLayout } from '../../navigation/PrivateLayout';
 import { RoutesView } from '../../navigation/routes';
@@ -11,6 +11,12 @@ import { SettingsPlaceholderScreen } from './screens/SettingsPlaceholderScreen';
 const StoreSettingsScreen = lazyLoad(() =>
   import('./screens/SettingsScreen').then((module) => ({
     default: module.StoreSettingsScreen,
+  }))
+);
+
+const InventorySettingsScreen = lazyLoad(() =>
+  import('./screens/InventorySettingsScreen').then((module) => ({
+    default: module.InventorySettingsScreen,
   }))
 );
 
@@ -37,17 +43,9 @@ export const SETTINGS_ROUTES: RouteConfig[] = [
     path: RoutesView.SETTINGS_INVENTORY,
     element: (
       <PrivateLayout>
-        <SettingsPlaceholderScreen
-          title="Inventario & Alertas"
-          description="Umbrales de existencias críticas, alertas tempranas y control de lotes."
-          icon={Boxes}
-          bulletPoints={[
-            'Umbral numérico de stock mínimo por fragancia (ej: ≤ 5 unidades).',
-            'Notificaciones en pantalla de productos agotados o críticos.',
-            'Bloqueo opcional de ventas sin stock físico disponible.',
-            'Gestión de vencimientos de lotes recibidos.',
-          ]}
-        />
+        <Suspense fallback={<LoadingSpinner fullScreen message="Cargando ajustes de inventario..." />}>
+          <InventorySettingsScreen />
+        </Suspense>
       </PrivateLayout>
     ),
     isProtected: true,
