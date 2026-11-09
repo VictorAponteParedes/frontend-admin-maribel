@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, Loader2, Image as ImageIcon, X, Star, Plus } from 'lucide-react';
+import { Upload, Loader2, X, Star, Plus } from 'lucide-react';
 import { resolveImageUrl, filesService } from '@/services/files.service';
 import { toast } from '@/store/useToastStore';
 

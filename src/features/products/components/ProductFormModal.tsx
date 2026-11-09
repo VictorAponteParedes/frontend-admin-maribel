@@ -73,11 +73,15 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
           <ProductImageUploader
             imageUrl={watch('imageUrl')}
             imageId={watch('imageId')}
+            images={watch('images')}
             onImageChange={(data) => {
               setValue('imageUrl', data.imageUrl, { shouldValidate: true });
               setValue('imageId', data.imageId || '', { shouldValidate: true });
+              setValue('images', data.images || (data.imageUrl ? [data.imageUrl] : []), {
+                shouldValidate: true,
+              });
             }}
-            label="Foto del Perfume"
+            label="Fotos / Galería del Perfume"
           />
 
           <ControlledInput
