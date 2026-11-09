@@ -21,6 +21,7 @@ export interface SaleItem {
 
 export interface Sale {
   id: string;
+  orderId?: string | null;
   saleNumber: string;
   date: string;
   time: string;

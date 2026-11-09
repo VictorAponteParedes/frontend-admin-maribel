@@ -9,6 +9,7 @@ interface SaleFormModalFooterProps {
   totalAmount: number;
   onClose: () => void;
   onSaveSale: (e: React.FormEvent) => void;
+  isLoading?: boolean;
 }
 
 export const SaleFormModalFooter: React.FC<SaleFormModalFooterProps> = ({
@@ -17,6 +18,7 @@ export const SaleFormModalFooter: React.FC<SaleFormModalFooterProps> = ({
   totalAmount,
   onClose,
   onSaveSale,
+  isLoading = false,
 }) => {
   const { t } = useTranslation(['sales', 'translation']);
 
@@ -43,6 +45,7 @@ export const SaleFormModalFooter: React.FC<SaleFormModalFooterProps> = ({
           type="button"
           variant="outline"
           onClick={onClose}
+          disabled={isLoading}
           className="w-1/3 py-2.5 rounded-xl text-xs font-semibold"
         >
           {t('common.cancel')}
@@ -51,7 +54,8 @@ export const SaleFormModalFooter: React.FC<SaleFormModalFooterProps> = ({
           type="button"
           variant="primary"
           onClick={onSaveSale}
-          disabled={cartItemsCount === 0}
+          disabled={cartItemsCount === 0 || isLoading}
+          isLoading={isLoading}
           className="w-2/3 py-2.5 rounded-xl text-xs font-bold transition-all disabled:opacity-50"
         >
           {t('form.completeSale')} {totalQuantity > 0 ? `(${totalQuantity})` : ''}

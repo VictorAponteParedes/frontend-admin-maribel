@@ -1,6 +1,8 @@
-import React, { useRef } from 'react';
-import { Image, Upload, RotateCcw, CheckCircle2 } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { Image, Upload, RotateCcw, CheckCircle2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui';
+import { filesService, resolveImageUrl } from '@/services/files.service';
+import { toast } from '@/store/useToastStore';
 
 export interface LogoUploaderProps {
   currentLogoUrl: string;
@@ -14,21 +16,29 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({
   onResetDefault,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        alert('La imagen no debe superar los 2MB');
-        return;
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Archivo muy grande', 'La imagen no debe superar los 2MB');
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      const uploaded = await filesService.uploadFile(file, 'Logotipo de la Tienda Web');
+      onLogoChange(uploaded.url);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error al subir el logotipo al servidor';
+      toast.error('Error de subida', msg);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
       }
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          onLogoChange(event.target.result as string);
-        }
-      };
-      reader.readAsDataURL(file);
     }
   };
 
@@ -53,6 +63,7 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({
           type="button"
           variant="ghost"
           size="xs"
+          disabled={isUploading}
           onClick={onResetDefault}
           leftIcon={<RotateCcw className="w-3 h-3" />}
           title="Restablecer logo predeterminado"
@@ -65,11 +76,18 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({
       <div className="flex flex-col sm:flex-row items-center gap-4">
         {/* Visual Box */}
         <div className="relative w-28 h-28 rounded-2xl border-2 border-rose-200 bg-rose-50/40 flex items-center justify-center p-3 shadow-2xs">
-          <img
-            src={currentLogoUrl || '/logo-maribel.png'}
-            alt="Logo de la tienda"
-            className="max-w-full max-h-full object-contain"
-          />
+          {isUploading ? (
+            <div className="flex flex-col items-center justify-center text-maribel-700">
+              <Loader2 className="w-6 h-6 animate-spin mb-1" />
+              <span className="text-[10px] font-semibold">Subiendo...</span>
+            </div>
+          ) : (
+            <img
+              src={resolveImageUrl(currentLogoUrl) || '/logo-maribel.png'}
+              alt="Logo de la tienda"
+              className="max-w-full max-h-full object-contain"
+            />
+          )}
         </div>
 
         {/* Action Controls */}
@@ -85,16 +103,24 @@ export const LogoUploader: React.FC<LogoUploaderProps> = ({
               type="file"
               accept="image/png, image/jpeg, image/webp, image/svg+xml"
               className="hidden"
+              disabled={isUploading}
               onChange={handleFileChange}
             />
             <Button
               type="button"
               variant="outline"
+              disabled={isUploading}
               onClick={() => fileInputRef.current?.click()}
-              leftIcon={<Upload className="w-3.5 h-3.5 text-maribel-700" />}
+              leftIcon={
+                isUploading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-maribel-700" />
+                ) : (
+                  <Upload className="w-3.5 h-3.5 text-maribel-700" />
+                )
+              }
               className="w-full py-2.5 font-bold text-stone-800"
             >
-              <span>Subir nuevo logotipo</span>
+              <span>{isUploading ? 'Subiendo imagen...' : 'Subir nuevo logotipo'}</span>
             </Button>
             <span className="text-[10px] text-stone-400 block text-center mt-1.5">
               PNG transparente, SVG o JPG (512x512px recomendado, máx. 2MB)

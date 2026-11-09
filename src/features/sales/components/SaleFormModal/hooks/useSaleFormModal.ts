@@ -19,6 +19,7 @@ export const useSaleFormModal = () => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
   const clearErrors = useCallback(() => {
@@ -54,36 +55,56 @@ export const useSaleFormModal = () => {
   // 4. Registro y Cierre de Venta
   const handleSaveSale = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     clearErrors();
 
     if (cart.cartItems.length === 0) {
-      setErrorMessage(t('form.errors.emptyCart'));
+      const msg = t('form.errors.emptyCart');
+      setErrorMessage(msg);
+      toast.error('Carrito vacío', msg);
       return;
     }
 
-    // Validación de stock
-    for (const item of cart.cartItems) {
-      const product = getByBarcode(item.barcode);
-      if (!product || product.stock < item.quantity) {
-        setErrorMessage(
-          t('form.errors.insufficientStock', {
-            product: item.name,
-            count: product ? product.stock : 0,
-          })
-        );
+    // Prevención de doble facturación si proviene de un pedido web ya facturado
+    if (preload.pendingOrderSale?.orderId) {
+      const orderAlreadyBilled = useSalesStore
+        .getState()
+        .sales.some((s) => s.orderId === preload.pendingOrderSale?.orderId);
+
+      if (orderAlreadyBilled) {
+        const msg = `El pedido #${preload.pendingOrderSale.orderNumber} ya cuenta con una venta registrada en el sistema. No se permite duplicar el cobro.`;
+        setErrorMessage(msg);
+        toast.warning('Pedido ya facturado', msg);
+        closeCreateModal();
         return;
       }
     }
 
-    // Descontar inventario local optimista
+    // Validación de stock: solo si el producto existe en el catálogo físico y no tiene stock suficiente
     for (const item of cart.cartItems) {
-      deductStock(item.barcode, item.quantity);
+      const product =
+        getByBarcode(item.barcode) ||
+        useInventoryStore.getState().getById(item.barcode);
+
+      if (product && product.stock < item.quantity) {
+        const errorMsg = t('form.errors.insufficientStock', {
+          product: item.name,
+          count: product.stock,
+        });
+        setErrorMessage(errorMsg);
+        toast.error('Stock insuficiente', errorMsg);
+        return;
+      }
     }
 
     try {
+      setIsSubmitting(true);
+      const isUuid = (val?: string): boolean =>
+        Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val.trim()));
+
       const createdSale = await addSale({
         orderId: preload.pendingOrderSale?.orderId,
-        customerId: selectedCustomer?.id,
+        customerId: isUuid(selectedCustomer?.id) ? selectedCustomer!.id : undefined,
         customerCode: selectedCustomer?.code ? String(selectedCustomer.code) : undefined,
         customerName: selectedCustomer ? selectedCustomer.name : t('customerSelect.casualCustomer'),
         customerPhone: selectedCustomer?.phone,
@@ -98,6 +119,11 @@ export const useSaleFormModal = () => {
           unitPrice: item.unitPrice,
         })),
       });
+
+      // Descontar inventario local únicamente tras confirmación exitosa del backend
+      for (const item of cart.cartItems) {
+        deductStock(item.barcode, item.quantity);
+      }
 
       setSuccessMessage(t('saleSaved'));
 
@@ -118,8 +144,15 @@ export const useSaleFormModal = () => {
       setTimeout(() => {
         closeCreateModal();
       }, 600);
-    } catch {
-      setErrorMessage(t('errors.saveFailed') || 'Error al registrar la venta en el servidor.');
+    } catch (err: unknown) {
+      const msg =
+        err instanceof Error && err.message
+          ? err.message
+          : t('errors.saveFailed') || 'Error al registrar la venta en el servidor.';
+      setErrorMessage(msg);
+      toast.error('Error al registrar venta', msg);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -132,6 +165,7 @@ export const useSaleFormModal = () => {
       selectedCustomer,
       errorMessage,
       successMessage,
+      isSubmitting,
       isSearchingLive: scanner.isSearchingLive,
       liveSearchResults: scanner.liveSearchResults,
       products: scanner.products,

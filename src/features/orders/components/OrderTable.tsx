@@ -8,6 +8,7 @@ import {
   Eye,
   ShoppingBag,
   ShoppingCart,
+  CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { Order, OrderStatus } from '@/features/orders/types/order.types';
@@ -236,24 +237,39 @@ export const OrderTable: React.FC<OrderTableProps> = ({
                   {/* Acciones: Facturar Venta y Ver Detalle */}
                   <td className="py-3.5 px-4 text-center whitespace-nowrap">
                     <div className="flex items-center justify-center gap-1.5">
-                      {onProcessSale && (
-                        <Button
-                          type="button"
-                          variant={order.status === 'DELIVERED' ? 'secondary' : 'primary'}
-                          size="xs"
-                          onClick={() => onProcessSale(order)}
-                          title={
-                            order.status === 'DELIVERED'
-                              ? 'Este pedido ya figura como entregado. Haz clic si deseas volver a facturarlo.'
-                              : 'Llevar los productos de este pedido directamente a la caja para facturar'
-                          }
-                        >
-                          <ShoppingCart className="w-3.5 h-3.5" />
-                          <span>
-                            {order.status === 'DELIVERED' ? 'Facturado' : 'Llevar a Venta'}
-                          </span>
-                        </Button>
-                      )}
+                      {(() => {
+                        const isBilled =
+                          order.status === 'DELIVERED' || order.paymentStatus === 'PAID';
+
+                        if (isBilled) {
+                          return (
+                            <span
+                              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs select-none"
+                              title="Este pedido ya fue cobrado y facturado. No se permite duplicar el cobro."
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>Facturado</span>
+                            </span>
+                          );
+                        }
+
+                        if (onProcessSale) {
+                          return (
+                            <Button
+                              type="button"
+                              variant="primary"
+                              size="xs"
+                              onClick={() => onProcessSale(order)}
+                              title="Llevar los productos de este pedido directamente a la caja para facturar"
+                            >
+                              <ShoppingCart className="w-3.5 h-3.5" />
+                              <span>Llevar a Venta</span>
+                            </Button>
+                          );
+                        }
+
+                        return null;
+                      })()}
 
                       <Button
                         type="button"

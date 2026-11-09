@@ -4,13 +4,33 @@ import {
   MapPin,
   Phone,
   Clock,
-  Instagram,
   ExternalLink,
   MessageCircle,
   ShieldCheck,
   Store,
 } from 'lucide-react';
 import { StoreGeneralSettings } from '../types/settings.types';
+import { resolveImageUrl } from '@/services/files.service';
+
+const InstagramIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-3.5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
+
+const FacebookIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-3.5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+  </svg>
+);
+
+const TikTokIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-3.5' }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298-.002.595.042.88.13V9.4a6.33 6.33 0 0 0-1-.08A6.34 6.34 0 0 0 3 15.66a6.34 6.34 0 0 0 10.86 4.43 6.3 6.3 0 0 0 1.93-4.52V8.62a8.2 8.2 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-.97-.05z" />
+  </svg>
+);
 
 export interface StoreFooterPreviewCardProps {
   settings: Partial<StoreGeneralSettings>;
@@ -31,7 +51,9 @@ export const StoreFooterPreviewCard: React.FC<StoreFooterPreviewCardProps> = ({
     country = 'Paraguay',
     mapsUrl = 'https://maps.google.com/?q=Pedro+Juan+Caballero',
     openingHours = 'Lunes a Sábados: 07:30 a 19:30 hs',
-    instagramUrl = 'https://instagram.com/maribel_tiendaderegalos',
+    instagramUrl = '',
+    facebookUrl = '',
+    tiktokUrl = '',
     logoUrl = '/logo-maribel.png',
     footerCopyright = '© 2026 Maribel Tienda de Regalos. Todos los derechos reservados.',
   } = settings;
@@ -98,7 +120,7 @@ export const StoreFooterPreviewCard: React.FC<StoreFooterPreviewCardProps> = ({
             <div className="flex items-center space-x-2.5">
               <div className="w-8 h-8 rounded-full bg-stone-900 border border-stone-800 flex items-center justify-center p-1 overflow-hidden shrink-0">
                 <img
-                  src={logoUrl || '/logo-maribel.png'}
+                  src={resolveImageUrl(logoUrl) || '/logo-maribel.png'}
                   alt={tradeName}
                   className="max-w-full max-h-full object-contain"
                   onError={(e) => {
@@ -115,18 +137,41 @@ export const StoreFooterPreviewCard: React.FC<StoreFooterPreviewCardProps> = ({
               {storeBio}
             </p>
 
-            {instagramUrl && (
-              <div className="pt-1">
-                <a
-                  href={instagramUrl.startsWith('http') ? instagramUrl : `https://instagram.com/${instagramUrl.replace('@', '')}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center space-x-1.5 text-stone-300 hover:text-rose-300 text-xs transition-colors font-medium"
-                >
-                  <Instagram className="w-3.5 h-3.5 text-rose-400" />
-                  <span>Instagram Oficial</span>
-                  <ExternalLink className="w-2.5 h-2.5 text-stone-500" />
-                </a>
+            {(instagramUrl || facebookUrl || tiktokUrl) && (
+              <div className="pt-2 flex flex-wrap gap-2">
+                {instagramUrl && (
+                  <a
+                    href={instagramUrl.startsWith('http') ? instagramUrl : `https://instagram.com/${instagramUrl.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-300 hover:text-rose-300 text-[11px] transition-colors"
+                  >
+                    <InstagramIcon className="w-3.5 h-3.5 text-rose-400" />
+                    <span>Instagram</span>
+                  </a>
+                )}
+                {facebookUrl && (
+                  <a
+                    href={facebookUrl.startsWith('http') ? facebookUrl : `https://facebook.com/${facebookUrl}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-300 hover:text-blue-300 text-[11px] transition-colors"
+                  >
+                    <FacebookIcon className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Facebook</span>
+                  </a>
+                )}
+                {tiktokUrl && (
+                  <a
+                    href={tiktokUrl.startsWith('http') ? tiktokUrl : `https://tiktok.com/@${tiktokUrl.replace('@', '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-stone-900 border border-stone-800 text-stone-300 hover:text-white text-[11px] transition-colors"
+                  >
+                    <TikTokIcon className="w-3.5 h-3.5 text-stone-200" />
+                    <span>TikTok</span>
+                  </a>
+                )}
               </div>
             )}
           </div>

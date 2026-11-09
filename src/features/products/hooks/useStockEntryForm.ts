@@ -35,6 +35,8 @@ export const useStockEntryForm = () => {
       sellingPrice: 0,
       receptionDate: getTodayFormattedDate(),
       batchNumber: generateDefaultBatchNumber(),
+      imageId: '',
+      imageUrl: '',
     },
     mode: 'onTouched',
   });
@@ -45,6 +47,13 @@ export const useStockEntryForm = () => {
   const watchedQuantity = watch('quantity');
   const watchedCostPrice = watch('costPrice');
   const watchedSellingPrice = watch('sellingPrice');
+  const watchedImageUrl = watch('imageUrl');
+  const watchedImageId = watch('imageId');
+
+  const handleImageChange = (imageData: { imageUrl: string; imageId?: string }) => {
+    setValue('imageUrl', imageData.imageUrl, { shouldValidate: true, shouldDirty: true });
+    setValue('imageId', imageData.imageId || '', { shouldValidate: true, shouldDirty: true });
+  };
 
   const cleanBarcode = (watchedBarcode || '').trim();
   const existingProduct = cleanBarcode ? getByBarcode(cleanBarcode) : undefined;
@@ -67,6 +76,8 @@ export const useStockEntryForm = () => {
       setValue('size', matched.size, { shouldValidate: true, shouldDirty: true });
       setValue('costPrice', matched.costPrice || 0, { shouldValidate: true, shouldDirty: true });
       setValue('sellingPrice', matched.price || 0, { shouldValidate: true, shouldDirty: true });
+      setValue('imageUrl', matched.imageUrl || '', { shouldValidate: true, shouldDirty: true });
+      setValue('imageId', matched.imageId || '', { shouldValidate: true, shouldDirty: true });
     }
   };
 
@@ -123,7 +134,8 @@ export const useStockEntryForm = () => {
           cleanBrand,
           cleanName,
           cleanSize,
-          data.batchNumber
+          data.batchNumber,
+          data.imageId || undefined
         );
       } else {
         await addProduct({
@@ -135,6 +147,8 @@ export const useStockEntryForm = () => {
           price: data.sellingPrice,
           totalIn: data.quantity,
           receptionDate: data.receptionDate,
+          imageId: data.imageId || undefined,
+          imageUrl: data.imageUrl || undefined,
         });
       }
 
@@ -175,6 +189,8 @@ export const useStockEntryForm = () => {
     watchedQuantity,
     watchedCostPrice,
     watchedSellingPrice,
+    imageUrl: watchedImageUrl,
+    imageId: watchedImageId,
     scanner: {
       isOpen: isScannerOpen,
       openScanner: () => setIsScannerOpen(true),
@@ -184,6 +200,7 @@ export const useStockEntryForm = () => {
     actions: {
       onSubmit,
       handleBarcodeChange,
+      handleImageChange,
       handleQuickAddQty,
       handleIncrementQty,
       handleDecrementQty,

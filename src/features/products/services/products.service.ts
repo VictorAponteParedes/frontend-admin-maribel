@@ -77,6 +77,7 @@ export const productsService = {
       sellingPrice: productData.price,
       initialStock: productData.totalIn ?? 0,
       receptionDate: normalizeToIsoDate(productData.receptionDate),
+      imageId: productData.imageId || undefined,
     };
 
     const response = await httpClient.post('/products', payload);

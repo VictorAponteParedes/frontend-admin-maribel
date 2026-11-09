@@ -98,6 +98,18 @@
     "printTicket": "Imprimir Ticket de Despacho",
     "close": "Cerrar"
   },
+  "detail": {
+    "backToOrders": "Volver a Pedidos Web",
+    "orderTitle": "Pedido {{number}}",
+    "channelWeb": "Canal: Tienda Web Online",
+    "notFoundTitle": "Pedido no encontrado",
+    "notFoundDesc": "El pedido con identificador \"{{id}}\" no existe o fue eliminado.",
+    "backButton": "Volver a la lista de pedidos",
+    "status": "Estado del Pedido",
+    "orderBilled": "Pedido Facturado y Cobrado",
+    "processSale": "Facturar / Llevar a Venta",
+    "printTicket": "Imprimir Ticket de Despacho"
+  },
   "whatsapp": {
     "message": "¡Hola {{name}}! 👋 Te escribimos desde *Maribel Tienda de Regalos* 🎁 con respecto a tu pedido *#{{orderNumber}}* por un total de {{total}}. ¿Cómo estás?"
   }

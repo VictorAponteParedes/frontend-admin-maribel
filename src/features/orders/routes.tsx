@@ -11,6 +11,12 @@ const OrdersScreen = lazyLoad(() =>
   }))
 );
 
+const OrderDetailScreen = lazyLoad(() =>
+  import('./screens/OrderDetailScreen').then((module) => ({
+    default: module.OrderDetailScreen,
+  }))
+);
+
 export const ORDERS_ROUTES: RouteConfig[] = [
   {
     path: RoutesView.ORDERS,
@@ -18,6 +24,28 @@ export const ORDERS_ROUTES: RouteConfig[] = [
       <PrivateLayout>
         <Suspense fallback={<OrdersSkeleton />}>
           <OrdersScreen />
+        </Suspense>
+      </PrivateLayout>
+    ),
+    isProtected: true,
+  },
+  {
+    path: RoutesView.ORDER_DETAIL,
+    element: (
+      <PrivateLayout>
+        <Suspense fallback={<OrdersSkeleton />}>
+          <OrderDetailScreen />
+        </Suspense>
+      </PrivateLayout>
+    ),
+    isProtected: true,
+  },
+  {
+    path: RoutesView.ORDER_DETAIL_ALIAS,
+    element: (
+      <PrivateLayout>
+        <Suspense fallback={<OrdersSkeleton />}>
+          <OrderDetailScreen />
         </Suspense>
       </PrivateLayout>
     ),

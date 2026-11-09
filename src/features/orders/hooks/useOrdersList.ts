@@ -4,6 +4,7 @@ import { useOrdersStore } from '@/store/useOrdersStore';
 import { useSalesStore } from '@/store/useSalesStore';
 import { Order, OrderStatus } from '@/features/orders/types/order.types';
 import { RoutesView } from '@/navigation/routes';
+import { toast } from '@/store/useToastStore';
 
 export const useOrdersList = () => {
   const navigate = useNavigate();
@@ -15,8 +16,6 @@ export const useOrdersList = () => {
     metrics,
     selectedOrder,
     isDetailModalOpen,
-    openDetailModal,
-    closeDetailModal,
     fetchOrders,
     fetchMetrics,
     updateOrderStatus,
@@ -52,6 +51,14 @@ export const useOrdersList = () => {
   }, [searchQuery, statusFilter, currentPage, pageSize, fetchOrders]);
 
   const handleProcessSale = (order: Order) => {
+    if (order.status === 'DELIVERED' || order.paymentStatus === 'PAID') {
+      toast.warning(
+        'Pedido ya facturado',
+        `El pedido #${order.orderNumber} ya fue procesado y cobrado. No se permite duplicar la venta.`
+      );
+      return;
+    }
+
     openCreateModalFromOrder({
       orderId: order.id,
       orderNumber: order.orderNumber,
@@ -101,8 +108,9 @@ export const useOrdersList = () => {
       setStatusFilter,
       setCurrentPage,
       setPageSize,
-      openDetailModal,
-      closeDetailModal,
+      openDetailModal: (order: Order) => {
+        navigate(RoutesView.orderDetail(order.id));
+      },
       updateOrderStatus,
       handleProcessSale,
       refreshOrders: () => {

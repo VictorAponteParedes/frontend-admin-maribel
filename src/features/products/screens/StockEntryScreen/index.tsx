@@ -14,6 +14,8 @@ export const StockEntryScreen: React.FC = () => {
     isFormValid,
     metrics,
     watchedQuantity,
+    imageUrl,
+    imageId,
     scanner,
     actions,
   } = useStockEntryForm();
@@ -30,6 +32,9 @@ export const StockEntryScreen: React.FC = () => {
           <StockEntryProductDataCard
             control={control}
             existingProduct={metrics.existingProduct}
+            imageUrl={imageUrl}
+            imageId={imageId}
+            onImageChange={actions.handleImageChange}
             onOpenScanner={scanner.openScanner}
             onBarcodeChange={actions.handleBarcodeChange}
           />

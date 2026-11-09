@@ -2,6 +2,7 @@ import React from 'react';
 import { Control, useController } from 'react-hook-form';
 import { Barcode, Camera, Tag, Droplets, Package } from 'lucide-react';
 import { AppInput, ControlledInput, Button } from '@/components/ui';
+import { ProductImageUploader } from '@/componentes';
 import { useTranslation } from '@/locale';
 import { Product } from '../types/product.types';
 import { StockEntryFormValues } from '../types/stockEntry.types';
@@ -9,6 +10,9 @@ import { StockEntryFormValues } from '../types/stockEntry.types';
 export interface StockEntryProductDataCardProps {
   control: Control<StockEntryFormValues>;
   existingProduct?: Product;
+  imageUrl?: string;
+  imageId?: string;
+  onImageChange?: (data: { imageUrl: string; imageId?: string }) => void;
   onOpenScanner: () => void;
   onBarcodeChange: (barcode: string) => void;
 }
@@ -16,6 +20,9 @@ export interface StockEntryProductDataCardProps {
 export const StockEntryProductDataCard: React.FC<StockEntryProductDataCardProps> = ({
   control,
   existingProduct,
+  imageUrl,
+  imageId,
+  onImageChange,
   onOpenScanner,
   onBarcodeChange,
 }) => {
@@ -121,6 +128,16 @@ export const StockEntryProductDataCard: React.FC<StockEntryProductDataCardProps>
         leftIcon={<Package className="w-4 h-4" />}
         rules={{ required: t('entry.errors.descRequired') }}
       />
+
+      {/* Imagen / Foto del Perfume */}
+      <div className="pt-2 border-t border-stone-100">
+        <ProductImageUploader
+          imageUrl={imageUrl}
+          imageId={imageId}
+          onImageChange={(data) => onImageChange?.(data)}
+          label="Foto / Imagen del Perfume"
+        />
+      </div>
     </div>
   );
 };

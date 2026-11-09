@@ -10,6 +10,7 @@ export const RoutesView = {
   WEB_CATALOG: '/web-catalog',
   ORDERS: '/orders',
   ORDER_DETAIL: '/orders/:id',
+  ORDER_DETAIL_ALIAS: '/orders-details/:id',
   CUSTOMERS: '/customers',
   USERS: '/users',
   SETTINGS: '/settings',

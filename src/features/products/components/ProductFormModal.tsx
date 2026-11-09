@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { ControlledInput, Button } from '@/components/ui';
-import { CategorySelect } from '@/componentes';
+import { CategorySelect, ProductImageUploader } from '@/componentes';
 import { ProductFormData } from '@/features/products/types/product.types';
 import { useTranslation } from '@/locale';
 import { X, Barcode } from 'lucide-react';
@@ -18,7 +18,7 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
   onSubmitProduct,
 }) => {
   const { t } = useTranslation(['inventory', 'translation']);
-  const { control, handleSubmit, reset } = useForm<ProductFormData>({
+  const { control, handleSubmit, reset, watch, setValue } = useForm<ProductFormData>({
     defaultValues: {
       barcode: '',
       brand: '',
@@ -27,6 +27,8 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
       category: '',
       price: 0,
       totalIn: 10,
+      imageId: '',
+      imageUrl: '',
     },
     mode: 'onTouched',
   });
@@ -66,7 +68,18 @@ export const ProductFormModal: React.FC<ProductFormModalProps> = ({
           </Button>
         </div>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-5 space-y-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="p-5 space-y-4 max-h-[85vh] overflow-y-auto">
+          {/* Subida / URL de Imagen */}
+          <ProductImageUploader
+            imageUrl={watch('imageUrl')}
+            imageId={watch('imageId')}
+            onImageChange={(data) => {
+              setValue('imageUrl', data.imageUrl, { shouldValidate: true });
+              setValue('imageId', data.imageId || '', { shouldValidate: true });
+            }}
+            label="Foto del Perfume"
+          />
+
           <ControlledInput
             control={control}
             name="barcode"

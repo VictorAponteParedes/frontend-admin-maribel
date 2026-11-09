@@ -11,6 +11,8 @@ export interface StoreGeneralSettings {
   mapsUrl: string;              // Enlace de Google Maps para retiros en tienda
   openingHours: string;         // Horarios de atención al público
   instagramUrl: string;         // Enlace o perfil de Instagram (@maribel.regalos)
+  facebookUrl?: string;         // Enlace de Facebook oficial (Opcional)
+  tiktokUrl?: string;           // Enlace o perfil de TikTok (Opcional)
   logoUrl: string;              // Logotipo de la tienda
   footerCopyright: string;      // Texto de copyright y créditos en el footer
 }

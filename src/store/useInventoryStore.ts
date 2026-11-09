@@ -26,6 +26,7 @@ export interface InventoryState {
     name?: string,
     size?: string,
     batchNumber?: string,
+    imageId?: string,
   ) => Promise<boolean>;
   getByBarcode: (barcode: string) => Product | undefined;
   getById: (id: string) => Product | undefined;
@@ -95,6 +96,8 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
         totalSold: 0,
         stock: productData.totalIn,
         isActive: true,
+        imageId: productData.imageId || null,
+        imageUrl: productData.imageUrl || null,
       };
       set((state) => ({ products: [newProduct, ...state.products] }));
     }
@@ -158,6 +161,7 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
     name?: string,
     size?: string,
     batchNumber?: string,
+    imageId?: string,
   ): Promise<boolean> => {
     const { products } = get();
     const product = products.find((p) => p.barcode === barcode);
@@ -170,6 +174,10 @@ export const useInventoryStore = create<InventoryState>((set, get) => ({
         batchNumber,
         entryDate: receptionDate,
       });
+
+      if (imageId && imageId !== product.imageId) {
+        await productsService.updateProduct(product.id, { imageId });
+      }
 
       const refreshed = await productsService.fetchProducts();
       set({ products: refreshed || [] });

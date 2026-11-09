@@ -73,11 +73,14 @@ export const salesService = {
   },
 
   createSale: async (payload: CreateSalePayload): Promise<Sale> => {
-    // Sanitizar UUIDs para evitar enviar cadenas vacías que rechazaría class-validator
+    const isUuid = (val?: string): boolean =>
+      Boolean(val && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val.trim()));
+
+    // Sanitizar UUIDs para evitar enviar cadenas temporales ("temp-...") que rechazaría class-validator
     const cleanPayload: CreateSalePayload = {
       ...payload,
-      orderId: payload.orderId && payload.orderId.trim() ? payload.orderId.trim() : undefined,
-      customerId: payload.customerId && payload.customerId.trim() ? payload.customerId.trim() : undefined,
+      orderId: isUuid(payload.orderId) ? payload.orderId!.trim() : undefined,
+      customerId: isUuid(payload.customerId) ? payload.customerId!.trim() : undefined,
       customerCode: payload.customerCode && payload.customerCode.trim() ? payload.customerCode.trim() : undefined,
       customerPhone: payload.customerPhone && payload.customerPhone.trim() ? payload.customerPhone.trim() : undefined,
       customerAddress: payload.customerAddress && payload.customerAddress.trim() ? payload.customerAddress.trim() : undefined,

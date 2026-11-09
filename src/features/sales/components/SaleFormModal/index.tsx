@@ -109,6 +109,7 @@ export const SaleFormModal: React.FC = () => {
             totalAmount={state.totalAmount}
             onClose={actions.closeCreateModal}
             onSaveSale={actions.handleSaveSale}
+            isLoading={state.isSubmitting}
           />
         </motion.div>
       </div>

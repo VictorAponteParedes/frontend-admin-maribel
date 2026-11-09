@@ -1,5 +1,5 @@
-import React from 'react';
-import { Gift, Upload, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Gift, Upload, Loader2, ImageOff } from 'lucide-react';
 import { resolveImageUrl } from '@/services/files.service';
 
 interface CreateComboImageUploaderProps {
@@ -15,6 +15,14 @@ export const CreateComboImageUploader: React.FC<CreateComboImageUploaderProps> =
   onFileUpload,
   isUploading = false,
 }) => {
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [imageUrl]);
+
+  const resolvedUrl = resolveImageUrl(imageUrl);
+
   return (
     <div className="bg-stone-50/60 border border-stone-200/90 rounded-2xl p-5 space-y-3">
       <label className="block text-xs font-bold text-stone-700 uppercase tracking-wide">
@@ -28,16 +36,18 @@ export const CreateComboImageUploader: React.FC<CreateComboImageUploaderProps> =
               <Loader2 className="w-6 h-6 animate-spin mb-1" />
               <span className="text-[10px] font-semibold">Subiendo...</span>
             </div>
-          ) : imageUrl ? (
+          ) : resolvedUrl && !hasError ? (
             <img
-              src={resolveImageUrl(imageUrl)}
+              src={resolvedUrl}
               alt="Estuche"
               className="w-full h-full object-cover"
-              onError={(e) => {
-                // Si la imagen falla al cargar, mostrar fallback visual
-                (e.target as HTMLElement).style.display = 'none';
-              }}
+              onError={() => setHasError(true)}
             />
+          ) : hasError ? (
+            <div className="w-full h-full flex flex-col items-center justify-center text-stone-400 text-[10px] text-center p-2 bg-stone-50">
+              <ImageOff className="w-5 h-5 text-stone-300 mb-1" />
+              <span>Sin vista</span>
+            </div>
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center text-stone-400 text-[11px] text-center p-2">
               <Gift className="w-6 h-6 text-stone-300 mb-1" />

@@ -29,6 +29,8 @@ export interface StockEntryFormValues {
   sellingPrice: number;
   receptionDate: string;
   batchNumber: string;
+  imageId?: string;
+  imageUrl?: string;
 }
 
 export interface StockEntryCalculatedMetrics {

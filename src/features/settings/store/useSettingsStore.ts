@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import { StoreGeneralSettings } from '../types/settings.types';
+import { settingsService } from '../services/settings.service';
 
 const STORAGE_KEY = 'maribel_store_general_settings';
 
 export const DEFAULT_STORE_SETTINGS: StoreGeneralSettings = {
   tradeName: 'Maribel Tienda de Regalos',
-  storeBio: 'Perfumería fina, fragancias exclusivas y detalles especiales con atención cálida en Pedro Juan Caballero y envíos a todo Paraguay.',
+  storeBio:
+    'Perfumería fina, fragancias exclusivas y detalles especiales con atención cálida en Pedro Juan Caballero y envíos a todo Paraguay.',
   legalName: 'Maribel Escriva',
   taxId: '4815234-7',
   whatsappNumber: '0986 314 630',
@@ -16,8 +18,11 @@ export const DEFAULT_STORE_SETTINGS: StoreGeneralSettings = {
   mapsUrl: 'https://maps.google.com/?q=Pedro+Juan+Caballero',
   openingHours: 'Lunes a Sábados: 07:30 a 19:30 hs',
   instagramUrl: 'https://instagram.com/maribel_tiendaderegalos',
+  facebookUrl: '',
+  tiktokUrl: '',
   logoUrl: '/logo-maribel.png',
-  footerCopyright: '© 2026 Maribel Tienda de Regalos. Todos los derechos reservados.',
+  footerCopyright:
+    '© 2026 Maribel Tienda de Regalos. Todos los derechos reservados.',
 };
 
 const loadInitialSettings = (): StoreGeneralSettings => {
@@ -34,26 +39,57 @@ const loadInitialSettings = (): StoreGeneralSettings => {
 
 interface SettingsState {
   settings: StoreGeneralSettings;
-  updateSettings: (newSettings: Partial<StoreGeneralSettings>) => void;
-  resetToDefaults: () => void;
+  isLoading: boolean;
+  error: string | null;
+  fetchSettings: (force?: boolean) => Promise<void>;
+  saveSettings: (
+    newSettings: Partial<StoreGeneralSettings>
+  ) => Promise<StoreGeneralSettings>;
+  resetToDefaults: () => Promise<void>;
 }
 
-export const useSettingsStore = create<SettingsState>((set) => ({
+export const useSettingsStore = create<SettingsState>((set, get) => ({
   settings: loadInitialSettings(),
+  isLoading: false,
+  error: null,
 
-  updateSettings: (newSettings) => {
-    set((state) => {
-      const updated = { ...state.settings, ...newSettings };
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-      } catch (error) {
-        console.error('Error saving store settings to localStorage', error);
-      }
-      return { settings: updated };
-    });
+  fetchSettings: async (force = false) => {
+    // Si ya cargó y no es forzado, no volver a pedir
+    if (!force && get().isLoading) return;
+
+    set({ isLoading: true, error: null });
+    try {
+      const serverSettings = await settingsService.fetchSettings();
+      set({ settings: serverSettings, isLoading: false });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(serverSettings));
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Error al cargar configuración';
+      set({ error: message, isLoading: false });
+    }
   },
 
-  resetToDefaults: () => {
+  saveSettings: async (newSettings) => {
+    set({ isLoading: true, error: null });
+    try {
+      const updated = await settingsService.updateSettings(newSettings);
+      set({ settings: updated, isLoading: false });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : 'Error al guardar configuración';
+      set({ error: message, isLoading: false });
+      throw err;
+    }
+  },
+
+  resetToDefaults: async () => {
+    try {
+      await settingsService.updateSettings(DEFAULT_STORE_SETTINGS);
+    } catch {
+      // Ignorar si falla la red al resetear
+    }
     localStorage.removeItem(STORAGE_KEY);
     set({ settings: DEFAULT_STORE_SETTINGS });
   },

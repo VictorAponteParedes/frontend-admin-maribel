@@ -16,6 +16,7 @@ export interface OrdersState {
   openDetailModal: (order: Order) => void;
   closeDetailModal: () => void;
   fetchOrders: (params?: OrderQueryParams) => Promise<void>;
+  fetchOrderById: (id: string) => Promise<Order | null>;
   fetchMetrics: () => Promise<void>;
   updateOrderStatus: (id: string, newStatus: OrderStatus) => Promise<void>;
   addOrder: (order: Order) => void;
@@ -54,6 +55,25 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
         totalItems: data.meta?.total ?? (data.items ? data.items.length : 0),
       });
     } catch {
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  fetchOrderById: async (id: string): Promise<Order | null> => {
+    const existing = get().orders.find((o) => o.id === id);
+    if (existing) {
+      set({ selectedOrder: existing });
+      return existing;
+    }
+
+    set({ isLoading: true });
+    try {
+      const order = await ordersService.fetchOrderById(id);
+      set({ selectedOrder: order });
+      return order;
+    } catch {
+      return null;
     } finally {
       set({ isLoading: false });
     }

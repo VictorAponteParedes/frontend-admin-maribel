@@ -2,7 +2,6 @@ import React from 'react';
 import { Header } from '@/components/layout/Header';
 import { Pagination } from '@/components/ui';
 import { OrderTable } from '@/features/orders/components/OrderTable';
-import { OrderDetailModal } from '@/features/orders/components/OrderDetailModal';
 import { OrderMetricsGrid } from '@/features/orders/components/OrderMetricsGrid';
 import { OrderStatusTabs } from '@/features/orders/components/OrderStatusTabs';
 import { OrderSearchBar } from '@/features/orders/components/OrderSearchBar';
@@ -70,15 +69,6 @@ export const OrdersScreen: React.FC = () => {
           pageSizeOptions={[10, 25, 50]}
         />
       )}
-
-      {/* Modal de Detalle */}
-      <OrderDetailModal
-        order={state.selectedOrder}
-        isOpen={state.isDetailModalOpen}
-        onClose={actions.closeDetailModal}
-        onStatusChange={actions.updateOrderStatus}
-        onProcessSale={actions.handleProcessSale}
-      />
     </div>
   );
 };

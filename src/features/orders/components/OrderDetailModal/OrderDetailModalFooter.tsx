@@ -1,5 +1,5 @@
 import React from 'react';
-import { Printer, ShoppingCart } from 'lucide-react';
+import { Printer, ShoppingCart, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { Order } from '@/features/orders/types/order.types';
 import { useTranslation } from '@/locale';
@@ -34,24 +34,38 @@ export const OrderDetailModalFooter: React.FC<OrderDetailModalFooterProps> = ({
       </Button>
 
       <div className="flex items-center gap-2">
-        {onProcessSale && (
-          <Button
-            type="button"
-            variant="primary"
-            size="sm"
-            onClick={() => {
-              onClose();
-              onProcessSale(order);
-            }}
-          >
-            <ShoppingCart className="w-4 h-4" />
-            <span>
-              {order.status === 'DELIVERED'
-                ? 'Volver a Facturar'
-                : 'Facturar / Llevar a Venta'}
-            </span>
-          </Button>
-        )}
+        {(() => {
+          const isBilled =
+            order.status === 'DELIVERED' || order.paymentStatus === 'PAID';
+
+          if (isBilled) {
+            return (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Pedido Facturado y Cobrado</span>
+              </span>
+            );
+          }
+
+          if (onProcessSale) {
+            return (
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                onClick={() => {
+                  onClose();
+                  onProcessSale(order);
+                }}
+              >
+                <ShoppingCart className="w-4 h-4" />
+                <span>Facturar / Llevar a Venta</span>
+              </Button>
+            );
+          }
+
+          return null;
+        })()}
 
         <Button
           type="button"

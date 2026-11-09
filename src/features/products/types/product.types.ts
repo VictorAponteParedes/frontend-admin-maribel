@@ -33,6 +33,8 @@ export interface ProductFormData {
   price: number;
   totalIn: number;
   receptionDate?: string;
+  imageId?: string;
+  imageUrl?: string;
 }
 
 export interface BulkImportProductItem {

@@ -23,6 +23,15 @@ export const useSalePreload = ({
   const { customers } = useCustomerStore();
 
   useEffect(() => {
+    if (useInventoryStore.getState().products.length === 0) {
+      useInventoryStore.getState().fetchProducts();
+    }
+    if (useCustomerStore.getState().customers.length === 0) {
+      useCustomerStore.getState().fetchCustomers();
+    }
+  }, []);
+
+  useEffect(() => {
     if (!isCreateModalOpen) return;
 
     onResetMessages();
@@ -30,12 +39,15 @@ export const useSalePreload = ({
     if (pendingOrderSale) {
       // Precargar productos desde la orden vinculada
       const preloadedCart: CartItem[] = pendingOrderSale.items.map((item) => {
-        const invProduct = getByBarcode(item.barcode);
+        const invProduct =
+          getByBarcode(item.barcode) ||
+          useInventoryStore.getState().getById(item.barcode);
+
         return {
           barcode: item.barcode,
           brand: item.brand,
           name: item.name,
-          size: item.size || invProduct?.size || '',
+          size: item.size || invProduct?.size || '100 ml',
           unitPrice: item.unitPrice,
           stock: invProduct ? invProduct.stock : 99,
           quantity: item.quantity,
