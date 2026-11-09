@@ -24,3 +24,11 @@ export interface StoreGeneralSettings {
 }
 
 export type SettingsTabId = 'store' | 'inventory' | 'whatsapp' | 'users';
+
+export type StoreSettingsTabId =
+  | 'identity'
+  | 'announcement'
+  | 'contact'
+  | 'location'
+  | 'hours_social';
+

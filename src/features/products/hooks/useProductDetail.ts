@@ -64,6 +64,14 @@ export const useProductDetail = () => {
   };
 
   const handleRecordEntry = () => {
+    if (product) {
+      const params = new URLSearchParams({
+        barcode: product.barcode,
+        productId: product.id,
+      });
+      navigate(`${RoutesView.STOCK_ENTRY}?${params.toString()}`);
+      return;
+    }
     navigate(RoutesView.STOCK_ENTRY);
   };
 

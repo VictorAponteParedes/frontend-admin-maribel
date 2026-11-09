@@ -19,7 +19,7 @@ export const useSettingsForm = () => {
     watch,
     setValue,
     reset,
-    formState: { isDirty, isSubmitting },
+    formState: { isDirty, isSubmitting, errors },
   } = useForm<StoreGeneralSettings>({
     defaultValues: settings,
     mode: 'onTouched',
@@ -97,6 +97,7 @@ export const useSettingsForm = () => {
       watchedValues,
       isDirty,
       isSubmitting: isSubmitting || isLoading,
+      errors,
     },
     actions: {
       onSubmit,

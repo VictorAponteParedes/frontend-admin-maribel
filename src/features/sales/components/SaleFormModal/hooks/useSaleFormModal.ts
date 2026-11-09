@@ -121,9 +121,27 @@ export const useSaleFormModal = () => {
         })),
       });
 
-      // Descontar inventario local únicamente tras confirmación exitosa del backend
+      // Descontar inventario local y alertar si algún producto quedó en 0 o stock crítico
+      const depletedNames: string[] = [];
       for (const item of cart.cartItems) {
+        const currentProd =
+          getByBarcode(item.barcode) ||
+          useInventoryStore.getState().getById(item.barcode);
+        const remainingAfterSale = currentProd
+          ? Math.max(0, currentProd.stock - item.quantity)
+          : Math.max(0, item.stock - item.quantity);
+
+        if (remainingAfterSale === 0) {
+          depletedNames.push(`${item.brand} ${item.name}`);
+        }
         deductStock(item.barcode, item.quantity);
+      }
+
+      if (depletedNames.length > 0) {
+        toast.warning(
+          '¡Alerta de Stock Agotado (0 uds)!',
+          `${depletedNames.join(', ')} quedó sin existencias. Registra un ingreso para reponer.`
+        );
       }
 
       setSuccessMessage(t('saleSaved'));

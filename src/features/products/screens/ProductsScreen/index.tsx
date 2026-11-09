@@ -11,7 +11,7 @@ import { ProductsTabsHeader } from '../../components/ProductsTabsHeader';
 import { ProductsFilterBar } from '../../components/ProductsFilterBar';
 import { useProductsList } from '../../hooks/useProductsList';
 import { useTranslation } from '@/locale';
-import { PackagePlus, FileSpreadsheet } from 'lucide-react';
+import { PackagePlus, FileSpreadsheet, AlertTriangle } from 'lucide-react';
 
 export const ProductsScreen: React.FC = () => {
   const { t } = useTranslation(['inventory', 'translation']);
@@ -61,7 +61,59 @@ export const ProductsScreen: React.FC = () => {
         }
       />
 
-      <ProductsMetricsBar metrics={metrics} />
+      <ProductsMetricsBar
+        metrics={metrics}
+        onClickCritical={actions.toggleFilterLowStock}
+      />
+
+      {metrics.lowStockCount > 0 && (
+        <div
+          className={`mb-5 p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+            metrics.outOfStockCount > 0
+              ? 'bg-rose-50 border-rose-300 text-rose-900'
+              : 'bg-amber-50 border-amber-300 text-amber-900'
+          }`}
+        >
+          <div className="flex items-start gap-3">
+            <div
+              className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 mt-0.5 ${
+                metrics.outOfStockCount > 0
+                  ? 'bg-rose-600 text-white'
+                  : 'bg-amber-500 text-white'
+              }`}
+            >
+              <AlertTriangle className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-xs font-bold">
+                {metrics.outOfStockCount > 0
+                  ? `¡Atención! Tienes ${metrics.outOfStockCount} producto(s) agotado(s) en 0 unidades`
+                  : `Alerta de inventario: ${metrics.lowStockCount} producto(s) con stock crítico (≤ ${metrics.lowStockThreshold} uds)`}
+              </p>
+              <p className="text-[11px] opacity-85 mt-0.5">
+                {(metrics.outOfStockCount > 0
+                  ? metrics.outOfStockProducts
+                  : metrics.lowStockProducts
+                )
+                  .slice(0, 4)
+                  .map((p) => `${p.brand} ${p.name} (${p.stock} uds)`)
+                  .join(' · ')}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              type="button"
+              variant="secondary"
+              size="xs"
+              onClick={actions.toggleFilterLowStock}
+            >
+              {filterLowStock ? 'Ver todos' : 'Filtrar críticos'}
+            </Button>
+          </div>
+        </div>
+      )}
 
       <section className="bg-white rounded-2xl border border-stone-200/80 shadow-xs overflow-hidden">
         <ProductsTabsHeader

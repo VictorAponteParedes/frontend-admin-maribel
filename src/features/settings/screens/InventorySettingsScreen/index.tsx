@@ -15,11 +15,13 @@ import { Button } from '@/components/ui';
 import { ToggleSwitch } from '@/componentes/ToggleSwitch';
 import { RoutesView } from '@/navigation/routes';
 import { useSettingsStore } from '../../store/useSettingsStore';
+import { useInventoryStore } from '@/store/useInventoryStore';
 import { toast } from '@/store/useToastStore';
 
 export const InventorySettingsScreen: React.FC = () => {
   const navigate = useNavigate();
   const { settings, isLoading, fetchSettings, saveSettings } = useSettingsStore();
+  const { products, fetchProducts } = useInventoryStore();
 
   const [showStockInWeb, setShowStockInWeb] = useState<boolean>(
     settings.showStockInWeb ?? true
@@ -34,7 +36,12 @@ export const InventorySettingsScreen: React.FC = () => {
 
   useEffect(() => {
     fetchSettings();
-  }, [fetchSettings]);
+    if (products.length === 0) {
+      fetchProducts();
+    }
+  }, [fetchSettings, fetchProducts, products.length]);
+
+  const affectedProducts = products.filter((p) => p.stock <= lowStockThreshold);
 
   useEffect(() => {
     setShowStockInWeb(settings.showStockInWeb ?? true);
@@ -219,6 +226,74 @@ export const InventorySettingsScreen: React.FC = () => {
                 />
                 <span className="text-xs font-semibold text-stone-500">uds</span>
               </div>
+            </div>
+
+            {/* Lista en vivo de productos actualmente en alerta según este umbral */}
+            <div className="pt-4 border-t border-stone-100 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-stone-800">
+                  Productos en alerta con umbral ≤ {lowStockThreshold} uds ({affectedProducts.length})
+                </span>
+                {affectedProducts.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => navigate(RoutesView.STOCK_ENTRY)}
+                    className="text-[11px] font-bold text-maribel-700 hover:underline cursor-pointer"
+                  >
+                    + Ir a Registrar Ingreso
+                  </button>
+                )}
+              </div>
+
+              {affectedProducts.length === 0 ? (
+                <p className="text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">
+                  Todo tu catálogo supera las {lowStockThreshold} unidades actualmente.
+                </p>
+              ) : (
+                <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1">
+                  {affectedProducts.map((prod) => (
+                    <div
+                      key={prod.id}
+                      className={`px-3 py-2 rounded-xl border flex items-center justify-between text-xs ${
+                        prod.stock <= 0
+                          ? 'bg-rose-50 border-rose-200 text-rose-900'
+                          : 'bg-amber-50/70 border-amber-200 text-amber-900'
+                      }`}
+                    >
+                      <div className="truncate pr-2">
+                        <span className="font-bold uppercase text-[10px] mr-1.5">
+                          {prod.brand}
+                        </span>
+                        <span className="font-medium">{prod.name}</span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            prod.stock <= 0
+                              ? 'bg-rose-600 text-white'
+                              : 'bg-amber-200/80 text-amber-900'
+                          }`}
+                        >
+                          {prod.stock <= 0 ? 'AGOTADO · 0 uds' : `${prod.stock} uds`}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate(
+                              `${RoutesView.STOCK_ENTRY}?barcode=${encodeURIComponent(
+                                prod.barcode
+                              )}&productId=${encodeURIComponent(prod.id)}`
+                            )
+                          }
+                          className="px-2 py-0.5 rounded-lg bg-maribel-700 hover:bg-maribel-800 text-white text-[10px] font-bold transition-colors cursor-pointer"
+                        >
+                          Reponer
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

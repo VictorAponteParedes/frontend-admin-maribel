@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useOrdersStore } from '@/store/useOrdersStore';
+import { useInventoryStore } from '@/store/useInventoryStore';
+import { useSettingsStore } from '@/features/settings/store/useSettingsStore';
 import { useSidebarStore } from '@/store/useSidebarStore';
 import { RoutesView } from '@/navigation/routes';
 import { useTranslation } from '@/locale';
@@ -28,16 +30,28 @@ export const useSidebarNav = () => {
   const navigate = useNavigate();
   const { user, logout, hasPermission, hasRole } = useAuthStore();
   const { orders, metrics, fetchMetrics } = useOrdersStore();
+  const { products, fetchProducts } = useInventoryStore();
+  const lowStockThreshold = useSettingsStore(
+    (state) => state.settings.lowStockThreshold ?? 5
+  );
   const { isCollapsed, toggleCollapse, isMobileOpen, closeMobile } = useSidebarStore();
   const [isSettingsExpanded, setIsSettingsExpanded] = useState<boolean>(true);
 
   useEffect(() => {
     fetchMetrics();
-  }, [fetchMetrics]);
+    if (products.length === 0) {
+      fetchProducts();
+    }
+  }, [fetchMetrics, fetchProducts, products.length]);
 
   const pendingOrdersCount = useMemo(
     () => metrics.pendingCount || orders.filter((o) => o.status === 'PENDING').length,
     [metrics.pendingCount, orders]
+  );
+
+  const criticalStockCount = useMemo(
+    () => products.filter((p) => p.stock <= lowStockThreshold).length,
+    [products, lowStockThreshold]
   );
 
   const isSettingsActive = useMemo(
@@ -95,6 +109,7 @@ export const useSidebarNav = () => {
         path: RoutesView.PRODUCTS,
         label: t('nav.inventory'),
         icon: Package,
+        badge: criticalStockCount > 0 ? criticalStockCount : undefined,
         requiredPermission: Permission.PRODUCTS_VIEW,
         isActive:
           location.pathname === RoutesView.PRODUCTS ||
@@ -169,7 +184,7 @@ export const useSidebarNav = () => {
         ],
       },
     ],
-    [location.pathname, pendingOrdersCount, isSettingsActive, t]
+    [location.pathname, pendingOrdersCount, criticalStockCount, isSettingsActive, t]
   );
 
   const navItems: NavItemConfig[] = useMemo(() => {

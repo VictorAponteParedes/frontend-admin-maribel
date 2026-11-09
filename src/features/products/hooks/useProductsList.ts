@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useInventoryStore } from "@/store/useInventoryStore";
 import { useStockEntryStore } from "@/store/useStockEntryStore";
+import { useSettingsStore } from "@/features/settings/store/useSettingsStore";
 import { RoutesView } from "@/navigation/routes";
 import { ProductFormData, Product } from "../types/product.types";
 import { StockEntry } from "../types/stockEntry.types";
@@ -12,6 +13,10 @@ export interface ProductsMetrics {
   totalCatalogCount: number;
   totalStockUnits: number;
   lowStockCount: number;
+  outOfStockCount: number;
+  lowStockThreshold: number;
+  outOfStockProducts: Product[];
+  lowStockProducts: Product[];
   totalEntriesUnits: number;
 }
 
@@ -20,6 +25,9 @@ export const useProductsList = () => {
   const { products, addProduct, fetchProducts, isLoading } =
     useInventoryStore();
   const { entries, fetchEntries } = useStockEntryStore();
+  const lowStockThreshold = useSettingsStore(
+    (state) => state.settings.lowStockThreshold ?? 5
+  );
 
   const [activeTab, setActiveTab] = useState<ProductTab>("stock");
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -62,11 +70,11 @@ export const useProductsList = () => {
         product.barcode.includes(q);
 
       if (filterLowStock) {
-        return matchesSearch && product.stock <= 5;
+        return matchesSearch && product.stock <= lowStockThreshold;
       }
       return matchesSearch;
     });
-  }, [products, searchQuery, selectedCategory, filterLowStock]);
+  }, [products, searchQuery, selectedCategory, filterLowStock, lowStockThreshold]);
 
   // Filtrado de ingresos
   const filteredEntries = useMemo<StockEntry[]>(() => {
@@ -95,17 +103,22 @@ export const useProductsList = () => {
 
   // Métricas
   const metrics: ProductsMetrics = useMemo(() => {
-    const lowStockCount = products.filter((p) => p.stock <= 5).length;
+    const outOfStockProducts = products.filter((p) => p.stock <= 0);
+    const lowStockProducts = products.filter((p) => p.stock <= lowStockThreshold);
     const totalStockUnits = products.reduce((acc, p) => acc + p.stock, 0);
     const totalEntriesUnits = entries.reduce((acc, e) => acc + e.quantity, 0);
 
     return {
       totalCatalogCount: products.length,
       totalStockUnits,
-      lowStockCount,
+      lowStockCount: lowStockProducts.length,
+      outOfStockCount: outOfStockProducts.length,
+      lowStockThreshold,
+      outOfStockProducts,
+      lowStockProducts,
       totalEntriesUnits,
     };
-  }, [products, entries]);
+  }, [products, entries, lowStockThreshold]);
 
   const handleCreateProduct = (data: ProductFormData) => {
     addProduct(data);

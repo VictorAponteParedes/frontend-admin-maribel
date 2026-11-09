@@ -5,7 +5,8 @@ import { formatCurrency } from '@/utils/formatters';
 import { RoutesView } from '@/navigation/routes';
 import { useTranslation } from '@/locale';
 import { Button } from '@/components/ui';
-import { Barcode, Eye, TrendingUp, Calendar, Tag } from 'lucide-react';
+import { useSettingsStore } from '@/features/settings/store/useSettingsStore';
+import { Barcode, Eye, TrendingUp, Calendar, Tag, AlertTriangle, PackagePlus } from 'lucide-react';
 
 export interface ProductTableProps {
   products: Product[];
@@ -15,9 +16,20 @@ export interface ProductTableProps {
 export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
   const { t } = useTranslation(['inventory', 'translation']);
   const navigate = useNavigate();
+  const lowStockThreshold = useSettingsStore(
+    (state) => state.settings.lowStockThreshold ?? 5
+  );
 
   const handleViewDetail = (productId: string) => {
     navigate(RoutesView.productDetail(productId));
+  };
+
+  const handleRestock = (product: Product) => {
+    const params = new URLSearchParams({
+      barcode: product.barcode,
+      productId: product.id,
+    });
+    navigate(`${RoutesView.STOCK_ENTRY}?${params.toString()}`);
   };
 
   return (
@@ -53,9 +65,20 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
         <tbody className="divide-y divide-stone-100">
           {products.map((product) => {
             const profit = product.profit || product.price - product.costPrice;
+            const isOutOfStock = product.stock <= 0;
+            const isLowStock = !isOutOfStock && product.stock <= lowStockThreshold;
 
             return (
-              <tr key={product.id} className="hover:bg-stone-50/70 transition-colors">
+              <tr
+                key={product.id}
+                className={`transition-colors ${
+                  isOutOfStock
+                    ? 'bg-rose-50/75 hover:bg-rose-100/70 border-l-4 border-l-rose-500'
+                    : isLowStock
+                    ? 'bg-amber-50/40 hover:bg-amber-50/80 border-l-4 border-l-amber-400'
+                    : 'hover:bg-stone-50/70'
+                }`}
+              >
                 {/* Código de barras */}
                 <td className="px-5 py-3.5 font-mono text-[11px] text-stone-600 whitespace-nowrap">
                   <div className="flex items-center space-x-1.5">
@@ -130,31 +153,52 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                 {/* Saldo Stock */}
                 <td className="px-4 py-3.5 text-center whitespace-nowrap">
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                      product.stock === 0
-                        ? 'bg-rose-50 text-rose-700 border border-rose-200'
-                        : product.stock <= 5
-                        ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                    className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                      isOutOfStock
+                        ? 'bg-rose-600 text-white shadow-2xs'
+                        : isLowStock
+                        ? 'bg-amber-100 text-amber-800 border border-amber-300'
                         : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                     }`}
                   >
-                    {product.stock} {t('units')}
+                    {(isOutOfStock || isLowStock) && (
+                      <AlertTriangle className="w-3 h-3 shrink-0" />
+                    )}
+                    <span>
+                      {isOutOfStock
+                        ? `AGOTADO · 0 ${t('units')}`
+                        : `${product.stock} ${t('units')}`}
+                    </span>
                   </span>
                 </td>
 
-                {/* Botón de Detalle que navega a vista dedicada */}
+                {/* Botón de Detalle y Reposición Rápida */}
                 <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="xs"
-                    leftIcon={<Eye className="w-3.5 h-3.5" />}
-                    onClick={() => handleViewDetail(product.id)}
-                    className="hover:bg-maribel-700 hover:text-white"
-                    title={t('table.viewDetailTooltip')}
-                  >
-                    {t('table.detail')}
-                  </Button>
+                  <div className="inline-flex items-center gap-1.5">
+                    {isOutOfStock && (
+                      <Button
+                        type="button"
+                        variant="primary"
+                        size="xs"
+                        leftIcon={<PackagePlus className="w-3.5 h-3.5" />}
+                        onClick={() => handleRestock(product)}
+                        title="Reponer stock de este producto"
+                      >
+                        Reponer
+                      </Button>
+                    )}
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="xs"
+                      leftIcon={<Eye className="w-3.5 h-3.5" />}
+                      onClick={() => handleViewDetail(product.id)}
+                      className="hover:bg-maribel-700 hover:text-white"
+                      title={t('table.viewDetailTooltip')}
+                    >
+                      {t('table.detail')}
+                    </Button>
+                  </div>
                 </td>
               </tr>
             );

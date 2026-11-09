@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useInventoryStore } from '@/store/useInventoryStore';
 import { useStockEntryStore } from '@/store/useStockEntryStore';
 import { toast } from '@/store/useToastStore';
 import { RoutesView } from '@/navigation/routes';
 import { useTranslation } from '@/locale';
+import { Product } from '../types/product.types';
 import {
   StockEntryFormValues,
   StockEntryCalculatedMetrics,
@@ -19,7 +20,9 @@ import {
 export const useStockEntryForm = () => {
   const { t } = useTranslation(['inventory', 'translation']);
   const navigate = useNavigate();
-  const { getByBarcode, recordIncomingStock, addProduct } = useInventoryStore();
+  const [searchParams] = useSearchParams();
+  const { products, fetchProducts, getByBarcode, getById, recordIncomingStock, addProduct } =
+    useInventoryStore();
   const { recordStockEntry } = useStockEntryStore();
 
   const [isScannerOpen, setIsScannerOpen] = useState(false);
@@ -71,12 +74,9 @@ export const useStockEntryForm = () => {
     existingProduct
   );
 
-  const applyMatchedProduct = (barcode: string) => {
-    const clean = barcode.trim();
-    if (!clean) return;
-
-    const matched = getByBarcode(clean);
-    if (matched) {
+  const fillFormWithProduct = useCallback(
+    (matched: Product) => {
+      setValue('barcode', matched.barcode, { shouldValidate: true, shouldDirty: true });
       setValue('brand', matched.brand, { shouldValidate: true, shouldDirty: true });
       setValue('name', matched.name, { shouldValidate: true, shouldDirty: true });
       setValue('size', matched.size, { shouldValidate: true, shouldDirty: true });
@@ -89,8 +89,45 @@ export const useStockEntryForm = () => {
         matched.images || (matched.imageUrl ? [matched.imageUrl] : []),
         { shouldValidate: true, shouldDirty: true }
       );
+    },
+    [setValue]
+  );
+
+  const applyMatchedProduct = useCallback(
+    (barcode: string) => {
+      const clean = barcode.trim();
+      if (!clean) return;
+
+      const matched = getByBarcode(clean);
+      if (matched) {
+        fillFormWithProduct(matched);
+      }
+    },
+    [getByBarcode, fillFormWithProduct]
+  );
+
+  useEffect(() => {
+    if (products.length === 0) {
+      fetchProducts();
     }
-  };
+  }, [products.length, fetchProducts]);
+
+  useEffect(() => {
+    const paramBarcode = searchParams.get('barcode')?.trim();
+    const paramProductId = searchParams.get('productId')?.trim();
+
+    if (!paramBarcode && !paramProductId) return;
+
+    const matched =
+      (paramProductId ? getById(paramProductId) : undefined) ||
+      (paramBarcode ? getByBarcode(paramBarcode) : undefined);
+
+    if (matched) {
+      fillFormWithProduct(matched);
+    } else if (paramBarcode) {
+      setValue('barcode', paramBarcode, { shouldValidate: true });
+    }
+  }, [searchParams, products, getById, getByBarcode, fillFormWithProduct, setValue]);
 
   const handleBarcodeChange = (newBarcode: string) => {
     setValue('barcode', newBarcode, { shouldValidate: true, shouldDirty: true });

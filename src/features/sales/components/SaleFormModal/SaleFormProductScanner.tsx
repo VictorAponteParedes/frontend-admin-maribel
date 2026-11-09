@@ -136,6 +136,7 @@ export const SaleFormProductScanner: React.FC<SaleFormProductScannerProps> = ({
         <div className="flex flex-wrap gap-1.5 max-h-28 overflow-y-auto">
           {quickProducts.slice(0, 6).map((p) => {
             const inCart = cartItems.find((ci) => ci.barcode === p.barcode);
+            const isDepleted = p.stock <= 0;
             return (
               <Button
                 key={p.id}
@@ -144,15 +145,25 @@ export const SaleFormProductScanner: React.FC<SaleFormProductScannerProps> = ({
                 variant={inCart ? 'primary' : 'secondary'}
                 onClick={() => onAddToCart(p, 1)}
                 className={`text-[11px] font-medium rounded-xl transition-all text-left flex items-center gap-1.5 ${
-                  inCart
+                  isDepleted
+                    ? '!bg-rose-50 !text-rose-700 border border-rose-200 opacity-85'
+                    : inCart
                     ? '!bg-rose-100 !text-maribel-900 border border-rose-300 font-semibold'
                     : '!bg-stone-100 hover:!bg-stone-200/80 text-stone-700'
                 }`}
               >
                 <span className="font-bold">{p.brand}</span>
                 <span className="truncate max-w-[120px]">{p.name}</span>
-                <strong className="text-emerald-700 font-mono text-[10px]">
-                  ({p.stock})
+                <strong
+                  className={`font-mono text-[10px] ${
+                    isDepleted
+                      ? 'text-rose-600'
+                      : p.stock <= 5
+                      ? 'text-amber-700'
+                      : 'text-emerald-700'
+                  }`}
+                >
+                  {isDepleted ? '(0 · Agotado)' : `(${p.stock})`}
                 </strong>
                 {inCart && (
                   <span className="w-4 h-4 rounded-full bg-maribel-700 text-white text-[9px] flex items-center justify-center font-bold">
