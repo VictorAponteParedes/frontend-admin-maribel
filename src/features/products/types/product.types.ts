@@ -20,6 +20,8 @@ export interface Product {
   webPrice?: number | null;
   imageUrl?: string | null;
   imageId?: string | null;
+  images?: string[];
+  description?: string | null;
 }
 
 export interface ProductFormData {
@@ -35,6 +37,8 @@ export interface ProductFormData {
   receptionDate?: string;
   imageId?: string;
   imageUrl?: string;
+  images?: string[];
+  description?: string;
 }
 
 export interface BulkImportProductItem {

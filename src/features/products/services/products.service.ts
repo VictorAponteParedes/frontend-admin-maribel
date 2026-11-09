@@ -118,6 +118,8 @@ export const productsService = {
       categoryId?: string;
       categoryName?: string;
       imageId?: string;
+      images?: string[];
+      description?: string;
       name?: string;
       price?: number;
       costPrice?: number;

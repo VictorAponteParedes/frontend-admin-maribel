@@ -12,7 +12,8 @@ export interface StockEntryProductDataCardProps {
   existingProduct?: Product;
   imageUrl?: string;
   imageId?: string;
-  onImageChange?: (data: { imageUrl: string; imageId?: string }) => void;
+  images?: string[];
+  onImageChange?: (data: { imageUrl: string; imageId?: string; images?: string[] }) => void;
   onOpenScanner: () => void;
   onBarcodeChange: (barcode: string) => void;
 }
@@ -22,6 +23,7 @@ export const StockEntryProductDataCard: React.FC<StockEntryProductDataCardProps>
   existingProduct,
   imageUrl,
   imageId,
+  images,
   onImageChange,
   onOpenScanner,
   onBarcodeChange,
@@ -134,8 +136,9 @@ export const StockEntryProductDataCard: React.FC<StockEntryProductDataCardProps>
         <ProductImageUploader
           imageUrl={imageUrl}
           imageId={imageId}
+          images={images}
           onImageChange={(data) => onImageChange?.(data)}
-          label="Foto / Imagen del Perfume"
+          label="Foto / Galería del Perfume"
         />
       </div>
     </div>

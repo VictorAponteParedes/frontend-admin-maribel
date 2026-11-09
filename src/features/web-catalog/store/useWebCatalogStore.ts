@@ -56,6 +56,10 @@ function mapProductToWebProduct(prod: Product): WebProduct {
     ? resolveImageUrl(prod.imageUrl)
     : 'https://images.unsplash.com/photo-1594035910387-fea47794261f?auto=format&fit=crop&w=500&q=80';
 
+  const images = Array.isArray(prod.images) && prod.images.length > 0
+    ? prod.images.map(resolveImageUrl)
+    : [resolvedImage];
+
   return {
     id: prod.id,
     barcode: prod.barcode,
@@ -67,6 +71,7 @@ function mapProductToWebProduct(prod: Product): WebProduct {
     webPrice: prod.webPrice ?? prod.price,
     stockQuantity: prod.stock,
     imageUrl: resolvedImage,
+    images,
     imageId: prod.imageId,
     isWebVisible: Boolean(prod.isWebVisible),
     webCategory: categoryName,
@@ -166,6 +171,7 @@ export const useWebCatalogStore = create<WebCatalogState>((set, get) => ({
         webPrice: updates.webPrice,
         categoryName: updates.webCategory,
         imageId: updates.imageId || undefined,
+        images: updates.images,
       });
 
       set((state) => ({

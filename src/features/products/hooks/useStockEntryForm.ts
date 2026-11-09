@@ -37,6 +37,7 @@ export const useStockEntryForm = () => {
       batchNumber: generateDefaultBatchNumber(),
       imageId: '',
       imageUrl: '',
+      images: [],
     },
     mode: 'onTouched',
   });
@@ -49,10 +50,15 @@ export const useStockEntryForm = () => {
   const watchedSellingPrice = watch('sellingPrice');
   const watchedImageUrl = watch('imageUrl');
   const watchedImageId = watch('imageId');
+  const watchedImages = watch('images') || [];
 
-  const handleImageChange = (imageData: { imageUrl: string; imageId?: string }) => {
+  const handleImageChange = (imageData: { imageUrl: string; imageId?: string; images?: string[] }) => {
     setValue('imageUrl', imageData.imageUrl, { shouldValidate: true, shouldDirty: true });
     setValue('imageId', imageData.imageId || '', { shouldValidate: true, shouldDirty: true });
+    setValue('images', imageData.images || (imageData.imageUrl ? [imageData.imageUrl] : []), {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
 
   const cleanBarcode = (watchedBarcode || '').trim();
@@ -78,6 +84,11 @@ export const useStockEntryForm = () => {
       setValue('sellingPrice', matched.price || 0, { shouldValidate: true, shouldDirty: true });
       setValue('imageUrl', matched.imageUrl || '', { shouldValidate: true, shouldDirty: true });
       setValue('imageId', matched.imageId || '', { shouldValidate: true, shouldDirty: true });
+      setValue(
+        'images',
+        matched.images || (matched.imageUrl ? [matched.imageUrl] : []),
+        { shouldValidate: true, shouldDirty: true }
+      );
     }
   };
 
@@ -149,6 +160,7 @@ export const useStockEntryForm = () => {
           receptionDate: data.receptionDate,
           imageId: data.imageId || undefined,
           imageUrl: data.imageUrl || undefined,
+          images: data.images,
         });
       }
 
@@ -191,6 +203,7 @@ export const useStockEntryForm = () => {
     watchedSellingPrice,
     imageUrl: watchedImageUrl,
     imageId: watchedImageId,
+    images: watchedImages,
     scanner: {
       isOpen: isScannerOpen,
       openScanner: () => setIsScannerOpen(true),

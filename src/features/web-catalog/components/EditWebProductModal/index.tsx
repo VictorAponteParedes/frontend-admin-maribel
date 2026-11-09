@@ -38,12 +38,10 @@ export const EditWebProductModal: React.FC<EditWebProductModalProps> = ({
 
         {/* Form Body */}
         <form onSubmit={actions.handleSubmit} className="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
-          {/* Subida / Preview de Imagen */}
+          {/* Subida / Preview de Múltiples Imágenes */}
           <EditWebProductImageUploader
-            imageUrl={state.imageUrl}
-            onImageUrlChange={actions.setImageUrl}
-            onFileUpload={actions.handleImageUpload}
-            isUploading={state.isUploadingImage}
+            images={state.images}
+            onImagesChange={actions.setImages}
           />
 
           {/* Switch de Visibilidad */}

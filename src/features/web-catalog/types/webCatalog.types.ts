@@ -14,6 +14,7 @@ export interface WebProduct {
   stockQuantity: number;
   imageUrl: string;
   imageId?: string | null;
+  images?: string[];
   isWebVisible: boolean;
   webCategory: WebCategory;
   webBadge?: WebBadge;
@@ -39,6 +40,7 @@ export interface WebCombo {
   savingsAmount: number;
   discountBadge: string;
   imageUrl: string;
+  images?: string[];
   isActive: boolean;
   createdAt: string;
 }

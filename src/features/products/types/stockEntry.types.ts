@@ -31,6 +31,7 @@ export interface StockEntryFormValues {
   batchNumber: string;
   imageId?: string;
   imageUrl?: string;
+  images?: string[];
 }
 
 export interface StockEntryCalculatedMetrics {
