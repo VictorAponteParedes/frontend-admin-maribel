@@ -14,6 +14,7 @@ export enum Permission {
   // Combos
   COMBOS_VIEW = 'combos:view',
   COMBOS_MANAGE = 'combos:manage',
+  COMBOS_DELETE = 'combos:delete',
 
   // Ventas (POS)
   SALES_VIEW = 'sales:view',

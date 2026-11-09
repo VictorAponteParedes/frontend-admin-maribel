@@ -3,7 +3,7 @@ import { Gift, Plus, Trash2, Sparkles, CheckCircle2, Loader2, Edit3 } from 'luci
 import { useWebCatalogStore } from '../store/useWebCatalogStore';
 import { WebCombo } from '../types/webCatalog.types';
 import { Button } from '@/components/ui';
-import { ToggleSwitch, ConfirmModal } from '@/componentes';
+import { ToggleSwitch, ConfirmModal, Can } from '@/componentes';
 import { resolveImageUrl } from '@/services/files.service';
 import { CreateComboModal } from './CreateComboModal/index';
 import { EditComboModal } from './EditComboModal/index';
@@ -174,14 +174,16 @@ export const CombosCreatorTab: React.FC = () => {
                     <Edit3 className="w-4 h-4" />
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setComboToDelete(combo)}
-                    className="p-1.5 text-stone-400 hover:text-rose-600 rounded-lg hover:bg-stone-100 transition-colors cursor-pointer"
-                    title="Eliminar combo"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <Can role="ADMIN">
+                    <button
+                      type="button"
+                      onClick={() => setComboToDelete(combo)}
+                      className="p-1.5 text-stone-400 hover:text-rose-600 rounded-lg hover:bg-stone-100 transition-colors cursor-pointer"
+                      title="Eliminar combo"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </Can>
                 </div>
               </div>
             </div>

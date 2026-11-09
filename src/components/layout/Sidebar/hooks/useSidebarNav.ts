@@ -131,7 +131,7 @@ export const useSidebarNav = () => {
         path: RoutesView.USERS,
         label: 'Equipo & Roles',
         icon: ShieldCheck,
-        requiredPermission: Permission.USERS_VIEW,
+        requiredRole: 'ADMIN',
         isActive:
           location.pathname === RoutesView.USERS ||
           location.pathname.startsWith(`${RoutesView.USERS}/`),
@@ -140,14 +140,14 @@ export const useSidebarNav = () => {
         path: RoutesView.SETTINGS_STORE,
         label: t('nav.settings'),
         icon: Settings,
-        requiredPermission: Permission.SETTINGS_VIEW,
+        requiredRole: 'ADMIN',
         isActive: isSettingsActive,
         subItems: [
           {
             path: RoutesView.SETTINGS_STORE,
             label: 'Datos de la Tienda (Web)',
             icon: Store,
-            requiredPermission: Permission.SETTINGS_VIEW,
+            requiredRole: 'ADMIN',
             isActive:
               location.pathname === RoutesView.SETTINGS_STORE ||
               location.pathname === RoutesView.SETTINGS,
@@ -156,14 +156,14 @@ export const useSidebarNav = () => {
             path: RoutesView.SETTINGS_INVENTORY,
             label: 'Inventario & Alertas',
             icon: Boxes,
-            requiredPermission: Permission.SETTINGS_VIEW,
+            requiredRole: 'ADMIN',
             isActive: location.pathname === RoutesView.SETTINGS_INVENTORY,
           },
           {
             path: RoutesView.SETTINGS_WHATSAPP,
             label: 'Integración WhatsApp',
             icon: MessageSquare,
-            requiredPermission: Permission.SETTINGS_VIEW,
+            requiredRole: 'ADMIN',
             isActive: location.pathname === RoutesView.SETTINGS_WHATSAPP,
           },
         ],

@@ -4,7 +4,6 @@ import { PrivateLayout } from '@/navigation/PrivateLayout';
 import { RoutesView } from '@/navigation/routes';
 import type { RouteConfig } from '@/navigation/types';
 import { LoadingSpinner } from '@/components/ui';
-import { Permission } from '@/types/permissions';
 
 const UsersScreen = lazyLoad(() =>
   import('./screens/UsersScreen').then((module) => ({
@@ -23,7 +22,7 @@ export const USERS_ROUTES: RouteConfig[] = [
       </PrivateLayout>
     ),
     isProtected: true,
-    requiredPermission: Permission.USERS_VIEW,
+    requiredRole: 'ADMIN',
   },
 ];
 

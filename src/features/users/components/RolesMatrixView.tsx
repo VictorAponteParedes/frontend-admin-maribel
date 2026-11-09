@@ -146,10 +146,17 @@ export const RolesMatrixView: React.FC = () => {
       icon: Layers,
       actions: [
         {
-          name: 'Crear y gestionar Combos/Kits de regalo',
+          name: 'Crear y editar Combos/Kits de regalo',
           description: 'Armar paquetes especiales de fragancias con precio promocional.',
           admin: true,
           manager: true,
+          staff: false,
+        },
+        {
+          name: 'Eliminar combos promocionales',
+          description: 'Dar de baja permanentemente sets o combos del sistema.',
+          admin: true,
+          manager: false,
           staff: false,
         },
         {
@@ -173,15 +180,15 @@ export const RolesMatrixView: React.FC = () => {
           staff: true,
         },
         {
-          name: 'Actualizar estado del pedido',
-          description: 'Marcar como Empacado, En camino o Entregado.',
+          name: 'Actualizar estado del pedido (o marcar cancelado)',
+          description: 'Marcar como Empacado, En camino, Entregado o Cancelado.',
           admin: true,
           manager: true,
           staff: true,
         },
         {
-          name: 'Eliminar o anular pedidos web',
-          description: 'Descartar órdenes no concretadas o canceladas.',
+          name: 'Eliminar pedido de la base de datos',
+          description: 'Borrado permanente del registro de la orden.',
           admin: true,
           manager: false,
           staff: false,

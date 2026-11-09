@@ -6,7 +6,6 @@ import { PrivateLayout } from '../../navigation/PrivateLayout';
 import { RoutesView } from '../../navigation/routes';
 import type { RouteConfig } from '../../navigation/types';
 import { LoadingSpinner } from '@/components/ui';
-import { Permission } from '@/types/permissions';
 import { SettingsPlaceholderScreen } from './screens/SettingsPlaceholderScreen';
 
 const StoreSettingsScreen = lazyLoad(() =>
@@ -20,7 +19,7 @@ export const SETTINGS_ROUTES: RouteConfig[] = [
     path: RoutesView.SETTINGS,
     element: <Navigate to={RoutesView.SETTINGS_STORE} replace />,
     isProtected: true,
-    requiredPermission: Permission.SETTINGS_VIEW,
+    requiredRole: 'ADMIN',
   },
   {
     path: RoutesView.SETTINGS_STORE,
@@ -32,7 +31,7 @@ export const SETTINGS_ROUTES: RouteConfig[] = [
       </PrivateLayout>
     ),
     isProtected: true,
-    requiredPermission: Permission.SETTINGS_VIEW,
+    requiredRole: 'ADMIN',
   },
   {
     path: RoutesView.SETTINGS_INVENTORY,
@@ -52,7 +51,7 @@ export const SETTINGS_ROUTES: RouteConfig[] = [
       </PrivateLayout>
     ),
     isProtected: true,
-    requiredPermission: Permission.SETTINGS_VIEW,
+    requiredRole: 'ADMIN',
   },
   {
     path: RoutesView.SETTINGS_WHATSAPP,
@@ -71,7 +70,7 @@ export const SETTINGS_ROUTES: RouteConfig[] = [
       </PrivateLayout>
     ),
     isProtected: true,
-    requiredPermission: Permission.SETTINGS_VIEW,
+    requiredRole: 'ADMIN',
   },
 ];
 
