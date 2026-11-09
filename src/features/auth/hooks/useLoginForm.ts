@@ -51,7 +51,7 @@ export const useLoginForm = () => {
     try {
       const response = await authService.login(data);
 
-      login(response.user, response.token);
+      login(response.user, response.token, response.refreshToken);
 
       toast.success('¡Bienvenido!', 'Sesión iniciada correctamente.');
       navigate(RoutesView.DASHBOARD);

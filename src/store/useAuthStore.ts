@@ -16,7 +16,7 @@ interface AuthState {
   token: string | null;
   isAuthenticated: boolean;
   initAuth: () => void;
-  login: (user: AuthUser, token: string) => void;
+  login: (user: AuthUser, token: string, refreshToken?: string) => void;
   logout: () => void;
   hasRole: (role: UserRole | UserRole[]) => boolean;
   hasPermission: (permission: string) => boolean;
@@ -32,22 +32,24 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     role: "ADMIN",
     permissions: ["*"], // Super Admin wildcard
   },
-  token:
-    localStorage.getItem(APP_STORAGE_KEYS.AUTH_TOKEN) || "demo-admin-token",
-  isAuthenticated: true,
+  token: localStorage.getItem(APP_STORAGE_KEYS.AUTH_TOKEN),
+  isAuthenticated: Boolean(localStorage.getItem(APP_STORAGE_KEYS.AUTH_TOKEN)),
   initAuth: () => {
     const token = localStorage.getItem(APP_STORAGE_KEYS.AUTH_TOKEN);
     if (!token) {
-      // For demo we keep authenticated, but in production:
-      // set({ isAuthenticated: false, user: null, token: null });
+      set({ isAuthenticated: false, user: null, token: null });
     }
   },
-  login: (user: AuthUser, token: string) => {
+  login: (user: AuthUser, token: string, refreshToken?: string) => {
     localStorage.setItem(APP_STORAGE_KEYS.AUTH_TOKEN, token);
+    if (refreshToken) {
+      localStorage.setItem(APP_STORAGE_KEYS.AUTH_REFRESH_TOKEN, refreshToken);
+    }
     set({ user, token, isAuthenticated: true });
   },
   logout: () => {
     localStorage.removeItem(APP_STORAGE_KEYS.AUTH_TOKEN);
+    localStorage.removeItem(APP_STORAGE_KEYS.AUTH_REFRESH_TOKEN);
     set({ user: null, token: null, isAuthenticated: false });
   },
   hasRole: (roles: UserRole | UserRole[]) => {

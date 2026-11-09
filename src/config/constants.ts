@@ -3,6 +3,7 @@ export const API_BASE_URL =
 
 export const APP_STORAGE_KEYS = {
   AUTH_TOKEN: 'admin_auth_token',
+  AUTH_REFRESH_TOKEN: 'admin_refresh_token',
   THEME: 'admin_theme',
   LANGUAGE: 'admin_language',
 } as const;
