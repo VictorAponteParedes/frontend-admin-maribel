@@ -30,6 +30,7 @@ interface WebCatalogState {
     price: number;
     imageId?: string;
     imageUrl?: string;
+    images?: string[];
     items: ComboItemSelection[];
     isActive: boolean;
   }) => Promise<WebCombo | null>;
@@ -42,6 +43,7 @@ interface WebCatalogState {
       price?: number;
       imageId?: string;
       imageUrl?: string;
+      images?: string[];
       items?: ComboItemSelection[];
       isActive?: boolean;
     }
@@ -238,6 +240,7 @@ export const useWebCatalogStore = create<WebCatalogState>((set, get) => ({
         price: data.price,
         imageId: data.imageId,
         imageUrl: data.imageUrl,
+        images: data.images,
         isActive: data.isActive,
         items: data.items.map((i) => ({
           productId: i.productId,
@@ -274,6 +277,7 @@ export const useWebCatalogStore = create<WebCatalogState>((set, get) => ({
         price: data.price,
         imageId: data.imageId,
         imageUrl: data.imageUrl,
+        images: data.images,
         isActive: data.isActive,
         items: data.items
           ? data.items.map((i) => ({

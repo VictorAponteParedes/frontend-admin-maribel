@@ -50,10 +50,10 @@ export const EditComboModal: React.FC<EditComboModalProps> = ({
             />
 
             <CreateComboImageUploader
+              images={state.images}
+              onImagesChange={actions.setImages}
               imageUrl={state.imageUrl}
               onImageUrlChange={actions.setImageUrl}
-              onFileUpload={actions.handleImageUpload}
-              isUploading={state.isUploadingImage}
             />
           </div>
 

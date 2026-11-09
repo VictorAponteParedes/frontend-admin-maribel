@@ -14,6 +14,7 @@ export const useCreateComboForm = (onClose: () => void) => {
   const [kicker, setKicker] = useState('★ FAVORITO BOUTIQUE');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [images, setImages] = useState<string[]>([]);
   const [imageId, setImageId] = useState<string | undefined>(undefined);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -119,6 +120,11 @@ export const useCreateComboForm = (onClose: () => void) => {
     }
   };
 
+  const handleImagesChange = (newImages: string[]) => {
+    setImages(newImages);
+    setImageUrl(newImages[0] || '');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -128,6 +134,9 @@ export const useCreateComboForm = (onClose: () => void) => {
 
     setIsSubmitting(true);
     try {
+      const effectiveImages =
+        images.length > 0 ? images : imageUrl.trim() ? [imageUrl.trim()] : [];
+
       const created = await createCombo({
         title: title.trim(),
         kicker: kicker.trim() || '★ FAVORITO BOUTIQUE',
@@ -136,7 +145,8 @@ export const useCreateComboForm = (onClose: () => void) => {
           `Incluye: ${selectedItems.map((i) => `${i.productName} (x${i.quantity})`).join(' + ')} en estuche rígido con dedicatoria.`,
         price: numericPromoPrice,
         imageId,
-        imageUrl: imageUrl.trim() || undefined,
+        imageUrl: effectiveImages[0] || undefined,
+        images: effectiveImages,
         items: selectedItems,
         isActive,
       });
@@ -161,6 +171,7 @@ export const useCreateComboForm = (onClose: () => void) => {
       kicker,
       description,
       imageUrl,
+      images,
       imageId,
       isUploadingImage,
       isSubmitting,
@@ -179,6 +190,7 @@ export const useCreateComboForm = (onClose: () => void) => {
       setKicker,
       setDescription,
       setImageUrl,
+      setImages: handleImagesChange,
       setIsActive,
       setSearchProduct,
       handlePriceChange,

@@ -80,9 +80,9 @@ export const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                 }`}
               >
                 {/* Código de barras */}
-                <td className="px-5 py-3.5 font-mono text-[11px] text-stone-600 whitespace-nowrap">
+                <td className="px-5 py-3.5 font-mono text-xs font-extrabold text-stone-900 tracking-tight whitespace-nowrap">
                   <div className="flex items-center space-x-1.5">
-                    <Barcode className="w-3.5 h-3.5 text-stone-400 shrink-0" />
+                    <Barcode className="w-4 h-4 text-maribel-700 shrink-0" />
                     <span>{product.barcode}</span>
                   </div>
                 </td>

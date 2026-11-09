@@ -29,8 +29,8 @@ export const StockEntryTable: React.FC<StockEntryTableProps> = ({ entries }) => 
         <tbody className="divide-y divide-stone-100">
           {entries.map((entry) => (
             <tr key={entry.id} className="hover:bg-stone-50/70 transition-colors">
-              <td className="px-5 py-3.5 font-mono text-[11px] text-stone-600 flex items-center space-x-1.5 whitespace-nowrap">
-                <Barcode className="w-3.5 h-3.5 text-stone-400" />
+              <td className="px-5 py-3.5 font-mono text-xs font-extrabold text-stone-900 tracking-tight flex items-center space-x-1.5 whitespace-nowrap">
+                <Barcode className="w-4 h-4 text-maribel-700 shrink-0" />
                 <span>{entry.barcode}</span>
               </td>
               <td className="px-4 py-3.5 text-center whitespace-nowrap">

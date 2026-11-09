@@ -42,10 +42,10 @@ export const CreateComboModal: React.FC<CreateComboModalProps> = ({ isOpen, onCl
             />
 
             <CreateComboImageUploader
+              images={state.images}
+              onImagesChange={actions.setImages}
               imageUrl={state.imageUrl}
               onImageUrlChange={actions.setImageUrl}
-              onFileUpload={actions.handleImageUpload}
-              isUploading={state.isUploadingImage}
             />
           </div>
 

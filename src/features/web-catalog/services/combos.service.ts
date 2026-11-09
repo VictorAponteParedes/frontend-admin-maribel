@@ -27,6 +27,7 @@ export interface BackendCombo {
   savingsAmount: number | string;
   imageId?: string | null;
   imageUrl?: string | null;
+  images?: string[] | null;
   image?: { id: string; url: string } | null;
   isActive: boolean;
   items?: BackendComboItem[];
@@ -41,6 +42,7 @@ export interface CreateComboPayload {
   price: number;
   imageId?: string;
   imageUrl?: string;
+  images?: string[];
   isActive?: boolean;
   items: {
     productId: string;
@@ -55,6 +57,7 @@ export interface UpdateComboPayload {
   price?: number;
   imageId?: string;
   imageUrl?: string;
+  images?: string[];
   isActive?: boolean;
   items?: {
     productId: string;
@@ -94,6 +97,11 @@ export function mapBackendComboToWebCombo(raw: BackendCombo): WebCombo {
     raw.imageUrl ||
     'https://images.unsplash.com/photo-1547887537-6158d64c35b3?auto=format&fit=crop&w=600&q=80';
 
+  const images =
+    Array.isArray(raw.images) && raw.images.length > 0
+      ? raw.images
+      : [resolvedImage];
+
   return {
     id: raw.id,
     title: raw.title,
@@ -109,6 +117,7 @@ export function mapBackendComboToWebCombo(raw: BackendCombo): WebCombo {
     savingsAmount,
     discountBadge: discountPercent > 0 ? `-${discountPercent}%` : 'PROMO',
     imageUrl: resolvedImage,
+    images,
     isActive: raw.isActive,
     createdAt: raw.createdAt,
   };

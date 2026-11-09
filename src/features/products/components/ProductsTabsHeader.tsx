@@ -26,13 +26,13 @@ export const ProductsTabsHeader: React.FC<ProductsTabsHeaderProps> = ({
       <div className="flex space-x-2">
         <Button
           type="button"
-          variant={activeTab === 'stock' ? 'primary' : 'ghost'}
+          variant="ghost"
           size="sm"
           leftIcon={<Boxes className="w-4 h-4" />}
           onClick={() => onTabChange('stock')}
-          className={`py-2 px-4 rounded-t-xl rounded-b-none border-b-2 transition-all ${
+          className={`py-2.5 px-4 font-semibold rounded-t-xl rounded-b-none border-b-2 transition-all ${
             activeTab === 'stock'
-              ? 'border-maribel-700 bg-white text-maribel-800 shadow-xs'
+              ? 'border-maribel-700 !bg-white !text-maribel-800 shadow-xs'
               : 'border-transparent text-stone-500 hover:text-stone-800'
           }`}
         >
@@ -41,13 +41,13 @@ export const ProductsTabsHeader: React.FC<ProductsTabsHeaderProps> = ({
 
         <Button
           type="button"
-          variant={activeTab === 'entries' ? 'primary' : 'ghost'}
+          variant="ghost"
           size="sm"
           leftIcon={<History className="w-4 h-4" />}
           onClick={() => onTabChange('entries')}
-          className={`py-2 px-4 rounded-t-xl rounded-b-none border-b-2 transition-all ${
+          className={`py-2.5 px-4 font-semibold rounded-t-xl rounded-b-none border-b-2 transition-all ${
             activeTab === 'entries'
-              ? 'border-maribel-700 bg-white text-maribel-800 shadow-xs'
+              ? 'border-maribel-700 !bg-white !text-maribel-800 shadow-xs'
               : 'border-transparent text-stone-500 hover:text-stone-800'
           }`}
         >

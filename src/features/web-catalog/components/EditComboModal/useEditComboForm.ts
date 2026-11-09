@@ -17,6 +17,7 @@ export const useEditComboForm = (
   const [kicker, setKicker] = useState('★ FAVORITO BOUTIQUE');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [images, setImages] = useState<string[]>([]);
   const [imageId, setImageId] = useState<string | undefined>(undefined);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,6 +40,13 @@ export const useEditComboForm = (
       setKicker(combo.kicker || '★ FAVORITO BOUTIQUE');
       setDescription(combo.description || '');
       setImageUrl(combo.imageUrl || '');
+      const comboImages =
+        Array.isArray(combo.images) && combo.images.length > 0
+          ? combo.images
+          : combo.imageUrl
+          ? [combo.imageUrl]
+          : [];
+      setImages(comboImages);
       setImageId(undefined);
       setSelectedItems(combo.items ? [...combo.items] : []);
       setPromoPrice(combo.price ? formatGuarani(combo.price) : '');
@@ -139,6 +147,11 @@ export const useEditComboForm = (
     }
   };
 
+  const handleImagesChange = (newImages: string[]) => {
+    setImages(newImages);
+    setImageUrl(newImages[0] || '');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!combo) return;
@@ -149,13 +162,17 @@ export const useEditComboForm = (
 
     setIsSubmitting(true);
     try {
+      const effectiveImages =
+        images.length > 0 ? images : imageUrl.trim() ? [imageUrl.trim()] : [];
+
       const updated = await updateCombo(combo.id, {
         title: title.trim(),
         kicker: kicker.trim() || '★ FAVORITO BOUTIQUE',
         description: description.trim(),
         price: numericPromoPrice,
         imageId,
-        imageUrl: imageUrl.trim() || undefined,
+        imageUrl: effectiveImages[0] || undefined,
+        images: effectiveImages,
         items: selectedItems,
         isActive,
       });
@@ -180,6 +197,7 @@ export const useEditComboForm = (
       kicker,
       description,
       imageUrl,
+      images,
       imageId,
       isUploadingImage,
       isSubmitting,
@@ -198,6 +216,7 @@ export const useEditComboForm = (
       setKicker,
       setDescription,
       setImageUrl,
+      setImages: handleImagesChange,
       setIsActive,
       setSearchProduct,
       handlePriceChange,
