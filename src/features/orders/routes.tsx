@@ -3,6 +3,7 @@ import lazyLoad from '@/utils/lazyLoad';
 import { PrivateLayout } from '@/navigation/PrivateLayout';
 import { RoutesView } from '@/navigation/routes';
 import type { RouteConfig } from '@/navigation/types';
+import { Permission } from '@/types/permissions';
 import { OrdersSkeleton } from './components/OrdersSkeleton';
 
 const OrdersScreen = lazyLoad(() =>
@@ -28,6 +29,7 @@ export const ORDERS_ROUTES: RouteConfig[] = [
       </PrivateLayout>
     ),
     isProtected: true,
+    requiredPermission: Permission.ORDERS_VIEW,
   },
   {
     path: RoutesView.ORDER_DETAIL,
@@ -39,6 +41,7 @@ export const ORDERS_ROUTES: RouteConfig[] = [
       </PrivateLayout>
     ),
     isProtected: true,
+    requiredPermission: Permission.ORDERS_VIEW,
   },
   {
     path: RoutesView.ORDER_DETAIL_ALIAS,
@@ -50,6 +53,7 @@ export const ORDERS_ROUTES: RouteConfig[] = [
       </PrivateLayout>
     ),
     isProtected: true,
+    requiredPermission: Permission.ORDERS_VIEW,
   },
 ];
 

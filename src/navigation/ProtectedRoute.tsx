@@ -1,25 +1,32 @@
 import React from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { ShieldAlert, ArrowLeft } from 'lucide-react';
-import { useAuthStore } from '../store/useAuthStore';
+import { useAuthStore, type UserRole } from '../store/useAuthStore';
 import { RoutesView } from './routes';
 
 export interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredPermission?: string;
+  requiredRole?: UserRole | UserRole[];
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   requiredPermission,
+  requiredRole,
 }) => {
-  const { isAuthenticated, hasPermission } = useAuthStore();
+  const { isAuthenticated, hasPermission, hasRole } = useAuthStore();
 
   if (!isAuthenticated) {
     return <Navigate to={RoutesView.LOGIN} replace />;
   }
 
-  if (requiredPermission && !hasPermission(requiredPermission)) {
+  const isRoleDenied = requiredRole ? !hasRole(requiredRole) : false;
+  const isPermissionDenied = requiredPermission
+    ? !hasPermission(requiredPermission)
+    : false;
+
+  if (isRoleDenied || isPermissionDenied) {
     return (
       <div className="min-h-screen bg-stone-100 flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-sm border border-stone-200 text-center space-y-5">

@@ -3,6 +3,7 @@ import lazyLoad from '@/utils/lazyLoad';
 import { PrivateLayout } from '@/navigation/PrivateLayout';
 import { RoutesView } from '@/navigation/routes';
 import type { RouteConfig } from '@/navigation/types';
+import { Permission } from '@/types/permissions';
 import { SalesSkeleton } from './components/SalesSkeleton';
 import { SaleDetailSkeleton } from './components/SaleDetailSkeleton';
 
@@ -29,6 +30,7 @@ export const SALES_ROUTES: RouteConfig[] = [
       </PrivateLayout>
     ),
     isProtected: true,
+    requiredPermission: Permission.SALES_VIEW,
   },
   {
     path: RoutesView.SALE_DETAIL,
@@ -40,6 +42,7 @@ export const SALES_ROUTES: RouteConfig[] = [
       </PrivateLayout>
     ),
     isProtected: true,
+    requiredPermission: Permission.SALES_VIEW,
   },
 ];
 

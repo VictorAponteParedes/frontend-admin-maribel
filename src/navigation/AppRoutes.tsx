@@ -32,7 +32,10 @@ export const AppRoutes: React.FC = () => {
       <Routes>
         {ALL_APP_ROUTES.map((route) => {
           const element = route.isProtected ? (
-            <ProtectedRoute requiredPermission={route.requiredPermission}>
+            <ProtectedRoute
+              requiredPermission={route.requiredPermission}
+              requiredRole={route.requiredRole}
+            >
               {route.element}
             </ProtectedRoute>
           ) : (

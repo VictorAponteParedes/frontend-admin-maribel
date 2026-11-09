@@ -3,6 +3,7 @@ import lazyLoad from '@/utils/lazyLoad';
 import { PrivateLayout } from '@/navigation/PrivateLayout';
 import { RoutesView } from '@/navigation/routes';
 import type { RouteConfig } from '@/navigation/types';
+import { Permission } from '@/types/permissions';
 import { CustomersSkeleton } from './components/CustomersSkeleton';
 
 const CustomersScreen = lazyLoad(() =>
@@ -22,6 +23,7 @@ export const CUSTOMERS_ROUTES: RouteConfig[] = [
       </PrivateLayout>
     ),
     isProtected: true,
+    requiredPermission: Permission.CUSTOMERS_VIEW,
   },
 ];
 

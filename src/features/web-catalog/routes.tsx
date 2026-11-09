@@ -4,6 +4,7 @@ import { PrivateLayout } from '../../navigation/PrivateLayout';
 import { RoutesView } from '../../navigation/routes';
 import type { RouteConfig } from '../../navigation/types';
 import { LoadingSpinner } from '@/components/ui';
+import { Permission } from '@/types/permissions';
 
 const WebCatalogScreen = lazyLoad(() =>
   import('./screens/WebCatalogScreen').then((module) => ({
@@ -22,5 +23,6 @@ export const WEB_CATALOG_ROUTES: RouteConfig[] = [
       </PrivateLayout>
     ),
     isProtected: true,
+    requiredPermission: Permission.SETTINGS_VIEW,
   },
 ];
