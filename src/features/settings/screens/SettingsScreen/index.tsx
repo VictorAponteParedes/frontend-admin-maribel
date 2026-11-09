@@ -2,6 +2,7 @@ import React from 'react';
 import { useSettingsForm } from '../../hooks/useSettingsForm';
 import { SettingsHeader } from '../../components/SettingsHeader';
 import { StoreIdentitySection } from '../../components/StoreIdentitySection';
+import { StoreAnnouncementSection } from '../../components/StoreAnnouncementSection';
 import { StoreContactSection } from '../../components/StoreContactSection';
 import { StoreLocationSection } from '../../components/StoreLocationSection';
 import { StoreHoursAndSocialSection } from '../../components/StoreHoursAndSocialSection';
@@ -28,6 +29,7 @@ export const StoreSettingsScreen: React.FC = () => {
         <div className="lg:col-span-7 space-y-6">
           <form onSubmit={form.handleSubmit(actions.onSubmit)} className="space-y-6">
             <StoreIdentitySection control={form.control} />
+            <StoreAnnouncementSection control={form.control} />
             <StoreContactSection control={form.control} />
             <StoreLocationSection
               control={form.control}

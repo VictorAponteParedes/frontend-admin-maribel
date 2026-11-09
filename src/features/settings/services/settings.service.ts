@@ -60,6 +60,13 @@ export const mapBackendSettingsToStoreSettings = (
     footerCopyright:
       raw.footerCopyright ||
       '© 2026 Maribel Tienda de Regalos. Todos los derechos reservados.',
+    announcementText:
+      raw.announcementText ??
+      'Envíos a todo el país · Caja de lujo de obsequio con tarjeta dedicatoria en compras desde Gs. 250.000',
+    announcementActive:
+      raw.announcementActive !== undefined ? raw.announcementActive : true,
+    freeShippingThreshold:
+      raw.freeShippingThreshold !== undefined ? Number(raw.freeShippingThreshold) : 250000,
   };
 };
 
@@ -91,6 +98,9 @@ export const settingsService = {
       tiktokUrl: data.tiktokUrl,
       logoUrl: data.logoUrl,
       footerCopyright: data.footerCopyright,
+      announcementText: data.announcementText,
+      announcementActive: data.announcementActive,
+      freeShippingThreshold: data.freeShippingThreshold,
     };
 
     const response = await httpClient.patch('/web-settings', payload);

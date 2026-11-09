@@ -15,6 +15,9 @@ export interface StoreGeneralSettings {
   tiktokUrl?: string;           // Enlace o perfil de TikTok (Opcional)
   logoUrl: string;              // Logotipo de la tienda
   footerCopyright: string;      // Texto de copyright y créditos en el footer
+  announcementText: string;     // Mensaje publicitario o promocional en el cintillo superior de la web
+  announcementActive: boolean;  // Estado de activación del cintillo en la web
+  freeShippingThreshold?: number; // Monto mínimo para envío gratuito (Gs.)
 }
 
 export type SettingsTabId = 'store' | 'inventory' | 'whatsapp' | 'users';

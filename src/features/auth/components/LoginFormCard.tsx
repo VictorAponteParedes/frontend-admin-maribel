@@ -1,6 +1,6 @@
 import React from 'react';
 import { Control } from 'react-hook-form';
-import { User, Lock, Eye, EyeOff, ArrowRight, Globe, Sparkles } from 'lucide-react';
+import { User, Lock, Eye, EyeOff, ArrowRight, Globe } from 'lucide-react';
 import { Button, ControlledInput } from '@/components/ui';
 import { LoginFormData } from '../types/auth.types';
 
@@ -11,7 +11,6 @@ export interface LoginFormCardProps {
   rememberMe: boolean;
   onToggleShowPassword: () => void;
   onToggleRememberMe: (checked: boolean) => void;
-  onFillCredentials: () => void;
   onSupportClick: () => void;
   onForgotPassword: () => void;
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
@@ -24,7 +23,6 @@ export const LoginFormCard: React.FC<LoginFormCardProps> = ({
   rememberMe,
   onToggleShowPassword,
   onToggleRememberMe,
-  onFillCredentials,
   onSupportClick,
   onForgotPassword,
   onSubmit,
@@ -63,28 +61,8 @@ export const LoginFormCard: React.FC<LoginFormCardProps> = ({
           </div>
         </div>
 
-        {/* Chip de prueba / Autocompletar rápido de credenciales */}
-        <div className="mb-5 p-2.5 rounded-xl bg-stone-50 border border-stone-200/80 flex items-center justify-between text-xs text-stone-600">
-          <div className="flex items-center gap-2 truncate">
-            <Sparkles className="w-3.5 h-3.5 text-maribel-700 shrink-0" />
-            <span className="text-[11px] truncate">
-              Demo: <strong className="text-stone-800">maribel@gmail.com</strong> /{' '}
-              <strong className="text-stone-800">Admin123.</strong>
-            </span>
-          </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="xs"
-            onClick={onFillCredentials}
-            className="text-[11px] font-semibold text-maribel-700 hover:text-maribel-800 p-0 h-auto ml-2 shrink-0"
-          >
-            Autocompletar
-          </Button>
-        </div>
-
-        {/* Formulario conectado a React Hook Form */}
-        <form onSubmit={onSubmit} className="space-y-4">
+        {/* Formulario conectado a React Hook Form sin autocompletado */}
+        <form onSubmit={onSubmit} className="space-y-4" autoComplete="off">
           {/* Campo Usuario o Correo */}
           <ControlledInput
             control={control}
@@ -92,7 +70,8 @@ export const LoginFormCard: React.FC<LoginFormCardProps> = ({
             type="email"
             label="USUARIO O CORREO ELECTRÓNICO"
             labelClassName="text-[10px] font-bold text-stone-600 tracking-wider uppercase"
-            placeholder="admin@maribelregalos.com"
+            placeholder="ej: usuario@maribelregalos.com"
+            autoComplete="off"
             leftIcon={<User className="w-4 h-4 text-stone-400" />}
             rules={{
               required: 'El correo electrónico es obligatorio',
@@ -110,7 +89,8 @@ export const LoginFormCard: React.FC<LoginFormCardProps> = ({
             type={showPassword ? 'text' : 'password'}
             label="CONTRASEÑA"
             labelClassName="text-[10px] font-bold text-stone-600 tracking-wider uppercase"
-            placeholder="••••••••••••"
+            placeholder="Ingresa tu contraseña..."
+            autoComplete="new-password"
             leftIcon={<Lock className="w-4 h-4 text-stone-400" />}
             rightIcon={
               showPassword ? (
@@ -138,7 +118,7 @@ export const LoginFormCard: React.FC<LoginFormCardProps> = ({
                 onChange={(e) => onToggleRememberMe(e.target.checked)}
                 className="w-4 h-4 rounded text-maribel-700 accent-maribel-700 focus:ring-maribel-600 border-stone-300 cursor-pointer"
               />
-              <span className="font-medium text-stone-600 text-xs">Recordar sesión</span>
+              <span className="font-medium text-stone-700">Recordar sesión</span>
             </label>
 
             <Button
@@ -146,47 +126,49 @@ export const LoginFormCard: React.FC<LoginFormCardProps> = ({
               variant="ghost"
               size="xs"
               onClick={onForgotPassword}
-              className="text-stone-500 hover:text-stone-800 font-medium p-0 h-auto"
+              className="text-stone-500 hover:text-stone-800 p-0 h-auto font-medium"
             >
               ¿Olvidaste tu contraseña?
             </Button>
           </div>
 
-          {/* Botón de Enviar */}
-          <Button
-            type="submit"
-            disabled={isLoading}
-            isLoading={isLoading}
-            className="w-full mt-4 py-3.5 rounded-xl bg-gradient-to-r from-maribel-800 to-maribel-900 hover:from-maribel-700 hover:to-maribel-800 text-white font-medium text-xs tracking-wider shadow-md shadow-maribel-900/15 flex items-center justify-center gap-2 group cursor-pointer transition-all active:scale-[0.99]"
-          >
-            <span>{isLoading ? 'Ingresando al sistema...' : 'Ingresar al Sistema'}</span>
-            {!isLoading && (
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            )}
-          </Button>
+          {/* Botón Principal de Envío */}
+          <div className="pt-2">
+            <Button
+              type="submit"
+              variant="primary"
+              size="lg"
+              isLoading={isLoading}
+              className="w-full justify-center bg-maribel-900 hover:bg-maribel-950 text-white rounded-xl py-3.5 shadow-md shadow-maribel-950/20 active:scale-[0.99] transition-all"
+            >
+              <span>Ingresar al Sistema</span>
+              <ArrowRight className="w-4 h-4 ml-1.5" />
+            </Button>
+          </div>
         </form>
       </div>
 
-      {/* Footer del Formulario */}
+      {/* Pie de Página: Selección de Idioma, Enlaces y Versión */}
       <div className="pt-8 mt-6 border-t border-stone-100 flex flex-wrap items-center justify-between text-[11px] text-stone-400 gap-3">
-        <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1 text-stone-500 hover:text-stone-700 cursor-pointer transition-colors">
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            className="flex items-center gap-1.5 hover:text-stone-600 transition-colors"
+          >
             <Globe className="w-3.5 h-3.5" />
             <span>Español (ES)</span>
-          </span>
+          </button>
           <span>•</span>
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="xs"
             onClick={onSupportClick}
-            className="text-stone-500 hover:text-stone-700 p-0 h-auto"
+            className="hover:text-stone-600 transition-colors"
           >
             Centro de Ayuda
-          </Button>
+          </button>
         </div>
 
-        <span className="text-stone-400 font-normal">Maribel Backoffice v2.4</span>
+        <span className="font-mono text-stone-400">Maribel Backoffice v2.4</span>
       </div>
     </div>
   );

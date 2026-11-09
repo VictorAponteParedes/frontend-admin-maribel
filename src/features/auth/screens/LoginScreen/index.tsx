@@ -46,7 +46,6 @@ export const LoginScreen: React.FC = () => {
           rememberMe={rememberMe}
           onToggleShowPassword={toggleShowPassword}
           onToggleRememberMe={setRememberMe}
-          onFillCredentials={actions.handleFillCredentials}
           onSupportClick={actions.handleSupportClick}
           onForgotPassword={actions.handleForgotPassword}
           onSubmit={handleSubmit(actions.handleLoginSubmit)}

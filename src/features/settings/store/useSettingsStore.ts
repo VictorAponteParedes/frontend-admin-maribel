@@ -23,6 +23,10 @@ export const DEFAULT_STORE_SETTINGS: StoreGeneralSettings = {
   logoUrl: '/logo-maribel.png',
   footerCopyright:
     '© 2026 Maribel Tienda de Regalos. Todos los derechos reservados.',
+  announcementText:
+    'Envíos a todo el país · Caja de lujo de obsequio con tarjeta dedicatoria en compras desde Gs. 250.000',
+  announcementActive: true,
+  freeShippingThreshold: 250000,
 };
 
 const loadInitialSettings = (): StoreGeneralSettings => {
