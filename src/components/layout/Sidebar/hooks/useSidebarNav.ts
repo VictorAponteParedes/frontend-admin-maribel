@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Globe,
   Tags,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useOrdersStore } from '@/store/useOrdersStore';
@@ -125,6 +126,15 @@ export const useSidebarNav = () => {
         isActive:
           location.pathname === RoutesView.CUSTOMERS ||
           location.pathname.startsWith(`${RoutesView.CUSTOMERS}/`),
+      },
+      {
+        path: RoutesView.USERS,
+        label: 'Equipo & Roles',
+        icon: ShieldCheck,
+        requiredPermission: Permission.USERS_VIEW,
+        isActive:
+          location.pathname === RoutesView.USERS ||
+          location.pathname.startsWith(`${RoutesView.USERS}/`),
       },
       {
         path: RoutesView.SETTINGS_STORE,

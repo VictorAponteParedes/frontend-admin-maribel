@@ -171,6 +171,7 @@ export const useWebCatalogStore = create<WebCatalogState>((set, get) => ({
         webPrice: updates.webPrice,
         categoryName: updates.webCategory,
         imageId: updates.imageId || undefined,
+        imageUrl: updates.imageUrl || (updates.images?.[0] ?? undefined),
         images: updates.images,
       });
 

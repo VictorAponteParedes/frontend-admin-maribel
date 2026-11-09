@@ -10,6 +10,7 @@ import { WEB_CATALOG_ROUTES } from '@/features/web-catalog/routes';
 import { SALES_ROUTES } from '@/features/sales/routes';
 import { ORDERS_ROUTES } from '@/features/orders/routes';
 import { CUSTOMERS_ROUTES } from '@/features/customers/routes';
+import { USERS_ROUTES } from '@/features/users/routes';
 import { SETTINGS_ROUTES } from '@/features/settings/routes';
 import { RoutesView } from '@/navigation/routes';
 import type { RouteConfig } from '@/navigation/types';
@@ -23,6 +24,7 @@ export const ALL_APP_ROUTES: RouteConfig[] = [
   ...CATEGORIES_ROUTES,
   ...WEB_CATALOG_ROUTES,
   ...CUSTOMERS_ROUTES,
+  ...USERS_ROUTES,
   ...SETTINGS_ROUTES,
 ];
 

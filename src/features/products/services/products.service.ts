@@ -118,6 +118,7 @@ export const productsService = {
       categoryId?: string;
       categoryName?: string;
       imageId?: string;
+      imageUrl?: string;
       images?: string[];
       description?: string;
       name?: string;
