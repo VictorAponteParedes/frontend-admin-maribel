@@ -129,4 +129,14 @@ export const productsService = {
     const response = await httpClient.patch(`/products/${id}`, updates);
     return response.data.data;
   },
+
+  fetchProductStockEntries: async (productId: string): Promise<StockEntry[]> => {
+    const response = await httpClient.get(`/products/${productId}/stock-entries`);
+    return response.data.data || [];
+  },
+
+  fetchProfitabilityReport: async () => {
+    const response = await httpClient.get('/products/reports/profitability');
+    return response.data.data || [];
+  },
 };

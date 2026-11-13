@@ -27,7 +27,7 @@ export const ProductDetailScreen: React.FC = () => {
 
       <ProductDetailStockBalance product={product} metrics={metrics} />
 
-      <ProductDetailEntriesTable entries={productEntries} />
+      <ProductDetailEntriesTable entries={productEntries} sellingPrice={product.price} />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { Header } from '@/components/layout/Header';
 import { MetricCard } from '@/features/dashboard/components/MetricCard';
 import { RevenueEvolutionChart } from '@/features/dashboard/components/RevenueEvolutionChart';
 import { BrandSalesChart } from '@/features/dashboard/components/BrandSalesChart';
+import { ProfitabilityReportTable } from '@/features/dashboard/components/ProfitabilityReportTable';
 import { useDashboardAnalytics } from '@/features/dashboard/hooks/useDashboardAnalytics';
 import { DashboardMetric } from '@/features/dashboard/types/dashboard.types';
 import { useTranslation } from '@/locale';
@@ -64,6 +65,11 @@ export const DashboardScreen: React.FC = () => {
         <div className="lg:col-span-1">
           <BrandSalesChart data={brandSales} />
         </div>
+      </section>
+
+      {/* Reporte Global de Rentabilidad y Márgenes */}
+      <section>
+        <ProfitabilityReportTable />
       </section>
     </div>
   );

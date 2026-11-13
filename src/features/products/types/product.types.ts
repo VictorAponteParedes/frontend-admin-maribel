@@ -10,9 +10,10 @@ export interface Product {
   totalIn: number;         // Ingreso acumulado
   totalSold: number;       // Venta acumulada
   stock: number;           // Saldo Inventario
-  costPrice: number;       // Precio unitario de compra
+  costPrice: number;       // Precio unitario de compra (costo promedio ponderado)
   price: number;           // Precio unitario de venta
   profit: number;          // Ganancia unitaria (price - costPrice)
+  marginPercent?: number;  // Margen de ganancia en porcentaje
   receptionDate: string;   // Fecha de recepción (DD/MM/AAAA)
   isActive: boolean;
   isWebVisible?: boolean;

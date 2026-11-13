@@ -10,6 +10,13 @@ export interface StockEntry {
   date: string;
   unitCost: number;
   totalCost: number;
+  batchNumber?: string | null;
+  sellingPrice?: number;
+  lotMargin?: number;
+  lotMarginPercent?: number;
+  previousAverageCost?: number | null;
+  newAverageCost?: number | null;
+  notes?: string | null;
 }
 
 export interface StockEntryFormData {
